@@ -27,7 +27,15 @@ namespace StrideUnbroken
         }
         #endregion Statics
 
-        private GameUI UI;
+        [SerializeField, Range(0.1f, 2f)]
+        private float _tempo;
+
+        private GameUI _UI;
+
+        public float Tempo
+        {
+            get { return _tempo; }
+        }
 
         public bool GameOver
         {
@@ -39,8 +47,8 @@ namespace StrideUnbroken
         /// </summary>
         void Awake()
         {
-            UI = FindObjectOfType<GameUI>();
-            if (UI == null)
+            _UI = FindObjectOfType<GameUI>();
+            if (_UI == null)
             {
                 Debug.LogError("GameUI object could not be found in the scene.");
             }

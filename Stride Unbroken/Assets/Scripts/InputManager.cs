@@ -13,6 +13,9 @@ namespace StrideUnbroken
         [SerializeField]
         private CameraController _camera;
 
+        [SerializeField]
+        private PlayerCharacter _player;
+
         /// <summary>
         /// Initializes the object.
         /// </summary>
@@ -31,12 +34,22 @@ namespace StrideUnbroken
 
         private void CheckInput()
         {
-            // Rotating the big cube
+            // Moving the player character
             Vector3 direction = new Vector3(Input.GetAxisRaw(HorizontalKey), Input.GetAxisRaw(VerticalKey));
 
             if (direction != Vector3.zero)
             {
-                
+                _player.MoveInput(direction);
+            }
+
+            // Double tempo
+            if (Input.GetButton(ActionKey))
+            {
+                _player.DoubleTempoInput(true);
+            }
+            else
+            {
+                _player.DoubleTempoInput(false);
             }
         }
     }
