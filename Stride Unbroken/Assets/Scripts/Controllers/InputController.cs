@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace StrideUnbroken
 {
-    public class InputManager : MonoBehaviour
+    public class InputController : MonoBehaviour
     {
         private const string HorizontalKey = "Horizontal";
         private const string VerticalKey = "Vertical";
@@ -30,12 +30,18 @@ namespace StrideUnbroken
         private void Update()
         {
             CheckInput();
+            CheckDebugInput();
+        }
+
+        public Vector3 GetMovementInput()
+        {
+            return new Vector3(Input.GetAxis(HorizontalKey), Input.GetAxis(VerticalKey)).normalized;
         }
 
         private void CheckInput()
         {
             // Moving the player character
-            Vector3 direction = new Vector3(Input.GetAxisRaw(HorizontalKey), Input.GetAxisRaw(VerticalKey));
+            Vector3 direction = GetMovementInput();
 
             if (direction != Vector3.zero)
             {
@@ -50,6 +56,15 @@ namespace StrideUnbroken
             else
             {
                 _player.DoubleTempoInput(false);
+            }
+        }
+
+        private void CheckDebugInput()
+        {
+            // Respawn
+            if (Input.GetKeyDown(KeyCode.R))
+            {
+                _player.Respawn();
             }
         }
     }
