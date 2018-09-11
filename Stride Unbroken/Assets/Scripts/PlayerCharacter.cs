@@ -17,9 +17,6 @@ namespace StrideUnbroken
         private float _speed;
 
         [SerializeField]
-        private float _turningSpeed;
-
-        [SerializeField]
         private Slider _energyBar;
 
         [SerializeField, Range(0.01f, 2f)]
@@ -36,8 +33,6 @@ namespace StrideUnbroken
         private Vector3 _spawnPosition;
         private Vector3 _startposition;
         private float _groundY;
-        private Vector3 _movingDirection;
-        private Vector3 _savedInput;
         private Vector3 _characterSize;
         private float _distRatio;
         private bool _bounceSuccess;
@@ -59,11 +54,11 @@ namespace StrideUnbroken
         /// </summary>
         private void Start()
         {
+            _bouncing = true;
             _groundY = transform.position.y;
             _spawnPosition = transform.position;
             _characterSize = GetComponent<Renderer>().bounds.size;
             _defaultBounceHeight = _bounceHeight;
-            _bouncing = true;
             _platformLayerMask = LayerMask.GetMask("Platform");
             _input = FindObjectOfType<InputController>();
             Metronome.Instance.OnTick += HandleTickEvent;
@@ -189,13 +184,6 @@ namespace StrideUnbroken
         private void StartBounce()
         {
             _startposition = new Vector3(transform.position.x, _groundY, transform.position.z);
-            Vector3 currentInput = _input.GetMovementInput();
-            _movingDirection = currentInput;
-            //_movingDirection = (currentInput == Vector3.zero ? _savedInput : currentInput);
-            //_savedInput = Vector3.zero;
-            _movingDirection = new Vector3(_movingDirection.x, 0, _movingDirection.y);
-
-            Debug.LogFormat("X: {0}, Z: {1}", _movingDirection.x, _movingDirection.z);
 
             if (_outOfEnergy || (!_doubleTempoRequest && _doubleTempo))
             {
@@ -213,24 +201,11 @@ namespace StrideUnbroken
         /// <param name="direction">The moving direction</param>
         public void MoveInput(Vector3 direction)
         {
-            //Vector3 newPosition = transform.position;
-            //newPosition.x += direction.x * _speed * Time.deltaTime;
-            //newPosition.z += direction.y * _speed * Time.deltaTime;
-
-            //transform.position = newPosition;
-
-
-            //if (GetTickRatio() > 0.5f)
-            //{
-            //    _savedInput = direction;
-            //}
-
-            // TODO: Fix
-            if (_movingDirection != Vector3.zero)
-            {
-                _movingDirection.x += (direction.x > _movingDirection.x ? 1 : -1) * _turningSpeed * Time.deltaTime;
-                _movingDirection.z -= (direction.y > _movingDirection.z ? 1 : -1) * _turningSpeed * Time.deltaTime;
-            }
+            Vector3 newPosition = transform.position;
+            newPosition.x += direction.x * _speed * Time.deltaTime;
+            newPosition.z += direction.y * _speed * Time.deltaTime;
+            transform.position = newPosition;
+            Debug.LogFormat("X: {0}, Z: {1}", direction.x, direction.z);
         }
 
         /// <summary>
@@ -243,7 +218,6 @@ namespace StrideUnbroken
                 return;
             }
 
-            _movingDirection = Vector3.zero;
             Vector3 newPosition = transform.position;
             newPosition.y = _groundY;
             transform.position = newPosition;
@@ -299,13 +273,6 @@ namespace StrideUnbroken
 
             Vector3 newPosition = transform.position;
             newPosition.y = _groundY + Mathf.Sin(ratio * Mathf.PI) * _bounceHeight;
-
-            if (_movingDirection != Vector3.zero)
-            {
-                newPosition.x = _startposition.x + ratio * _movingDirection.x * _bounceDistance;
-                newPosition.z = _startposition.z + ratio * _movingDirection.z * _bounceDistance;
-            }
-
             transform.position = newPosition;
 
             GameManager.Instance.PlayerTickRatio = (_secondTick ? ratio : 1 - ratio);

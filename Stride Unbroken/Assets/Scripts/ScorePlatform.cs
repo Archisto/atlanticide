@@ -55,5 +55,23 @@ namespace StrideUnbroken
             _scorePerHit = 100;
             _scoreHits = 3;
         }
+
+        /// <summary>
+        /// Draws gizmos.
+        /// </summary>
+        private void OnDrawGizmos()
+        {
+            Gizmos.color = Color.green;
+            float dotRadius = 0.2f;
+            float dotSpacing = 0.1f;
+            Vector3 position = transform.position;
+            position.y += dotRadius + 0.2f;
+
+            for (int i = 0; i < _scoreHitsLeft; i++)
+            {
+                position.x = transform.position.x + i * (2 * dotRadius + dotSpacing);
+                Gizmos.DrawSphere(position, dotRadius);
+            }
+        }
     }
 }
