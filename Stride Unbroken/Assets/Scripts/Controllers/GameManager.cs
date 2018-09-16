@@ -85,7 +85,10 @@ namespace StrideUnbroken
 
         public void TickEnded()
         {
-            _UI.UpdateUI();
+            if (_UI != null)
+            {
+                _UI.UpdateUI();
+            }
         }
     }
 }
