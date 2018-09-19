@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace StrideUnbroken
+namespace Atlanticide
 {
     public class WeakPlatform : Platform
     {
@@ -23,10 +23,8 @@ namespace StrideUnbroken
         /// <summary>
         /// Handles logic when the platform is bounced on.
         /// </summary>
-        public override void BouncedOn()
+        public void TakeDamage()
         {
-            base.BouncedOn();
-
             _hitPointsLeft--;
             if (_hitPointsLeft == 0)
             {

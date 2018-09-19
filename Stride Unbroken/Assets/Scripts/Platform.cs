@@ -2,12 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace StrideUnbroken
+namespace Atlanticide
 {
     public class Platform : MonoBehaviour
     {
-        public int _timesBouncedOn;
-
         public bool IsBroken { get; protected set; }
 
         /// <summary>
@@ -23,7 +21,6 @@ namespace StrideUnbroken
         /// </summary>
         protected virtual void ResetValues()
         {
-            _timesBouncedOn = 0;
             IsBroken = false;
         }
 
@@ -36,14 +33,6 @@ namespace StrideUnbroken
             {
 
             }
-        }
-
-        /// <summary>
-        /// Handles logic when the platform is bounced on.
-        /// </summary>
-        public virtual void BouncedOn()
-        {
-            _timesBouncedOn++;
         }
 
         protected virtual void Break()

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace StrideUnbroken
+namespace Atlanticide
 {
     public class GameManager : MonoBehaviour
     {

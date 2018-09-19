@@ -3,19 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace StrideUnbroken
+namespace Atlanticide
 {
-    public class PlayerCharacter : MonoBehaviour
+    public class PlayerCharacter : GameCharacter
     {
-        [SerializeField]
-        private float _bounceHeight;
-
-        [SerializeField]
-        private float _bounceDistance;
-
-        [SerializeField]
-        private float _speed;
-
         [SerializeField]
         private Slider _energyBar;
 
@@ -28,170 +19,35 @@ namespace StrideUnbroken
         [SerializeField, Range(0.01f, 1f)]
         private float _minRechargedEnergy;
 
-        private float _defaultBounceHeight;
-        private bool _bouncing;
-        private Vector3 _spawnPosition;
-        private Vector3 _startposition;
-        private float _groundY;
-        private Vector3 _characterSize;
-        private float _distRatio;
-        private bool _bounceSuccess;
-        private bool _startBounceNextFrame;
-        private bool _secondTick;
-        private bool _doubleTempo;
-        private bool _doubleTempoRequest;
-        private bool _doubleTempoTick;
-        private bool _halfTempoOffset;
+        private bool _useEnergy; // TODO: Use for what?
         private bool _outOfEnergy;
         private float _energy = 1;
-        private bool _isDead;
-        private float _hitDist = 3f;
-        private LayerMask _platformLayerMask;
         private InputController _input;
 
         /// <summary>
         /// Initializes the object.
         /// </summary>
-        private void Start()
+        protected override void Start()
         {
-            _bouncing = true;
-            _groundY = transform.position.y;
-            _spawnPosition = transform.position;
-            _characterSize = GetComponent<Renderer>().bounds.size;
-            _defaultBounceHeight = _bounceHeight;
-            _platformLayerMask = LayerMask.GetMask("Platform");
+            base.Start();
             _input = FindObjectOfType<InputController>();
-            Metronome.Instance.OnTick += HandleTickEvent;
-
-            StartBounce();
-        }
-
-        /// <summary>
-        /// Gets the tick ratio with possible modifiers.
-        /// </summary>
-        /// <returns>The usable tick ratio</returns>
-        private float GetTickRatio()
-        {
-            // TODO
-
-            if (!_doubleTempo)
-            {
-                if (!_halfTempoOffset)
-                {
-                    return Metronome.TickRatio;
-                }
-                else
-                {
-                    if (Metronome.TickRatio > 0.5f)
-                    {
-                        Debug.Log("A");
-                        return Metronome.TickRatio - 0.5f;
-                    }
-                    else
-                    {
-                        Debug.Log("B");
-                        return Metronome.TickRatio + 0.5f;
-                    }
-                }
-            }
-            else
-            {
-                float result = Metronome.TickRatio;
-
-                if (Metronome.TickRatio > 0.5f)
-                {
-                    result = Metronome.TickRatio - 0.5f;
-
-                    if (!_doubleTempoTick)
-                    {
-                        _doubleTempoTick = true;
-                        _halfTempoOffset = true;
-                        HandleTickEvent();
-                    }
-                }
-                else if (_doubleTempoTick)
-                {
-                    _doubleTempoTick = false;
-                }
-
-                return result * 2;
-            }
-        }
-
-        /// <summary>
-        /// Activates the double tempo power.
-        /// </summary>
-        private void ActivateDoubleTempo()
-        {
-            _doubleTempo = true;
-            _bounceHeight = _defaultBounceHeight / 2;
-        }
-
-        /// <summary>
-        /// Deactivates the double tempo power.
-        /// </summary>
-        private void DeactivateDoubleTempo()
-        {
-            _doubleTempo = false;
-            _bounceHeight = _defaultBounceHeight;
         }
 
         /// <summary>
         /// Updates the object once per frame.
         /// </summary>
-        private void Update()
+        protected override void Update()
         {
+            base.Update();
+
             if (_isDead)
             {
                 return;
             }
 
-            if (_bouncing)
+            if (_energyBar != null)
             {
-                if (_startBounceNextFrame)
-                {
-                    _startBounceNextFrame = false;
-                    StartBounce();
-                }
-
-                UpdateBounce();
-            }
-
-            if (_bounceSuccess)
-            {
-                _bounceSuccess = false;
-                _startBounceNextFrame = true;
-            }
-
-            UpdateEnergy();
-        }
-
-        /// <summary>
-        /// Handles the player character's movement on each tick.
-        /// </summary>
-        private void HandleTickEvent()
-        {
-            if (!_isDead)
-            {
-                _halfTempoOffset = false; // TODO
-                EndBounce();
-            }
-        }
-
-        /// <summary>
-        /// Starts a bounce.
-        /// </summary>
-        private void StartBounce()
-        {
-            _startposition = new Vector3(transform.position.x, _groundY, transform.position.z);
-
-            if (_outOfEnergy || (!_doubleTempoRequest && _doubleTempo))
-            {
-                DeactivateDoubleTempo();
-            }
-            else if (_doubleTempoRequest && !_doubleTempo)
-            {
-                ActivateDoubleTempo();
+                UpdateEnergy();
             }
         }
 
@@ -205,77 +61,16 @@ namespace StrideUnbroken
             newPosition.x += direction.x * _speed * Time.deltaTime;
             newPosition.z += direction.y * _speed * Time.deltaTime;
             transform.position = newPosition;
-            Debug.LogFormat("X: {0}, Z: {1}", direction.x, direction.z);
+            //Debug.LogFormat("X: {0}, Z: {1}", direction.x, direction.y);
         }
 
         /// <summary>
-        /// Ends a bounce.
+        /// Rotates the player character.
         /// </summary>
-        private void EndBounce()
+        /// <param name="direction">The looking direction</param>
+        public void LookInput(Vector3 direction)
         {
-            if (_isDead)
-            {
-                return;
-            }
-
-            Vector3 newPosition = transform.position;
-            newPosition.y = _groundY;
-            transform.position = newPosition;
-
-            if (CheckCollision())
-            {
-                _bounceSuccess = true;
-            }
-            else
-            {
-                Die();
-            }
-
-            _secondTick = !_secondTick;
-        }
-
-        private bool CheckCollision()
-        {
-            Vector3 p1 = transform.position + new Vector3(-0.5f * _characterSize.x, 0, 0.5f * _characterSize.z);
-            Vector3 p2 = transform.position + new Vector3(-0.5f * _characterSize.x, 0, 0.5f * _characterSize.z);
-            Vector3 p3 = transform.position + new Vector3(0.5f * _characterSize.x, 0, 0.5f * _characterSize.z);
-            Vector3 p4 = transform.position + new Vector3(0.5f * _characterSize.x, 0, -0.5f * _characterSize.z);
-            Ray ray1 = new Ray(p1, Vector3.down);
-            Ray ray2 = new Ray(p2, Vector3.down);
-            Ray ray3 = new Ray(p3, Vector3.down);
-            Ray ray4 = new Ray(p4, Vector3.down);
-            RaycastHit hit;
-            bool touchingPlatform =
-                Physics.Raycast(ray1, out hit, _hitDist, _platformLayerMask) ||
-                Physics.Raycast(ray2, out hit, _hitDist, _platformLayerMask) ||
-                Physics.Raycast(ray3, out hit, _hitDist, _platformLayerMask) ||
-                Physics.Raycast(ray4, out hit, _hitDist, _platformLayerMask);
-
-            if (touchingPlatform)
-            {
-                Platform platform = hit.transform.GetComponent<Platform>();
-                if (platform != null)
-                {
-                    platform.BouncedOn();
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        /// <summary>
-        /// Updates bouncing.
-        /// </summary>
-        private void UpdateBounce()
-        {
-            float ratio = GetTickRatio();
-
-            Vector3 newPosition = transform.position;
-            newPosition.y = _groundY + Mathf.Sin(ratio * Mathf.PI) * _bounceHeight;
-            transform.position = newPosition;
-
-            GameManager.Instance.PlayerTickRatio = (_secondTick ? ratio : 1 - ratio);
+            RotateTowards(direction);
         }
 
         /// <summary>
@@ -284,7 +79,7 @@ namespace StrideUnbroken
         private void UpdateEnergy()
         {
             // Drain
-            if (_doubleTempo)
+            if (_useEnergy)
             {
                 if (_energy > 0)
                 {
@@ -316,58 +111,26 @@ namespace StrideUnbroken
             }
         }
 
-        private void Die()
+        public void SpendEnergy(bool active)
         {
-            // TODO
-            _isDead = true;
-            Debug.Log("Player died.");
-            Respawn();
+            // TODO: For what?
+            _useEnergy = active && !_outOfEnergy;
         }
 
-        public void Respawn()
+        protected override void Die()
         {
-            _isDead = false;
-            _halfTempoOffset = false;
-            transform.position = _spawnPosition;
-            StartBounce();
-            Debug.Log("Player respawned.");
         }
 
-        /// <summary>
-        /// Activates or deactivates the double tempo power.
-        /// </summary>
-        /// <param name="activate">Should the double tempo
-        /// power be activated</param>
-        public void DoubleTempoInput(bool activate)
+        public override void Respawn()
         {
-            _doubleTempoRequest = activate;
+            base.Respawn();
+            _energy = 1;
+            _outOfEnergy = false;
         }
 
-        /// <summary>
-        /// Disposes of everything necessary when the application is quit. 
-        /// </summary>
-        private void OnApplicationQuit()
+        protected override void OnDrawGizmos()
         {
-            Metronome.Instance.OnTick -= HandleTickEvent;
-        }
-
-        private void OnDrawGizmos()
-        {
-            // Distance circle
-            Gizmos.color = Color.white;
-            Vector3 point = new Vector3(_startposition.x, _groundY, _startposition.z);
-            Gizmos.DrawWireSphere(point, _bounceDistance);
-
-            // Character dimensions
-            Gizmos.color = Color.blue;
-            Vector3 p1 = transform.position + -0.5f * _characterSize;
-            Vector3 p2 = transform.position + new Vector3(-0.5f * _characterSize.x, -0.5f * _characterSize.y, 0.5f * _characterSize.z);
-            Vector3 p3 = transform.position + new Vector3(0.5f * _characterSize.x, -0.5f * _characterSize.y, 0.5f * _characterSize.z);
-            Vector3 p4 = transform.position + new Vector3(0.5f * _characterSize.x, -0.5f * _characterSize.y, -0.5f * _characterSize.z);
-            Gizmos.DrawLine(p1, p2);
-            Gizmos.DrawLine(p2, p3);
-            Gizmos.DrawLine(p3, p4);
-            Gizmos.DrawLine(p4, p1);
+            base.OnDrawGizmos();
         }
     }
 }

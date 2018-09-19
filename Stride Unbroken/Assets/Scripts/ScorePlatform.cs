@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace StrideUnbroken
+namespace Atlanticide
 {
     public class ScorePlatform : Platform
     {
@@ -28,10 +28,8 @@ namespace StrideUnbroken
         /// <summary>
         /// Handles logic when the platform is bounced on.
         /// </summary>
-        public override void BouncedOn()
+        public void GiveScore()
         {
-            base.BouncedOn();
-
             if (_active)
             {
                 GameManager.Instance.CurrentScore += _scorePerHit;

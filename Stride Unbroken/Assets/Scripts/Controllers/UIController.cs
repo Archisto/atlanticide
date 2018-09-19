@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace StrideUnbroken
+namespace Atlanticide
 {
     public class UIController : MonoBehaviour
     {
@@ -12,12 +12,6 @@ namespace StrideUnbroken
 
         [SerializeField]
         private Slider _energyBar;
-
-        [SerializeField]
-        private Slider _tickRatioBar;
-
-        [SerializeField]
-        private Slider _tickRatioBar2;
 
         /// <summary>
         /// Initializes the object.
@@ -32,8 +26,6 @@ namespace StrideUnbroken
         /// </summary>
         private void Update()
         {
-            _tickRatioBar.value = GameManager.Instance.PlayerTickRatio;
-            _tickRatioBar2.value = (Metronome.CurrentTick % 2 == 0 ? Metronome.TickRatio : 1 - Metronome.TickRatio);
         }
 
         /// <summary>

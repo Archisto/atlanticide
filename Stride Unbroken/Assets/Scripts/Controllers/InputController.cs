@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace StrideUnbroken
+namespace Atlanticide
 {
     public class InputController : MonoBehaviour
     {
-        private const string HorizontalKey = "Horizontal";
-        private const string VerticalKey = "Vertical";
+        private const string HorizontalMoveKey = "HorizontalMove";
+        private const string VerticalMoveKey = "VerticalMove";
+        private const string HorizontalLookKey = "HorizontalLook";
+        private const string VerticalLookKey = "VerticalLook";
         private const string ActionKey = "Action";
 
         [SerializeField]
@@ -33,30 +35,34 @@ namespace StrideUnbroken
             CheckDebugInput();
         }
 
-        public Vector3 GetMovementInput()
+        public Vector3 GetMoveInput()
         {
-            return new Vector3(Input.GetAxis(HorizontalKey), Input.GetAxis(VerticalKey)).normalized;
+            return new Vector3(Input.GetAxis(HorizontalMoveKey), Input.GetAxis(VerticalMoveKey)).normalized;
+        }
+
+        public Vector3 GetLookInput()
+        {
+            return new Vector3(Input.GetAxis(HorizontalLookKey), Input.GetAxis(VerticalLookKey)).normalized;
         }
 
         private void CheckInput()
         {
             // Moving the player character
-            Vector3 direction = GetMovementInput();
+            Vector3 movingDirection = GetMoveInput();
+            Vector3 lookingDirection = GetLookInput();
 
-            if (direction != Vector3.zero)
+            if (movingDirection != Vector3.zero)
             {
-                _player.MoveInput(direction);
+                _player.MoveInput(movingDirection);
             }
 
-            // Double tempo
-            if (Input.GetButton(ActionKey))
+            if (lookingDirection != Vector3.zero)
             {
-                _player.DoubleTempoInput(true);
+                _player.LookInput(lookingDirection);
             }
-            else
-            {
-                _player.DoubleTempoInput(false);
-            }
+
+            // Spend energy (for what?)
+            _player.SpendEnergy(Input.GetButton(ActionKey));
         }
 
         private void CheckDebugInput()
