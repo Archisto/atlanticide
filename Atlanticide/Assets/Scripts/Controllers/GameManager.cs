@@ -30,7 +30,7 @@ namespace Atlanticide
         public const int MaxPlayers = 4;
 
         private PlayerCharacter _playerPrefab;
-        private PlayerCharacter[] _players = new PlayerCharacter[4];
+        private PlayerCharacter[] _players;
         private UIController _UI;
 
         public int CurrentScore { get; set; }
@@ -60,28 +60,35 @@ namespace Atlanticide
         /// </summary>
         private void InitPlayers()
         {
+            _players = new PlayerCharacter[MaxPlayers];
             _playerPrefab = Resources.Load<PlayerCharacter>("PlayerCharacter");
-            CreatePlayers(2);
+            CreatePlayers();
+            ActivatePlayers(2);
         }
 
         /// <summary>
-        /// Creates player characters.
+        /// Creates the player characters.
         /// </summary>
         /// <param name="playerCount">The player count</param>
-        public void CreatePlayers(int playerCount)
+        private void CreatePlayers()
         {
             for (int i = 0; i < MaxPlayers; i++)
             {
-                if (i < playerCount)
-                {
-                    _players[i] = Instantiate(_playerPrefab);
-                    _players[i].CharacterName = "Player " + (i + 1);
-                    _players[i].Input = new PlayerInput(i);
-                }
-                else if (_players[i] != null)
-                {
-                    Destroy(_players[i].gameObject);
-                }
+                _players[i] = Instantiate(_playerPrefab);
+                _players[i].name = "Player " + (i + 1);
+                _players[i].Input = new PlayerInput(i);
+            }
+        }
+
+        /// <summary>
+        /// Activates a player character for each player and deactives the rest.
+        /// </summary>
+        /// <param name="playerCount">The player count</param>
+        public void ActivatePlayers(int playerCount)
+        {
+            for (int i = 0; i < MaxPlayers; i++)
+            {
+                _players[i].gameObject.SetActive(i < playerCount);
             }
         }
 

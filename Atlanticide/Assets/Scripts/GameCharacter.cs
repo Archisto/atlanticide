@@ -10,13 +10,14 @@ namespace Atlanticide
         [SerializeField]
         protected float _speed;
 
+        [SerializeField]
+        protected float _turningSpeed;
+
         protected bool _isDead;
         protected float _distFallen;
         private Vector3 _characterSize;
         private float _groundHitDist;
         private LayerMask _platformLayerMask;
-
-        public string CharacterName { get; set; }
 
         /// <summary>
         /// Initializes the object.
@@ -47,10 +48,9 @@ namespace Atlanticide
 
         protected virtual void RotateTowards(Vector3 direction)
         {
-            float rotSpeed = 0.3f;
             direction = new Vector3(direction.x, 0, direction.y);
             Quaternion targetRotation = Quaternion.LookRotation(direction, Vector3.up);
-            Quaternion newRotation = Quaternion.Lerp(transform.rotation, targetRotation, rotSpeed);
+            Quaternion newRotation = Quaternion.Lerp(transform.rotation, targetRotation, _turningSpeed);
             transform.rotation = newRotation;
         }
 
@@ -102,7 +102,7 @@ namespace Atlanticide
         {
             // TODO
             _isDead = true;
-            Debug.Log(CharacterName + " died.");
+            Debug.Log(name + " died.");
             Respawn();
         }
 
@@ -110,7 +110,7 @@ namespace Atlanticide
         {
             _isDead = false;
             _distFallen = 0;
-            Debug.Log(CharacterName + " respawned.");
+            Debug.Log(name + " respawned.");
         }
 
         protected virtual void OnDrawGizmos()

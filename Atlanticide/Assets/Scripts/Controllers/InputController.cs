@@ -38,7 +38,7 @@ namespace Atlanticide
         {
             for (int i = 0; i < _players.Length; i++)
             {
-                if (_players[i] != null)
+                if (_players[i] != null && _players[i].gameObject.activeSelf && i <= 1) // TODO: Remove 2-player limit
                 {
                     // Moving the player character
                     Vector3 movingDirection = _players[i].Input.GetMoveInput();
@@ -66,6 +66,24 @@ namespace Atlanticide
             if (Input.GetKeyDown(KeyCode.R))
             {
                 _players[0].Respawn();
+            }
+
+            // Change player count
+            if (Input.GetKeyDown(KeyCode.Alpha1))
+            {
+                GameManager.Instance.ActivatePlayers(1);
+            }
+            else if (Input.GetKeyDown(KeyCode.Alpha2))
+            {
+                GameManager.Instance.ActivatePlayers(2);
+            }
+            else if (Input.GetKeyDown(KeyCode.Alpha3))
+            {
+                GameManager.Instance.ActivatePlayers(3);
+            }
+            else if (Input.GetKeyDown(KeyCode.Alpha4))
+            {
+                GameManager.Instance.ActivatePlayers(4);
             }
         }
 

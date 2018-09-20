@@ -171,6 +171,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _speed: 7
+  _turningSpeed: 0.3
   _energyDrainSpeed: 0.7
   _energyRechargeSpeed: 0.5
   _minRechargedEnergy: 0.3
