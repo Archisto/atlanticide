@@ -48,8 +48,6 @@ namespace Atlanticide
             {
                 UpdateEnergy();
             }
-
-            CheckGroundCollision();
         }
 
         /// <summary>
@@ -61,8 +59,8 @@ namespace Atlanticide
             Vector3 newPosition = transform.position;
             newPosition.x += direction.x * _speed * Time.deltaTime;
             newPosition.z += direction.y * _speed * Time.deltaTime;
-            transform.position = newPosition;
-            //Debug.LogFormat("X: {0}, Z: {1}", direction.x, direction.y);
+
+            transform.position = GetPositionOffWall(transform.position, newPosition);
         }
 
         /// <summary>

@@ -14,10 +14,13 @@ namespace Atlanticide
         protected float _turningSpeed;
 
         protected bool _isDead;
+        protected bool _isRising;
         protected float _distFallen;
         private Vector3 _characterSize;
         private float _groundHitDist;
+        private float _wallHitDist;
         private LayerMask _platformLayerMask;
+        private LayerMask _wallLayerMask;
 
         /// <summary>
         /// Initializes the object.
@@ -26,7 +29,9 @@ namespace Atlanticide
         {
             _characterSize = GetComponent<Renderer>().bounds.size;
             _groundHitDist = _characterSize.y / 2;
+            _wallHitDist = _characterSize.x / 2;
             _platformLayerMask = LayerMask.GetMask("Platform");
+            _wallLayerMask = LayerMask.GetMask("Wall");
         }
 
         /// <summary>
@@ -37,6 +42,21 @@ namespace Atlanticide
             if (_isDead)
             {
                 return;
+            }
+
+            if (_isRising)
+            {
+                Rise(5f);
+
+                float maxRiseDist = 0.99f * _characterSize.y;
+                if (!Physics.Raycast(GetTopOfHeadDownRay(), maxRiseDist, _platformLayerMask))
+                {
+                    _isRising = false;
+                }
+            }
+            else
+            {
+                CheckGroundCollision();
             }
         }
 
@@ -60,21 +80,21 @@ namespace Atlanticide
             Vector3 p2 = transform.position + new Vector3(-0.5f * _characterSize.x, 0, 0.5f * _characterSize.z);
             Vector3 p3 = transform.position + new Vector3(0.5f * _characterSize.x, 0, 0.5f * _characterSize.z);
             Vector3 p4 = transform.position + new Vector3(0.5f * _characterSize.x, 0, -0.5f * _characterSize.z);
-            Vector3 topOfHead = transform.position + new Vector3(0, 0.5f * _characterSize.y, 0);
             RaycastHit hit;
             bool touchingPlatform =
-                Physics.Raycast(GetDownRay(p1), out hit, _groundHitDist, _platformLayerMask) ||
-                Physics.Raycast(GetDownRay(p2), out hit, _groundHitDist, _platformLayerMask) ||
-                Physics.Raycast(GetDownRay(p3), out hit, _groundHitDist, _platformLayerMask) ||
-                Physics.Raycast(GetDownRay(p4), out hit, _groundHitDist, _platformLayerMask);
+                Physics.Raycast(new Ray(p1, Vector3.down), out hit, _groundHitDist, _platformLayerMask) ||
+                Physics.Raycast(new Ray(p2, Vector3.down), out hit, _groundHitDist, _platformLayerMask) ||
+                Physics.Raycast(new Ray(p3, Vector3.down), out hit, _groundHitDist, _platformLayerMask) ||
+                Physics.Raycast(new Ray(p4, Vector3.down), out hit, _groundHitDist, _platformLayerMask);
 
             if (touchingPlatform)
             {
                 _distFallen = 0;
 
-                if (Physics.Raycast(GetDownRay(topOfHead), 0.99f * _characterSize.y, _platformLayerMask))
+                float minRiseDist = 0.8f * _characterSize.y;
+                if (Physics.Raycast(GetTopOfHeadDownRay(), minRiseDist, _platformLayerMask))
                 {
-                    Rise(2f);
+                    _isRising = true;
                 }
 
                 return true;
@@ -84,13 +104,45 @@ namespace Atlanticide
             return false;
         }
 
-        private Ray GetDownRay(Vector3 point)
+        protected Vector3 GetPositionOffWall(Vector3 oldPosition, Vector3 position)
         {
-            return new Ray(point, Vector3.down);
+            Vector3 result = position;
+            RaycastHit hit;
+            bool touchingWall =
+                Physics.Raycast(new Ray(position + Vector3.back * _wallHitDist, Vector3.forward), out hit, 2 * _wallHitDist, _wallLayerMask) ||
+                Physics.Raycast(new Ray(position + Vector3.right * _wallHitDist, Vector3.left), out hit, 2 * _wallHitDist, _wallLayerMask) ||
+                Physics.Raycast(new Ray(position + Vector3.left * _wallHitDist, Vector3.right), out hit, 2 * _wallHitDist, _wallLayerMask) ||
+                Physics.Raycast(new Ray(position + Vector3.forward * _wallHitDist, Vector3.back), out hit, 2 * _wallHitDist, _wallLayerMask);
+
+            if (touchingWall)
+            {
+                Vector3 hitDirection = hit.point - position;
+
+                if (hitDirection.x != 0)
+                {
+                    result.x = oldPosition.x;
+                }
+                if (hitDirection.z != 0)
+                {
+                    result.z = oldPosition.z;
+                }
+            }
+
+            return result;
+        }
+
+        private Ray GetTopOfHeadDownRay()
+        {
+            return new Ray(transform.position + new Vector3(0, 0.5f * _characterSize.y, 0), Vector3.down);
         }
 
         protected virtual void Fall()
         {
+            if (_isRising)
+            {
+                return;
+            }
+
             float fallDistance =
                 World.Instance.gravity * Time.deltaTime + 0.05f * _distFallen;
             Vector3 newPosition = transform.position;
@@ -124,6 +176,7 @@ namespace Atlanticide
         public virtual void Respawn()
         {
             _isDead = false;
+            _isRising = false;
             _distFallen = 0;
             Debug.Log(name + " respawned.");
         }
