@@ -57,7 +57,6 @@ namespace Atlanticide
             }
 
             _activeByDefault = _active;
-            Metronome.Instance.OnTick += HandleTickEvent;
             base.Start();
         }
 
@@ -109,31 +108,16 @@ namespace Atlanticide
         {
             if (!_tickChanged)
             {
-                transform.position = Vector3.Lerp(
-                    _positions[GetNewPositionIndex(false)],
-                    _positions[_currentPositionIndex],
-                    Metronome.TickRatio);
+                // TODO: Not controlled by the metronome
+                //transform.position = Vector3.Lerp(
+                //    _positions[GetNewPositionIndex(false)],
+                //    _positions[_currentPositionIndex],
+                //    Metronome.TickRatio);
             }
             else
             {
                 _tickChanged = false;
             }
-        }
-
-        /// <summary>
-        /// Disposes of everything necessary when the object is disabled. 
-        /// </summary>
-        private void OnDisable()
-        {
-            //Metronome.Instance.OnTick -= HandleTickEvent;
-        }
-
-        /// <summary>
-        /// Disposes of everything necessary when the application is quit. 
-        /// </summary>
-        private void OnApplicationQuit()
-        {
-            Metronome.Instance.OnTick -= HandleTickEvent;
         }
 
         /// <summary>

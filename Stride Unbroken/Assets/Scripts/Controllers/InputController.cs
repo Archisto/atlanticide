@@ -15,15 +15,14 @@ namespace Atlanticide
         [SerializeField]
         private CameraController _camera;
 
-        [SerializeField]
-        private PlayerCharacter _player;
+        private PlayerCharacter[] _players;
 
         /// <summary>
         /// Initializes the object.
         /// </summary>
         private void Start()
         {
-
+            _players = GameManager.Instance.GetPlayers();
         }
 
         /// <summary>
@@ -35,34 +34,30 @@ namespace Atlanticide
             CheckDebugInput();
         }
 
-        public Vector3 GetMoveInput()
-        {
-            return new Vector3(Input.GetAxis(HorizontalMoveKey), Input.GetAxis(VerticalMoveKey)).normalized;
-        }
-
-        public Vector3 GetLookInput()
-        {
-            return new Vector3(Input.GetAxis(HorizontalLookKey), Input.GetAxis(VerticalLookKey)).normalized;
-        }
-
         private void CheckInput()
         {
-            // Moving the player character
-            Vector3 movingDirection = GetMoveInput();
-            Vector3 lookingDirection = GetLookInput();
-
-            if (movingDirection != Vector3.zero)
+            for (int i = 0; i < _players.Length; i++)
             {
-                _player.MoveInput(movingDirection);
-            }
+                if (_players[i] != null)
+                {
+                    // Moving the player character
+                    Vector3 movingDirection = _players[i].Input.GetMoveInput();
+                    Vector3 lookingDirection = _players[i].Input.GetLookInput();
 
-            if (lookingDirection != Vector3.zero)
-            {
-                _player.LookInput(lookingDirection);
-            }
+                    if (movingDirection != Vector3.zero)
+                    {
+                        _players[i].MoveInput(movingDirection);
+                    }
 
-            // Spend energy (for what?)
-            _player.SpendEnergy(Input.GetButton(ActionKey));
+                    if (lookingDirection != Vector3.zero)
+                    {
+                        _players[i].LookInput(lookingDirection);
+                    }
+
+                    // Spend energy (for what?)
+                    _players[i].SpendEnergy(_players[i].Input.GetActionInput());
+                }
+            }
         }
 
         private void CheckDebugInput()
@@ -70,7 +65,35 @@ namespace Atlanticide
             // Respawn
             if (Input.GetKeyDown(KeyCode.R))
             {
-                _player.Respawn();
+                _players[0].Respawn();
+            }
+        }
+
+        private void SetPlayerInputDevice(int playerNum, InputDevice inputDevice)
+        {
+            if (playerNum >= 0 && playerNum < _players.Length &&
+                _players[playerNum] != null)
+            {
+                // The given player already has the input device
+                if (_players[playerNum].Input.InputDevice == inputDevice)
+                {
+                    return;
+                }
+
+                foreach (PlayerCharacter player in _players)
+                {
+                    // The player which has the input device
+                    // swaps it with the given player
+                    if (player.Input.InputDevice == inputDevice)
+                    {
+                        InputDevice temp = _players[playerNum].Input.InputDevice;
+                        _players[playerNum].Input.InputDevice = inputDevice;
+                        player.Input.InputDevice = temp;
+                        return;
+                    }
+                }
+
+                _players[playerNum].Input.InputDevice = inputDevice;
             }
         }
     }

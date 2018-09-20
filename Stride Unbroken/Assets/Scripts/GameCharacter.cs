@@ -11,8 +11,9 @@ namespace Atlanticide
         protected float _speed;
 
         protected bool _isDead;
+        protected float _distFallen;
         private Vector3 _characterSize;
-        private float _groundHitDist = 3f;
+        private float _groundHitDist;
         private LayerMask _platformLayerMask;
 
         public string CharacterName { get; set; }
@@ -23,6 +24,7 @@ namespace Atlanticide
         protected virtual void Start()
         {
             _characterSize = GetComponent<Renderer>().bounds.size;
+            _groundHitDist = _characterSize.y / 2;
             _platformLayerMask = LayerMask.GetMask("Platform");
         }
 
@@ -52,7 +54,7 @@ namespace Atlanticide
             transform.rotation = newRotation;
         }
 
-        private bool CheckCollision()
+        protected bool CheckGroundCollision()
         {
             Vector3 p1 = transform.position + new Vector3(-0.5f * _characterSize.x, 0, 0.5f * _characterSize.z);
             Vector3 p2 = transform.position + new Vector3(-0.5f * _characterSize.x, 0, 0.5f * _characterSize.z);
@@ -71,14 +73,29 @@ namespace Atlanticide
 
             if (touchingPlatform)
             {
-                Platform platform = hit.transform.GetComponent<Platform>();
-                if (platform != null)
-                {
-                    return true;
-                }
+                _distFallen = 0;
+                return true;
             }
 
+            Fall();
             return false;
+        }
+
+        protected virtual void Fall()
+        {
+            float fallDistance =
+                World.Instance.gravity * Time.deltaTime + 0.05f * _distFallen;
+            Vector3 newPosition = transform.position;
+            newPosition.y -= fallDistance;
+            _distFallen += fallDistance;
+            transform.position = newPosition;
+
+            Debug.Log("Dist fallen: " + _distFallen);
+
+            if (_distFallen > 20)
+            {
+                Die();
+            }
         }
 
         protected virtual void Die()
@@ -92,6 +109,7 @@ namespace Atlanticide
         public virtual void Respawn()
         {
             _isDead = false;
+            _distFallen = 0;
             Debug.Log(CharacterName + " respawned.");
         }
 

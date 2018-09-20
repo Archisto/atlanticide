@@ -7,9 +7,6 @@ namespace Atlanticide
 {
     public class PlayerCharacter : GameCharacter
     {
-        [SerializeField]
-        private Slider _energyBar;
-
         [SerializeField, Range(0.01f, 2f)]
         private float _energyDrainSpeed;
 
@@ -22,7 +19,10 @@ namespace Atlanticide
         private bool _useEnergy; // TODO: Use for what?
         private bool _outOfEnergy;
         private float _energy = 1;
-        private InputController _input;
+
+        public PlayerInput Input { get; set; }
+
+        public Slider EnergyBar { get; set; }
 
         /// <summary>
         /// Initializes the object.
@@ -30,7 +30,6 @@ namespace Atlanticide
         protected override void Start()
         {
             base.Start();
-            _input = FindObjectOfType<InputController>();
         }
 
         /// <summary>
@@ -45,10 +44,12 @@ namespace Atlanticide
                 return;
             }
 
-            if (_energyBar != null)
+            if (EnergyBar != null)
             {
                 UpdateEnergy();
             }
+
+            CheckGroundCollision();
         }
 
         /// <summary>
@@ -90,7 +91,7 @@ namespace Atlanticide
                         _outOfEnergy = true;
                     }
 
-                    _energyBar.value = _energy;
+                    EnergyBar.value = _energy;
                 }
             }
             // Recharge
@@ -107,7 +108,7 @@ namespace Atlanticide
                     _energy = 1;
                 }
 
-                _energyBar.value = _energy;
+                EnergyBar.value = _energy;
             }
         }
 
@@ -119,6 +120,7 @@ namespace Atlanticide
 
         protected override void Die()
         {
+            base.Die();
         }
 
         public override void Respawn()
@@ -126,6 +128,7 @@ namespace Atlanticide
             base.Respawn();
             _energy = 1;
             _outOfEnergy = false;
+            transform.position = new Vector3(0, 5, 0);
         }
 
         protected override void OnDrawGizmos()
