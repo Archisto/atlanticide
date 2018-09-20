@@ -2,3 +2,4 @@ Atlanticide/Library/
 Atlanticide/Temp/
 *.csproj
 *.sln
+*.suo

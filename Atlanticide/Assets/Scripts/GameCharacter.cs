@@ -60,25 +60,33 @@ namespace Atlanticide
             Vector3 p2 = transform.position + new Vector3(-0.5f * _characterSize.x, 0, 0.5f * _characterSize.z);
             Vector3 p3 = transform.position + new Vector3(0.5f * _characterSize.x, 0, 0.5f * _characterSize.z);
             Vector3 p4 = transform.position + new Vector3(0.5f * _characterSize.x, 0, -0.5f * _characterSize.z);
-            Ray ray1 = new Ray(p1, Vector3.down);
-            Ray ray2 = new Ray(p2, Vector3.down);
-            Ray ray3 = new Ray(p3, Vector3.down);
-            Ray ray4 = new Ray(p4, Vector3.down);
+            Vector3 topOfHead = transform.position + new Vector3(0, 0.5f * _characterSize.y, 0);
             RaycastHit hit;
             bool touchingPlatform =
-                Physics.Raycast(ray1, out hit, _groundHitDist, _platformLayerMask) ||
-                Physics.Raycast(ray2, out hit, _groundHitDist, _platformLayerMask) ||
-                Physics.Raycast(ray3, out hit, _groundHitDist, _platformLayerMask) ||
-                Physics.Raycast(ray4, out hit, _groundHitDist, _platformLayerMask);
+                Physics.Raycast(GetDownRay(p1), out hit, _groundHitDist, _platformLayerMask) ||
+                Physics.Raycast(GetDownRay(p2), out hit, _groundHitDist, _platformLayerMask) ||
+                Physics.Raycast(GetDownRay(p3), out hit, _groundHitDist, _platformLayerMask) ||
+                Physics.Raycast(GetDownRay(p4), out hit, _groundHitDist, _platformLayerMask);
 
             if (touchingPlatform)
             {
                 _distFallen = 0;
+
+                if (Physics.Raycast(GetDownRay(topOfHead), 0.99f * _characterSize.y, _platformLayerMask))
+                {
+                    Rise(2f);
+                }
+
                 return true;
             }
 
             Fall();
             return false;
+        }
+
+        private Ray GetDownRay(Vector3 point)
+        {
+            return new Ray(point, Vector3.down);
         }
 
         protected virtual void Fall()
@@ -96,6 +104,13 @@ namespace Atlanticide
             {
                 Die();
             }
+        }
+
+        protected virtual void Rise(float speed)
+        {
+            Vector3 newPosition = transform.position;
+            newPosition.y += speed * Time.deltaTime;
+            transform.position = newPosition;
         }
 
         protected virtual void Die()
