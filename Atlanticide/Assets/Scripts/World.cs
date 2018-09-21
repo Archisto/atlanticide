@@ -29,6 +29,9 @@ namespace Atlanticide
 
         public float gravity = 1;
 
+        [SerializeField, Range(0.1f, 5f)]
+        public float telegrabRadius = 1;
+
         /// <summary>
         /// Initializes the singleton instance.
         /// </summary>

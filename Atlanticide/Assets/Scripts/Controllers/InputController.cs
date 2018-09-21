@@ -6,15 +6,6 @@ namespace Atlanticide
 {
     public class InputController : MonoBehaviour
     {
-        private const string HorizontalMoveKey = "HorizontalMove";
-        private const string VerticalMoveKey = "VerticalMove";
-        private const string HorizontalLookKey = "HorizontalLook";
-        private const string VerticalLookKey = "VerticalLook";
-        private const string ActionKey = "Action";
-
-        [SerializeField]
-        private CameraController _camera;
-
         private PlayerCharacter[] _players;
 
         /// <summary>

@@ -16,11 +16,13 @@ namespace Atlanticide
         protected bool _isDead;
         protected bool _isRising;
         protected float _distFallen;
+        protected GameObject _myWall;
         private Vector3 _characterSize;
         private float _groundHitDist;
         private float _wallHitDist;
         private LayerMask _platformLayerMask;
         private LayerMask _wallLayerMask;
+        private Telegrabable _telegrabability;
 
         /// <summary>
         /// Initializes the object.
@@ -32,6 +34,7 @@ namespace Atlanticide
             _wallHitDist = _characterSize.x / 2;
             _platformLayerMask = LayerMask.GetMask("Platform");
             _wallLayerMask = LayerMask.GetMask("Wall");
+            _telegrabability = GetComponent<Telegrabable>();
         }
 
         /// <summary>
@@ -44,19 +47,29 @@ namespace Atlanticide
                 return;
             }
 
-            if (_isRising)
+            if (_telegrabability == null || !_telegrabability.telegrabbed)
             {
-                Rise(5f);
-
-                float maxRiseDist = 0.99f * _characterSize.y;
-                if (!Physics.Raycast(GetTopOfHeadDownRay(), maxRiseDist, _platformLayerMask))
+                if (_isRising)
                 {
-                    _isRising = false;
+                    Rise(5f);
+
+                    float maxRiseDist = 0.99f * _characterSize.y;
+                    if (!Physics.Raycast(GetTopOfHeadDownRay(), maxRiseDist, _platformLayerMask))
+                    {
+                        _isRising = false;
+                    }
+                }
+                else
+                {
+                    CheckGroundCollision();
                 }
             }
-            else
+
+            Vector3? newPosition = GetPositionOffWall(transform.position, transform.position);
+            if (newPosition != null)
             {
-                CheckGroundCollision();
+                Debug.Log("touch");
+                transform.position = newPosition.Value;
             }
         }
 
@@ -104,7 +117,7 @@ namespace Atlanticide
             return false;
         }
 
-        protected Vector3 GetPositionOffWall(Vector3 oldPosition, Vector3 position)
+        protected Vector3? GetPositionOffWall(Vector3 oldPosition, Vector3 position)
         {
             Vector3 result = position;
             RaycastHit hit;
@@ -114,21 +127,27 @@ namespace Atlanticide
                 Physics.Raycast(new Ray(position + Vector3.left * _wallHitDist, Vector3.right), out hit, 2 * _wallHitDist, _wallLayerMask) ||
                 Physics.Raycast(new Ray(position + Vector3.forward * _wallHitDist, Vector3.back), out hit, 2 * _wallHitDist, _wallLayerMask);
 
-            if (touchingWall)
+            if (touchingWall && hit.transform.gameObject != _myWall)
             {
                 Vector3 hitDirection = hit.point - position;
 
                 if (hitDirection.x != 0)
                 {
-                    result.x = oldPosition.x;
+                    //result.x = oldPosition.x;
+                    result.x -= hitDirection.x;
                 }
                 if (hitDirection.z != 0)
                 {
-                    result.z = oldPosition.z;
+                    //result.z = oldPosition.z;
+                    result.z -= hitDirection.z;
                 }
-            }
 
-            return result;
+                return result;
+            }
+            else
+            {
+                return null;
+            } 
         }
 
         private Ray GetTopOfHeadDownRay()

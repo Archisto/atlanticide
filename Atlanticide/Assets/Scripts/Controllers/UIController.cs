@@ -35,5 +35,10 @@ namespace Atlanticide
         {
             _scoreText.text = "Score: " + GameManager.Instance.CurrentScore;
         }
+
+        public Slider GetEnergyBar()
+        {
+            return _energyBar;
+        }
     }
 }

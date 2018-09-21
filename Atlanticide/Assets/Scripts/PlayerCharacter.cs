@@ -7,6 +7,12 @@ namespace Atlanticide
 {
     public class PlayerCharacter : GameCharacter
     {
+        [SerializeField]
+        private GameObject _pushBlock;
+
+        [SerializeField]
+        private GameObject _telegrab;
+
         [SerializeField, Range(0.01f, 2f)]
         private float _energyDrainSpeed;
 
@@ -20,6 +26,8 @@ namespace Atlanticide
         private bool _outOfEnergy;
         private float _energy = 1;
 
+        public int ID { get; set; }
+
         public PlayerInput Input { get; set; }
 
         public Slider EnergyBar { get; set; }
@@ -30,6 +38,7 @@ namespace Atlanticide
         protected override void Start()
         {
             base.Start();
+            _myWall = _pushBlock;
         }
 
         /// <summary>
@@ -60,7 +69,8 @@ namespace Atlanticide
             newPosition.x += direction.x * _speed * Time.deltaTime;
             newPosition.z += direction.y * _speed * Time.deltaTime;
 
-            transform.position = GetPositionOffWall(transform.position, newPosition);
+            //transform.position = GetPositionOffWall(transform.position, newPosition);
+            transform.position = newPosition;
         }
 
         /// <summary>
@@ -77,35 +87,11 @@ namespace Atlanticide
         /// </summary>
         private void UpdateEnergy()
         {
-            // Drain
-            if (_useEnergy)
+            _energy = Utils.DrainOrRecharge(_energy, _useEnergy, _energyDrainSpeed,
+                _energyRechargeSpeed, _minRechargedEnergy, _outOfEnergy, out _outOfEnergy);
+
+            if (EnergyBar != null)
             {
-                if (_energy > 0)
-                {
-                    _energy -= _energyDrainSpeed * Time.deltaTime;
-                    if (_energy <= 0)
-                    {
-                        _energy = 0;
-                        _outOfEnergy = true;
-                    }
-
-                    EnergyBar.value = _energy;
-                }
-            }
-            // Recharge
-            else if (_energy < 1)
-            {
-                _energy += _energyRechargeSpeed * Time.deltaTime;
-
-                if (_outOfEnergy && _energy >= _minRechargedEnergy)
-                {
-                    _outOfEnergy = false;
-                }
-                if (_energy > 1)
-                {
-                    _energy = 1;
-                }
-
                 EnergyBar.value = _energy;
             }
         }
@@ -114,6 +100,15 @@ namespace Atlanticide
         {
             // TODO: For what?
             _useEnergy = active && !_outOfEnergy;
+
+            // Test
+
+            // Push block
+            //_pushBlock.SetActive(_useEnergy);
+
+            // Telegrab
+            _telegrab.SetActive(_useEnergy);
+            GameManager.Instance.UpdateTelegrab(ID, _telegrab.transform, _useEnergy);
         }
 
         protected override void Die()
@@ -132,6 +127,12 @@ namespace Atlanticide
         protected override void OnDrawGizmos()
         {
             base.OnDrawGizmos();
+
+            if (_useEnergy)
+            {
+                Gizmos.color = Color.blue;
+                Gizmos.DrawWireSphere(_telegrab.transform.position, World.Instance.telegrabRadius);
+            }
         }
     }
 }

@@ -27,11 +27,12 @@ namespace Atlanticide
         }
         #endregion Statics
 
-        public const int MaxPlayers = 4;
+        public const int MaxPlayers = 2;
 
         private PlayerCharacter _playerPrefab;
         private PlayerCharacter[] _players;
         private UIController _UI;
+        private Transform[] _telegrabs;
 
         public int CurrentScore { get; set; }
 
@@ -51,8 +52,8 @@ namespace Atlanticide
 
             DontDestroyOnLoad(gameObject);
 
-            InitPlayers();
             InitUI();
+            InitPlayers();
         }
 
         /// <summary>
@@ -64,6 +65,9 @@ namespace Atlanticide
             _playerPrefab = Resources.Load<PlayerCharacter>("PlayerCharacter");
             CreatePlayers();
             ActivatePlayers(2);
+
+            // Test
+            _telegrabs = new Transform[MaxPlayers];
         }
 
         /// <summary>
@@ -75,8 +79,15 @@ namespace Atlanticide
             for (int i = 0; i < MaxPlayers; i++)
             {
                 _players[i] = Instantiate(_playerPrefab);
+                _players[i].ID = i;
                 _players[i].name = "Player " + (i + 1);
                 _players[i].Input = new PlayerInput(i);
+
+                // Test
+                if (i == 0)
+                {
+                    _players[i].EnergyBar = _UI.GetEnergyBar();
+                }
             }
         }
 
@@ -100,7 +111,7 @@ namespace Atlanticide
             _UI = FindObjectOfType<UIController>();
             if (_UI == null)
             {
-                Debug.LogError("A UIController object could not be found in the scene.");
+                Debug.LogError(Utils.GetObjectMissingString("UIController"));
             }
         }
 
@@ -112,6 +123,23 @@ namespace Atlanticide
         public PlayerCharacter[] GetPlayers()
         {
             return _players;
+        }
+
+        public void UpdateTelegrab(int playerNum, Transform telegrab, bool active)
+        {
+            if (active)
+            {
+                _telegrabs[playerNum] = telegrab;
+            }
+            else
+            {
+                _telegrabs[playerNum] = null;
+            }
+        }
+
+        public Transform[] GetTelegrabs()
+        {
+            return _telegrabs;
         }
     }
 }
