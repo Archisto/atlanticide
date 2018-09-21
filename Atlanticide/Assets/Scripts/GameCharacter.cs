@@ -19,11 +19,13 @@ namespace Atlanticide
         protected int _hitpoints;
         protected bool _isRising;
         protected float _distFallen;
-        private Vector3 _respawnPosition;
+        protected Vector3 _respawnPosition;
         protected GameObject _myWall;
-        private Vector3 _characterSize;
+        protected Vector3 _characterSize;
         private float _groundHitDist;
         private float _wallHitDist;
+        private float _minRiseDist;
+        private float _maxRiseDist;
         private LayerMask _platformLayerMask;
         private LayerMask _wallLayerMask;
         private Telegrabable _telegrabability;
@@ -52,6 +54,8 @@ namespace Atlanticide
             _characterSize = GetComponent<Renderer>().bounds.size;
             _groundHitDist = _characterSize.y / 2;
             _wallHitDist = _characterSize.x / 2;
+            _minRiseDist = 0.80f * _characterSize.y;
+            _maxRiseDist = 0.99f * _characterSize.y;
             _platformLayerMask = LayerMask.GetMask("Platform");
             _wallLayerMask = LayerMask.GetMask("Wall");
             _telegrabability = GetComponent<Telegrabable>();
@@ -73,8 +77,7 @@ namespace Atlanticide
                 {
                     Rise(5f);
 
-                    float maxRiseDist = 0.99f * _characterSize.y;
-                    if (!Physics.Raycast(GetTopOfHeadDownRay(), maxRiseDist, _platformLayerMask))
+                    if (!Physics.Raycast(GetTopOfHeadDownRay(), _maxRiseDist, _platformLayerMask))
                     {
                         _isRising = false;
                     }
@@ -106,6 +109,28 @@ namespace Atlanticide
             transform.rotation = newRotation;
         }
 
+        protected float GroundHeightDifference(Vector3 position)
+        {
+            position.y = transform.position.y;
+            float groundY = transform.position.y - (_characterSize.y / 2);
+
+            RaycastHit hit;
+            bool touchingPlatform =
+                Physics.Raycast(new Ray(position, Vector3.down), out hit, _characterSize.y, _platformLayerMask);
+
+            if (touchingPlatform)
+            {
+                // Positive value for higher ground,
+                // negative for lower
+                return hit.point.y - groundY;
+            }
+            else
+            {
+                // The height difference is "big"
+                return -10;
+            }
+        }
+
         protected bool CheckGroundCollision(Vector3 position, bool currPos)
         {
             Vector3 p1 = position + new Vector3(-0.5f * _characterSize.x, 0, 0.5f * _characterSize.z);
@@ -121,12 +146,12 @@ namespace Atlanticide
 
             if (touchingPlatform)
             {
+                // Rise if currently inside the ground
                 if (currPos)
                 {
                     _distFallen = 0;
 
-                    float minRiseDist = 0.8f * _characterSize.y;
-                    if (Physics.Raycast(GetTopOfHeadDownRay(), minRiseDist, _platformLayerMask))
+                    if (Physics.Raycast(GetTopOfHeadDownRay(), _minRiseDist, _platformLayerMask))
                     {
                         _isRising = true;
                     }

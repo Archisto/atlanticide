@@ -27,14 +27,11 @@ namespace Atlanticide
             {
                 depleted = false;
 
-                if (value > 0)
+                value -= drainSpeed * Time.deltaTime;
+                if (value <= 0)
                 {
-                    value -= drainSpeed * Time.deltaTime;
-                    if (value <= 0)
-                    {
-                        value = 0;
-                        depleted = true;
-                    }
+                    value = 0;
+                    depleted = true;
                 }
             }
             // Recharge

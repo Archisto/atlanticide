@@ -73,8 +73,26 @@ namespace Atlanticide
                 newPosition.x += direction.x * _speed * Time.deltaTime;
                 newPosition.z += direction.y * _speed * Time.deltaTime;
 
-                //transform.position = GetPositionOffWall(transform.position, newPosition);
-                transform.position = newPosition;
+                if (_isRising)
+                {
+                    transform.position = newPosition;
+                }
+                else
+                {
+                    float groundHeightDiff = GroundHeightDifference(newPosition);
+
+                    if (groundHeightDiff < 0.5 * _characterSize.y)
+                    {
+                        if (groundHeightDiff > -0.1 * _characterSize.y &&
+                            groundHeightDiff < 0.2 * _characterSize.y)
+                        {
+                            newPosition.y += groundHeightDiff;
+                        }
+
+                        //transform.position = GetPositionOffWall(transform.position, newPosition);
+                        transform.position = newPosition;
+                    }
+                }
             }
         }
 
@@ -105,8 +123,6 @@ namespace Atlanticide
         {
             // TODO: For what?
             _useEnergy = active && !_outOfEnergy;
-
-            // Test
 
             // Push beam
             //_pushBeam.SetActive(_useEnergy);

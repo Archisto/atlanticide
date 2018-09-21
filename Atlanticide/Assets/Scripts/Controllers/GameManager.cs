@@ -154,5 +154,11 @@ namespace Atlanticide
                 _telegrabs[playerNum] = null;
             }
         }
+
+        public void SetScore(int score)
+        {
+            CurrentScore = score;
+            _UI.UpdateUI();
+        }
     }
 }
