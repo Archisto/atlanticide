@@ -49,6 +49,12 @@ namespace Atlanticide
             }
         }
 
+        public void PromoteToPlayer()
+        {
+            Die();
+            //gameObject.SetActive(false);
+        }
+
         protected override void Die()
         {
             base.Die();

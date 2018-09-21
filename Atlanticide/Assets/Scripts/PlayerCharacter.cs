@@ -141,12 +141,24 @@ namespace Atlanticide
         {
             base.Die();
 
-            // Testing
-            Respawn();
+            NonPlayerCharacter[] npcs = GameManager.Instance.GetNPCs();
+            NonPlayerCharacter npc = Utils.GetFirstActiveOrInactiveObject(npcs, true) as NonPlayerCharacter;
+            if (npc != null)
+            {
+                Respawn(npc);
+            }
+            else
+            {
+                gameObject.SetActive(false);
+            }
         }
 
-        public override void Respawn()
+        public void Respawn(NonPlayerCharacter npc)
         {
+            // Promotes an NPC to a player character
+            _respawnPosition = npc.transform.position;
+            npc.PromoteToPlayer();
+
             base.Respawn();
             _energy = 1;
             _outOfEnergy = false;

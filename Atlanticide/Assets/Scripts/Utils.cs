@@ -51,5 +51,39 @@ namespace Atlanticide
 
             return value;
         }
+
+        public static object GetFirstActiveOrInactiveObject(object[] array, bool active)
+        {
+            if (array.Length == 0)
+            {
+                return null;
+            }
+
+            bool objIsGameObject = array[0] is GameObject;
+
+            foreach (object obj in array)
+            {
+                GameObject go = null;
+                if (objIsGameObject)
+                {
+                    go = obj as GameObject;
+                }
+                else
+                {
+                    Component c = obj as Component;
+                    if (c != null)
+                    {
+                        go = c.gameObject;
+                    }
+                }
+
+                if (go != null && go.activeSelf == active)
+                {
+                    return obj;
+                }
+            }
+
+            return null;
+        }
     }
 }

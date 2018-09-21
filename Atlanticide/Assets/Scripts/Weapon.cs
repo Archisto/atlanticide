@@ -63,7 +63,7 @@ namespace Atlanticide
         {
             if (!_fired)
             {
-                GameObject projectile = GetFirstInactiveProjectile();
+                GameObject projectile = Utils.GetFirstActiveOrInactiveObject(_projectiles, false) as GameObject;
                 if (projectile != null)
                 {
                     _fired = true;
@@ -75,19 +75,6 @@ namespace Atlanticide
                     projectileMover.StartMoving(true);
                 }
             }
-        }
-
-        private GameObject GetFirstInactiveProjectile()
-        {
-            foreach (GameObject projectile in _projectiles)
-            {
-                if (!projectile.activeSelf)
-                {
-                    return projectile;
-                }
-            }
-
-            return null;
         }
     }
 }
