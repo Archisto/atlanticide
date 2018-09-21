@@ -56,7 +56,15 @@ namespace Atlanticide
             // Respawn
             if (Input.GetKeyDown(KeyCode.R))
             {
-                _players[0].Respawn();
+                foreach (PlayerCharacter pc in GameManager.Instance.GetPlayers())
+                {
+                    pc.Respawn();
+                }
+
+                foreach (NonPlayerCharacter npc in GameManager.Instance.GetNPCs())
+                {
+                    npc.Respawn();
+                }
             }
 
             // Change player count

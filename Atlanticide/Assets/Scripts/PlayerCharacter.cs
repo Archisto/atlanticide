@@ -48,7 +48,7 @@ namespace Atlanticide
         {
             base.Update();
 
-            if (_isDead)
+            if (IsDead)
             {
                 return;
             }
@@ -65,12 +65,15 @@ namespace Atlanticide
         /// <param name="direction">The moving direction</param>
         public void MoveInput(Vector3 direction)
         {
-            Vector3 newPosition = transform.position;
-            newPosition.x += direction.x * _speed * Time.deltaTime;
-            newPosition.z += direction.y * _speed * Time.deltaTime;
+            if (!IsImmobile)
+            {
+                Vector3 newPosition = transform.position;
+                newPosition.x += direction.x * _speed * Time.deltaTime;
+                newPosition.z += direction.y * _speed * Time.deltaTime;
 
-            //transform.position = GetPositionOffWall(transform.position, newPosition);
-            transform.position = newPosition;
+                //transform.position = GetPositionOffWall(transform.position, newPosition);
+                transform.position = newPosition;
+            }
         }
 
         /// <summary>
@@ -114,6 +117,9 @@ namespace Atlanticide
         protected override void Die()
         {
             base.Die();
+
+            // Testing
+            Respawn();
         }
 
         public override void Respawn()

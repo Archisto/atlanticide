@@ -4,4 +4,8 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Scenes/Lauri's Colosseum.unity
+    guid: e0803ffc2901a9444bd4c1f553b935d3
+  m_configObjects: {}

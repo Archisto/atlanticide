@@ -31,6 +31,7 @@ namespace Atlanticide
 
         private PlayerCharacter _playerPrefab;
         private PlayerCharacter[] _players;
+        private NonPlayerCharacter[] _npcs;
         private UIController _UI;
         private Transform[] _telegrabs;
 
@@ -54,6 +55,7 @@ namespace Atlanticide
 
             InitUI();
             InitPlayers();
+            InitNPCs();
         }
 
         /// <summary>
@@ -68,6 +70,14 @@ namespace Atlanticide
 
             // Test
             _telegrabs = new Transform[MaxPlayers];
+        }
+
+        /// <summary>
+        /// Initializes the non-player characters.
+        /// </summary>
+        private void InitNPCs()
+        {
+            _npcs = FindObjectsOfType<NonPlayerCharacter>();
         }
 
         /// <summary>
@@ -125,6 +135,16 @@ namespace Atlanticide
             return _players;
         }
 
+        public NonPlayerCharacter[] GetNPCs()
+        {
+            return _npcs;
+        }
+
+        public Transform[] GetTelegrabs()
+        {
+            return _telegrabs;
+        }
+
         public void UpdateTelegrab(int playerNum, Transform telegrab, bool active)
         {
             if (active)
@@ -135,11 +155,6 @@ namespace Atlanticide
             {
                 _telegrabs[playerNum] = null;
             }
-        }
-
-        public Transform[] GetTelegrabs()
-        {
-            return _telegrabs;
         }
     }
 }

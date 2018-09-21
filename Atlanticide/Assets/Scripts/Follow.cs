@@ -37,7 +37,7 @@ namespace Atlanticide
         /// <summary>
         /// Updates the object once per frame.
         /// </summary>
-        private void Update()
+        private void LateUpdate()
         {
             if (_objectToFollow != null)
             {

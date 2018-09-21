@@ -13,9 +13,13 @@ namespace Atlanticide
         [SerializeField]
         protected float _turningSpeed;
 
-        protected bool _isDead;
+        [SerializeField]
+        protected int _maxHitpoints = 3;
+
+        protected int _hitpoints;
         protected bool _isRising;
         protected float _distFallen;
+        private Vector3 _respawnPosition;
         protected GameObject _myWall;
         private Vector3 _characterSize;
         private float _groundHitDist;
@@ -24,11 +28,27 @@ namespace Atlanticide
         private LayerMask _wallLayerMask;
         private Telegrabable _telegrabability;
 
+        public bool IsInvulnerable { get; set; }
+
+        public bool IsImmobile { get; set; }
+
+        public bool IsDead { get; protected set; }
+
+        public bool Telegrabbed
+        {
+            get
+            {
+                return _telegrabability != null && _telegrabability.Telegrabbed;
+            }
+        }
+
         /// <summary>
         /// Initializes the object.
         /// </summary>
         protected virtual void Start()
         {
+            _hitpoints = _maxHitpoints;
+            _respawnPosition = transform.position;
             _characterSize = GetComponent<Renderer>().bounds.size;
             _groundHitDist = _characterSize.y / 2;
             _wallHitDist = _characterSize.x / 2;
@@ -42,12 +62,12 @@ namespace Atlanticide
         /// </summary>
         protected virtual void Update()
         {
-            if (_isDead)
+            if (IsDead)
             {
                 return;
             }
 
-            if (_telegrabability == null || !_telegrabability.telegrabbed)
+            if (!Telegrabbed)
             {
                 if (_isRising)
                 {
@@ -61,14 +81,13 @@ namespace Atlanticide
                 }
                 else
                 {
-                    CheckGroundCollision();
+                    CheckGroundCollision(transform.position, true);
                 }
             }
 
             Vector3? newPosition = GetPositionOffWall(transform.position, transform.position);
             if (newPosition != null)
             {
-                Debug.Log("touch");
                 transform.position = newPosition.Value;
             }
         }
@@ -87,12 +106,12 @@ namespace Atlanticide
             transform.rotation = newRotation;
         }
 
-        protected bool CheckGroundCollision()
+        protected bool CheckGroundCollision(Vector3 position, bool currPos)
         {
-            Vector3 p1 = transform.position + new Vector3(-0.5f * _characterSize.x, 0, 0.5f * _characterSize.z);
-            Vector3 p2 = transform.position + new Vector3(-0.5f * _characterSize.x, 0, 0.5f * _characterSize.z);
-            Vector3 p3 = transform.position + new Vector3(0.5f * _characterSize.x, 0, 0.5f * _characterSize.z);
-            Vector3 p4 = transform.position + new Vector3(0.5f * _characterSize.x, 0, -0.5f * _characterSize.z);
+            Vector3 p1 = position + new Vector3(-0.5f * _characterSize.x, 0, 0.5f * _characterSize.z);
+            Vector3 p2 = position + new Vector3(-0.5f * _characterSize.x, 0, 0.5f * _characterSize.z);
+            Vector3 p3 = position + new Vector3(0.5f * _characterSize.x, 0, 0.5f * _characterSize.z);
+            Vector3 p4 = position + new Vector3(0.5f * _characterSize.x, 0, -0.5f * _characterSize.z);
             RaycastHit hit;
             bool touchingPlatform =
                 Physics.Raycast(new Ray(p1, Vector3.down), out hit, _groundHitDist, _platformLayerMask) ||
@@ -102,18 +121,25 @@ namespace Atlanticide
 
             if (touchingPlatform)
             {
-                _distFallen = 0;
-
-                float minRiseDist = 0.8f * _characterSize.y;
-                if (Physics.Raycast(GetTopOfHeadDownRay(), minRiseDist, _platformLayerMask))
+                if (currPos)
                 {
-                    _isRising = true;
+                    _distFallen = 0;
+
+                    float minRiseDist = 0.8f * _characterSize.y;
+                    if (Physics.Raycast(GetTopOfHeadDownRay(), minRiseDist, _platformLayerMask))
+                    {
+                        _isRising = true;
+                    }
                 }
 
                 return true;
             }
 
-            Fall();
+            if (currPos)
+            {
+                Fall();
+            }
+
             return false;
         }
 
@@ -169,8 +195,6 @@ namespace Atlanticide
             _distFallen += fallDistance;
             transform.position = newPosition;
 
-            Debug.Log("Dist fallen: " + _distFallen);
-
             if (_distFallen > 20)
             {
                 Die();
@@ -184,19 +208,39 @@ namespace Atlanticide
             transform.position = newPosition;
         }
 
+        /// <summary>
+        /// Makes the character take damage.
+        /// </summary>
+        /// <param name="damage">The damage amount</param>
+        /// <returns>Does the character die.</returns>
+        public virtual bool TakeDamage(int damage)
+        {
+            _hitpoints -= damage;
+
+            if (_hitpoints <= 0)
+            {
+                _hitpoints = 0;
+                Die();
+                return true;
+            }
+
+            return false;
+        }
+
         protected virtual void Die()
         {
-            // TODO
-            _isDead = true;
+            IsDead = true;
+            _telegrabability.Telegrabbed = false;
             Debug.Log(name + " died.");
-            Respawn();
         }
 
         public virtual void Respawn()
         {
-            _isDead = false;
+            IsDead = false;
+            _hitpoints = _maxHitpoints;
             _isRising = false;
             _distFallen = 0;
+            transform.position = _respawnPosition;
             Debug.Log(name + " respawned.");
         }
 

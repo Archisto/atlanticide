@@ -6,27 +6,60 @@ namespace Atlanticide
 {
     public class Telegrabable : MonoBehaviour
     {
-        public bool telegrabbed;
+        [SerializeField, Range(0.1f, 20f)]
+        private float _baseTelegrabSpeed = 1;
+
+        private float _telegrabSpeed;
+        private int _telegrabID;
         private Vector3 _telegrabPosition;
+
+        public bool Telegrabbed { get; set; }
 
         private void Update()
         {
-            telegrabbed = false;
+            UpdateTelegrabState();
+            Move();
+        }
 
-            foreach (Transform telegrab in GameManager.Instance.GetTelegrabs())
+        private void UpdateTelegrabState()
+        {
+            Transform[] telegrabs = GameManager.Instance.GetTelegrabs();
+            if (Telegrabbed)
             {
-                if (telegrab != null &&
-                    Vector3.Distance(transform.position, telegrab.position) <= World.Instance.telegrabRadius)
+                // The telegrab stopped
+                if (telegrabs[_telegrabID] == null)
                 {
-                    telegrabbed = true;
-                    _telegrabPosition = telegrab.position;
-                    break;
+                    Telegrabbed = false;
+                }
+                else
+                {
+                    _telegrabPosition = telegrabs[_telegrabID].position;
                 }
             }
-
-            if (telegrabbed)
+            else
             {
-                transform.position = _telegrabPosition;
+                for (int i = 0; i < telegrabs.Length; i++)
+                {
+                    if (telegrabs[i] != null &&
+                        Vector3.Distance(transform.position, telegrabs[i].position) <= World.Instance.telegrabRadius)
+                    {
+                        Telegrabbed = true;
+                        _telegrabID = i;
+                        _telegrabPosition = telegrabs[i].position;
+                        break;
+                    }
+                }
+            }
+        }
+
+        private void Move()
+        {
+            if (Telegrabbed)
+            {
+                _telegrabSpeed = _baseTelegrabSpeed + Vector3.Distance(transform.position, _telegrabPosition) * 3f;
+
+                transform.position =
+                    Vector3.MoveTowards(transform.position, _telegrabPosition, _telegrabSpeed * Time.deltaTime);
             }
         }
     }

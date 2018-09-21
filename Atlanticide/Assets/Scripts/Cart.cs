@@ -6,14 +6,18 @@ namespace Atlanticide
 {
     public class Cart : MonoBehaviour
     {
-        // Use this for initialization
-        void Start()
+        /// <summary>
+        /// Initializes the object.
+        /// </summary>
+        private void Start()
         {
 
         }
 
-        // Update is called once per frame
-        void Update()
+        /// <summary>
+        /// Updates the object once per frame.
+        /// </summary>
+        private void Update()
         {
 
         }

@@ -24,7 +24,7 @@ GameObject:
   - component: {fileID: 23613210804707372}
   - component: {fileID: 114626275593767968}
   - component: {fileID: 114952992052952158}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: PlayerCharacter
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -131,7 +131,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1465877221674398}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 3.79, y: 0.5, z: 10.9}
+  m_LocalPosition: {x: 0, y: 0.5, z: 4}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4643413983326668}
@@ -333,10 +333,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _speed: 7
   _turningSpeed: 0.3
+  _maxHitpoints: 1
   _pushBlock: {fileID: 1860198998906878}
   _telegrab: {fileID: 1787108829491718}
-  _energyDrainSpeed: 0.3
-  _energyRechargeSpeed: 0.9
+  _energyDrainSpeed: 0.1
+  _energyRechargeSpeed: 2
   _minRechargedEnergy: 0.3
 --- !u!114 &114952992052952158
 MonoBehaviour:
@@ -349,7 +350,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bbe50ab621cf0ee40888582ae2db13af, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  telegrabbed: 0
+  _baseTelegrabSpeed: 2
 --- !u!135 &135483930551706938
 SphereCollider:
   m_ObjectHideFlags: 1
