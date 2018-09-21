@@ -61,7 +61,7 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RenderingLayerMask: 4294967295
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: 18fe2a522db7b5847bec9b74b27f2f0c, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -101,7 +101,7 @@ Rigidbody:
   m_UseGravity: 0
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 0
+  m_Constraints: 126
   m_CollisionDetection: 0
 --- !u!114 &114161746573794730
 MonoBehaviour:
@@ -116,8 +116,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   damage: 1
   _continuousDamage: 0
-  _destroyOnCollision: 1
-  damageDealt: 0
+  _deactivateOnCollision: 1
 --- !u!114 &114204464223301432
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -129,10 +128,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3ece001fb63147c4686ca79b33ee3d57, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _topSpeed: {x: -10, y: 0, z: 0}
+  _topSpeed: {x: 0, y: 0, z: 0}
   _acceleration: 1
   _deceleration: -1
-  _active: 0
+  _decayDistance: 10
+  _active: 1
   _hasInstantTopSpeedByDefault: 1
 --- !u!114 &114613580595468400
 MonoBehaviour:

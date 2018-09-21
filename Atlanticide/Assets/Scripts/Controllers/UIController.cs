@@ -11,7 +11,10 @@ namespace Atlanticide
         private Text _scoreText;
 
         [SerializeField]
-        private Slider _energyBar;
+        private Slider _energyBar1;
+
+        [SerializeField]
+        private Slider _energyBar2;
 
         /// <summary>
         /// Initializes the object.
@@ -36,9 +39,23 @@ namespace Atlanticide
             _scoreText.text = "Score: " + GameManager.Instance.CurrentScore;
         }
 
-        public Slider GetEnergyBar()
+        public Slider GetEnergyBar(int playerNum)
         {
-            return _energyBar;
+            switch (playerNum)
+            {
+                case 0:
+                {
+                    return _energyBar1;
+                }
+                case 1:
+                {
+                    return _energyBar2;
+                }
+                default:
+                {
+                    return null;
+                }
+            }
         }
     }
 }

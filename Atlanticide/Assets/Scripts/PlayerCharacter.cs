@@ -8,7 +8,7 @@ namespace Atlanticide
     public class PlayerCharacter : GameCharacter
     {
         [SerializeField]
-        private GameObject _pushBlock;
+        private GameObject _pushBeam;
 
         [SerializeField]
         private GameObject _telegrab;
@@ -22,6 +22,7 @@ namespace Atlanticide
         [SerializeField, Range(0.01f, 1f)]
         private float _minRechargedEnergy;
 
+        private Weapon _weapon;
         private bool _useEnergy; // TODO: Use for what?
         private bool _outOfEnergy;
         private float _energy = 1;
@@ -38,7 +39,8 @@ namespace Atlanticide
         protected override void Start()
         {
             base.Start();
-            _myWall = _pushBlock;
+            _myWall = _pushBeam;
+            _weapon = GetComponentInChildren<Weapon>();
         }
 
         /// <summary>
@@ -106,12 +108,17 @@ namespace Atlanticide
 
             // Test
 
-            // Push block
-            //_pushBlock.SetActive(_useEnergy);
+            // Push beam
+            //_pushBeam.SetActive(_useEnergy);
 
             // Telegrab
             _telegrab.SetActive(_useEnergy);
             GameManager.Instance.UpdateTelegrab(ID, _telegrab.transform, _useEnergy);
+        }
+
+        public void FireWeapon()
+        {
+            _weapon.Fire();
         }
 
         protected override void Die()
@@ -127,7 +134,6 @@ namespace Atlanticide
             base.Respawn();
             _energy = 1;
             _outOfEnergy = false;
-            transform.position = new Vector3(0, 5, 0);
         }
 
         protected override void OnDrawGizmos()

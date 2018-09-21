@@ -19,10 +19,42 @@ namespace Atlanticide
         private float _deceleration;
 
         [SerializeField]
+        private float _decayDistance = 0;
+
+        [SerializeField]
         private bool _active;
 
         [SerializeField]
         private bool _hasInstantTopSpeedByDefault;
+
+        private float _movedDistance;
+
+        /// <summary>
+        /// The top speed vector.
+        /// </summary>
+        public Vector3 TopSpeed
+        {
+            get
+            {
+                return _topSpeed;
+            }
+            set
+            {
+                _topSpeed = value;
+            }
+        }
+
+        public float DecayDistance
+        {
+            get
+            {
+                return _decayDistance;
+            }
+            set
+            {
+                _decayDistance = value;
+            }
+        }
 
         /// <summary>
         /// The current speed.
@@ -37,7 +69,7 @@ namespace Atlanticide
         /// <summary>
         /// The speed factor.
         /// </summary>
-        public float SpeedFactor { get; private set; }
+        public float SpeedRatio { get; private set; }
 
         /// <summary>
         /// Has the object reached the target speed.
@@ -72,7 +104,15 @@ namespace Atlanticide
         /// </summary>
         private void MoveObject()
         {
-            transform.position += CurrentSpeed * Time.deltaTime;
+            Vector3 movement = CurrentSpeed * Time.deltaTime;
+            _movedDistance += movement.magnitude;
+            transform.position += movement;
+
+            if (DecayDistance > 0 && _movedDistance >= DecayDistance)
+            {
+                _movedDistance = 0;
+                gameObject.SetActive(false);
+            }
         }
 
         /// <summary>
@@ -88,22 +128,22 @@ namespace Atlanticide
 
             if (_active)
             {
-                SpeedFactor += _acceleration * Time.deltaTime;
+                SpeedRatio += _acceleration * Time.deltaTime;
 
-                if (SpeedFactor >= 1)
+                if (SpeedRatio >= 1)
                 {
-                    SpeedFactor = 1;
-                    CurrentSpeed = _topSpeed;
+                    SpeedRatio = 1;
+                    CurrentSpeed = TopSpeed;
                     ReachedTargetSpeed = true;
                 }
             }
             else
             {
-                SpeedFactor += _deceleration * Time.deltaTime;
+                SpeedRatio += _deceleration * Time.deltaTime;
 
-                if (SpeedFactor <= 0)
+                if (SpeedRatio <= 0)
                 {
-                    SpeedFactor = 0;
+                    SpeedRatio = 0;
                     CurrentSpeed = Vector3.zero;
                     ReachedTargetSpeed = true;
                     Moving = false;
@@ -112,7 +152,7 @@ namespace Atlanticide
 
             if (!ReachedTargetSpeed)
             {
-                CurrentSpeed = SpeedFactor * _topSpeed;
+                CurrentSpeed = SpeedRatio * TopSpeed;
             }
         }
 
@@ -126,16 +166,17 @@ namespace Atlanticide
         {
             if (instant)
             {
-                SpeedFactor = 1;
-                CurrentSpeed = _topSpeed;
+                SpeedRatio = 1;
+                CurrentSpeed = TopSpeed;
             }
             else
             {
-                SpeedFactor = 0;
+                SpeedRatio = 0;
                 CurrentSpeed = Vector3.zero;
             }
 
             ReachedTargetSpeed = instant;
+            _movedDistance = 0;
             _active = true;
             Moving = true;
         }
@@ -149,7 +190,7 @@ namespace Atlanticide
         {
             if (instant)
             {
-                SpeedFactor = 0;
+                SpeedRatio = 0;
                 CurrentSpeed = Vector3.zero;
                 ReachedTargetSpeed = true;
                 Moving = false;

@@ -92,12 +92,10 @@ namespace Atlanticide
                 _players[i].ID = i;
                 _players[i].name = "Player " + (i + 1);
                 _players[i].Input = new PlayerInput(i);
+                _players[i].EnergyBar = _UI.GetEnergyBar(i);
 
-                // Test
-                if (i == 0)
-                {
-                    _players[i].EnergyBar = _UI.GetEnergyBar();
-                }
+                // Testing
+                _players[i].transform.position = new Vector3(i * 2 - 4, 0.5f, 4);
             }
         }
 

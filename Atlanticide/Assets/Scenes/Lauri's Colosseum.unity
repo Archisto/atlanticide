@@ -204,6 +204,30 @@ Prefab:
       propertyPath: m_Name
       value: Projectile (4)
       objectReference: {fileID: 0}
+    - target: {fileID: 1857649544940456, guid: a6d69c84222b23d4787f2c540557d773, type: 2}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114161746573794730, guid: a6d69c84222b23d4787f2c540557d773,
+        type: 2}
+      propertyPath: _deactivateOnCollision
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114204464223301432, guid: a6d69c84222b23d4787f2c540557d773,
+        type: 2}
+      propertyPath: _active
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114204464223301432, guid: a6d69c84222b23d4787f2c540557d773,
+        type: 2}
+      propertyPath: _decayDistance
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114204464223301432, guid: a6d69c84222b23d4787f2c540557d773,
+        type: 2}
+      propertyPath: _topSpeed.x
+      value: -10
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a6d69c84222b23d4787f2c540557d773, type: 2}
   m_IsPrefabAsset: 0
@@ -763,6 +787,7 @@ MonoBehaviour:
   _topSpeed: {x: 2, y: 0, z: 0}
   _acceleration: 1
   _deceleration: -1
+  _decayDistance: 0
   _active: 1
   _hasInstantTopSpeedByDefault: 1
 --- !u!114 &271442024
@@ -1237,6 +1262,21 @@ Prefab:
       propertyPath: m_Name
       value: Projectile (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 114204464223301432, guid: a6d69c84222b23d4787f2c540557d773,
+        type: 2}
+      propertyPath: _decayDistance
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114204464223301432, guid: a6d69c84222b23d4787f2c540557d773,
+        type: 2}
+      propertyPath: _active
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114204464223301432, guid: a6d69c84222b23d4787f2c540557d773,
+        type: 2}
+      propertyPath: _topSpeed.x
+      value: -10
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a6d69c84222b23d4787f2c540557d773, type: 2}
   m_IsPrefabAsset: 0
@@ -1330,6 +1370,7 @@ MonoBehaviour:
   _topSpeed: {x: 2, y: 0, z: 0}
   _acceleration: 1
   _deceleration: -1
+  _decayDistance: 0
   _active: 1
   _hasInstantTopSpeedByDefault: 1
 --- !u!136 &421188890
@@ -2269,12 +2310,12 @@ Prefab:
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1672372502797790, guid: 2800859ab82631c479bea7095e203ec0,
     type: 2}
-  m_PrefabInternal: {fileID: 808765122}
+  m_PrefabInternal: {fileID: 867236393}
 --- !u!4 &699635168 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4223208665594164, guid: 2800859ab82631c479bea7095e203ec0,
     type: 2}
-  m_PrefabInternal: {fileID: 808765122}
+  m_PrefabInternal: {fileID: 867236393}
 --- !u!1 &702628143
 GameObject:
   m_ObjectHideFlags: 0
@@ -2355,7 +2396,7 @@ Transform:
   m_GameObject: {fileID: 702628143}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 5.5, y: 0, z: 7.02}
-  m_LocalScale: {x: 25.789, y: 0.5, z: 10.523}
+  m_LocalScale: {x: 25.789, y: 0.5, z: 17.62392}
   m_Children: []
   m_Father: {fileID: 2073475971}
   m_RootOrder: 0
@@ -2641,6 +2682,30 @@ Prefab:
       propertyPath: m_Name
       value: Projectile (3)
       objectReference: {fileID: 0}
+    - target: {fileID: 1857649544940456, guid: a6d69c84222b23d4787f2c540557d773, type: 2}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114161746573794730, guid: a6d69c84222b23d4787f2c540557d773,
+        type: 2}
+      propertyPath: _deactivateOnCollision
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114204464223301432, guid: a6d69c84222b23d4787f2c540557d773,
+        type: 2}
+      propertyPath: _active
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114204464223301432, guid: a6d69c84222b23d4787f2c540557d773,
+        type: 2}
+      propertyPath: _decayDistance
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114204464223301432, guid: a6d69c84222b23d4787f2c540557d773,
+        type: 2}
+      propertyPath: _topSpeed.x
+      value: -10
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a6d69c84222b23d4787f2c540557d773, type: 2}
   m_IsPrefabAsset: 0
@@ -2705,48 +2770,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4764982075234844, guid: 17cde5192d7728e498d51956a7227866,
     type: 2}
   m_PrefabInternal: {fileID: 1183370827}
---- !u!1001 &808765122
-Prefab:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    m_TransformParent: {fileID: 237953302}
-    m_Modifications:
-    - target: {fileID: 4223208665594164, guid: 2800859ab82631c479bea7095e203ec0, type: 2}
-      propertyPath: m_LocalPosition.x
-      value: -0.29999924
-      objectReference: {fileID: 0}
-    - target: {fileID: 4223208665594164, guid: 2800859ab82631c479bea7095e203ec0, type: 2}
-      propertyPath: m_LocalPosition.y
-      value: 0.25
-      objectReference: {fileID: 0}
-    - target: {fileID: 4223208665594164, guid: 2800859ab82631c479bea7095e203ec0, type: 2}
-      propertyPath: m_LocalPosition.z
-      value: 0.8200004
-      objectReference: {fileID: 0}
-    - target: {fileID: 4223208665594164, guid: 2800859ab82631c479bea7095e203ec0, type: 2}
-      propertyPath: m_LocalRotation.x
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4223208665594164, guid: 2800859ab82631c479bea7095e203ec0, type: 2}
-      propertyPath: m_LocalRotation.y
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4223208665594164, guid: 2800859ab82631c479bea7095e203ec0, type: 2}
-      propertyPath: m_LocalRotation.z
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4223208665594164, guid: 2800859ab82631c479bea7095e203ec0, type: 2}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4223208665594164, guid: 2800859ab82631c479bea7095e203ec0, type: 2}
-      propertyPath: m_RootOrder
-      value: 0
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 2800859ab82631c479bea7095e203ec0, type: 2}
-  m_IsPrefabAsset: 0
 --- !u!1 &845861510
 GameObject:
   m_ObjectHideFlags: 0
@@ -2837,6 +2860,48 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4764982075234844, guid: 17cde5192d7728e498d51956a7227866,
     type: 2}
   m_PrefabInternal: {fileID: 712367333}
+--- !u!1001 &867236393
+Prefab:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 237953302}
+    m_Modifications:
+    - target: {fileID: 4223208665594164, guid: 2800859ab82631c479bea7095e203ec0, type: 2}
+      propertyPath: m_LocalPosition.x
+      value: -0.29999924
+      objectReference: {fileID: 0}
+    - target: {fileID: 4223208665594164, guid: 2800859ab82631c479bea7095e203ec0, type: 2}
+      propertyPath: m_LocalPosition.y
+      value: 0.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 4223208665594164, guid: 2800859ab82631c479bea7095e203ec0, type: 2}
+      propertyPath: m_LocalPosition.z
+      value: 0.8200004
+      objectReference: {fileID: 0}
+    - target: {fileID: 4223208665594164, guid: 2800859ab82631c479bea7095e203ec0, type: 2}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4223208665594164, guid: 2800859ab82631c479bea7095e203ec0, type: 2}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4223208665594164, guid: 2800859ab82631c479bea7095e203ec0, type: 2}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4223208665594164, guid: 2800859ab82631c479bea7095e203ec0, type: 2}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4223208665594164, guid: 2800859ab82631c479bea7095e203ec0, type: 2}
+      propertyPath: m_RootOrder
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 2800859ab82631c479bea7095e203ec0, type: 2}
+  m_IsPrefabAsset: 0
 --- !u!1001 &875173482
 Prefab:
   m_ObjectHideFlags: 0
@@ -3824,6 +3889,30 @@ Prefab:
     - target: {fileID: 1857649544940456, guid: a6d69c84222b23d4787f2c540557d773, type: 2}
       propertyPath: m_Name
       value: Projectile (2)
+      objectReference: {fileID: 0}
+    - target: {fileID: 1857649544940456, guid: a6d69c84222b23d4787f2c540557d773, type: 2}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114161746573794730, guid: a6d69c84222b23d4787f2c540557d773,
+        type: 2}
+      propertyPath: _deactivateOnCollision
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114204464223301432, guid: a6d69c84222b23d4787f2c540557d773,
+        type: 2}
+      propertyPath: _active
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114204464223301432, guid: a6d69c84222b23d4787f2c540557d773,
+        type: 2}
+      propertyPath: _decayDistance
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114204464223301432, guid: a6d69c84222b23d4787f2c540557d773,
+        type: 2}
+      propertyPath: _topSpeed.x
+      value: -10
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a6d69c84222b23d4787f2c540557d773, type: 2}
@@ -5961,6 +6050,21 @@ Prefab:
       propertyPath: m_RootOrder
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 114204464223301432, guid: a6d69c84222b23d4787f2c540557d773,
+        type: 2}
+      propertyPath: _decayDistance
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114204464223301432, guid: a6d69c84222b23d4787f2c540557d773,
+        type: 2}
+      propertyPath: _active
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114204464223301432, guid: a6d69c84222b23d4787f2c540557d773,
+        type: 2}
+      propertyPath: _topSpeed.x
+      value: -10
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a6d69c84222b23d4787f2c540557d773, type: 2}
   m_IsPrefabAsset: 0
@@ -6430,10 +6534,6 @@ Prefab:
       propertyPath: m_Pivot.y
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 1187253780042196, guid: 933fb5427eaf36848b49493b36609d93, type: 2}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 933fb5427eaf36848b49493b36609d93, type: 2}
   m_IsPrefabAsset: 0
@@ -6765,6 +6865,7 @@ MonoBehaviour:
   _topSpeed: {x: 2, y: 0, z: 0}
   _acceleration: 1
   _deceleration: -1
+  _decayDistance: 0
   _active: 1
   _hasInstantTopSpeedByDefault: 1
 --- !u!1001 &2040911615

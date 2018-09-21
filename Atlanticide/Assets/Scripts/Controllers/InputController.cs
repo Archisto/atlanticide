@@ -47,6 +47,12 @@ namespace Atlanticide
 
                     // Spend energy (for what?)
                     _players[i].SpendEnergy(_players[i].Input.GetActionInput());
+
+                    // Fire weapon
+                    if (_players[i].Input.GetAltActionInput())
+                    {
+                        _players[i].FireWeapon();
+                    }
                 }
             }
         }
@@ -64,6 +70,22 @@ namespace Atlanticide
                 foreach (NonPlayerCharacter npc in GameManager.Instance.GetNPCs())
                 {
                     npc.Respawn();
+                }
+            }
+
+            // Move NPCs
+            if (Input.GetKey(KeyCode.J))
+            {
+                foreach (NonPlayerCharacter npc in GameManager.Instance.GetNPCs())
+                {
+                    npc.transform.position += Vector3.left * 5 * Time.deltaTime;
+                }
+            }
+            else if (Input.GetKey(KeyCode.L))
+            {
+                foreach (NonPlayerCharacter npc in GameManager.Instance.GetNPCs())
+                {
+                    npc.transform.position += Vector3.right * 5 * Time.deltaTime;
                 }
             }
 

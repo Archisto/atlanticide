@@ -12,9 +12,7 @@ namespace Atlanticide
         private bool _continuousDamage;
 
         [SerializeField]
-        private bool _destroyOnCollision;
-
-        public bool damageDealt;
+        private bool _deactivateOnCollision;
 
         /// <summary>
         /// Handles colliding with objects that can take damage.
@@ -22,15 +20,12 @@ namespace Atlanticide
         /// <param name="collision">The collision</param>
         private void OnCollisionEnter(Collision collision)
         {
-            if (!damageDealt || _continuousDamage)
-            {
-                GameCharacter character = collision.gameObject.GetComponent<GameCharacter>();
-                DealDamage(character);
-            }
+            GameCharacter character = collision.gameObject.GetComponent<GameCharacter>();
+            DealDamage(character);
 
-            if (_destroyOnCollision)
+            if (_deactivateOnCollision)
             {
-                Destroy(gameObject);
+                gameObject.SetActive(false);
             }
         }
 
@@ -43,19 +38,10 @@ namespace Atlanticide
         {
             if (character != null)
             {
-                damageDealt = true;
                 return character.TakeDamage(damage);
             }
 
             return false;
-        }
-
-        /// <summary>
-        /// Reactivates the damage dealer if the damage has already been dealt.
-        /// </summary>
-        public void Reactivate()
-        {
-            damageDealt = false;
         }
     }
 }

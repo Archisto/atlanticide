@@ -64,6 +64,11 @@ namespace Atlanticide
 
         private void OnCollisionEnter(Collision collision)
         {
+            if (Telegrabbed)
+            {
+                return;
+            }
+
             GameCharacter character = collision.gameObject.GetComponent<GameCharacter>();
             if (character != null)
             {

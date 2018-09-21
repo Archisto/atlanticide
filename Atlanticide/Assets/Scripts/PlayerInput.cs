@@ -98,7 +98,16 @@ namespace Atlanticide
         /// <returns>Is the action input pressed</returns>
         public bool GetActionInput()
         {
-            return Input.GetButton(_actionKey);
+            return Input.GetButton(_actionKey) || Input.GetAxis(_actionKey) == 1;
+        }
+
+        /// <summary>
+        /// Gets the player's alternate action input.
+        /// </summary>
+        /// <returns>Is the alt action input pressed</returns>
+        public bool GetAltActionInput()
+        {
+            return Input.GetButton(_altActionKey) || Input.GetAxis(_altActionKey) == 1;
         }
     }
 }
