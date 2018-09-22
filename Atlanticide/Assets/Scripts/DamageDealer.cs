@@ -26,9 +26,11 @@ namespace Atlanticide
         /// <param name="collision">The collision</param>
         private void OnCollisionEnter(Collision collision)
         {
+            Collider immediateCollider = collision.contacts[0].otherCollider;
+
             if (_damageCharacters)
             {
-                GameCharacter character = collision.gameObject.GetComponent<GameCharacter>();
+                GameCharacter character = immediateCollider.gameObject.GetComponent<GameCharacter>();
                 DealDamage(character);
             }
             if (_damageDestructibleObjects)

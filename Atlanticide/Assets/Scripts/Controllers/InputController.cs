@@ -32,7 +32,8 @@ namespace Atlanticide
         {
             for (int i = 0; i < _players.Length; i++)
             {
-                if (_players[i] != null && _players[i].gameObject.activeSelf)
+                if (_players[i] != null && _players[i].gameObject.activeSelf &&
+                    !_players[i].IsDead)
                 {
                     // Moving the player character
                     Vector3 movingDirection = _players[i].Input.GetMoveInput();

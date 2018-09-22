@@ -13,6 +13,9 @@ namespace Atlanticide
         [SerializeField]
         private GameObject _telegrab;
 
+        [SerializeField]
+        private GameObject _shield;
+
         [SerializeField, Range(0.2f, 20f)]
         private float _jumpHeight = 1f;
 
@@ -58,6 +61,7 @@ namespace Atlanticide
         {
             base.ResetBaseValues();
             _jumping = false;
+            SetAbilityActive(false);
         }
 
         /// <summary>
@@ -207,6 +211,11 @@ namespace Atlanticide
             _energy = Utils.DrainOrRecharge(_energy, _useEnergy, _energyDrainSpeed,
                 _energyRechargeSpeed, _minRechargedEnergy, _outOfEnergy, out _outOfEnergy);
 
+            if (_outOfEnergy)
+            {
+                SetAbilityActive(false);
+            }
+
             if (EnergyBar != null)
             {
                 EnergyBar.value = _energy;
@@ -229,13 +238,20 @@ namespace Atlanticide
         public void SpendEnergy(bool active)
         {
             _useEnergy = active && !_outOfEnergy;
+            SetAbilityActive(active);
+        }
 
+        private void SetAbilityActive(bool active)
+        {
             // Push beam
-            //_pushBeam.SetActive(_useEnergy);
+            //_pushBeam.SetActive(active);
 
             // Telegrab
-            _telegrab.SetActive(_useEnergy);
-            GameManager.Instance.UpdateTelegrab(ID, _telegrab.transform, _useEnergy);
+            //_telegrab.SetActive(active);
+            //GameManager.Instance.UpdateTelegrab(ID, _telegrab.transform, active);
+
+            // Shield
+            _shield.SetActive(active);
         }
 
         /// <summary>
@@ -252,7 +268,7 @@ namespace Atlanticide
         protected override void Die()
         {
             base.Die();
-            GameManager.Instance.UpdateTelegrab(ID, _telegrab.transform, false);
+            SetAbilityActive(false);
         }
 
         public void TryRespawn()
