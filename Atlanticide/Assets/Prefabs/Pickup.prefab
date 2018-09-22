@@ -24,6 +24,7 @@ GameObject:
   - component: {fileID: 65372656856949318}
   - component: {fileID: 54526637745668572}
   - component: {fileID: 114046625425976832}
+  - component: {fileID: 114928497696685284}
   m_Layer: 12
   m_Name: Pickup
   m_TagString: Untagged
@@ -125,3 +126,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _score: 100
+--- !u!114 &114928497696685284
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1056169832355710}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbe50ab621cf0ee40888582ae2db13af, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _baseTelegrabSpeed: 1
+  _active: 1

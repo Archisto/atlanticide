@@ -38,6 +38,7 @@ namespace Atlanticide
         private PlayerCharacter[] _players;
         private NonPlayerCharacter[] _npcs;
         private UIController _UI;
+        private Pickup[] _pickups;
         private Transform[] _telegrabs;
         private FadeToColor _fade;
         private bool _sceneChanged;
@@ -45,7 +46,7 @@ namespace Atlanticide
 
         public int CurrentLevel { get; set; }
 
-        public int CurrentScore { get; set; }
+        public int CurrentScore { get; private set; }
 
         public bool SceneChanging { get; private set; }
 
@@ -97,6 +98,7 @@ namespace Atlanticide
             InitPlayers();
             InitNPCs();
             InitFade();
+            _pickups = FindObjectsOfType<Pickup>();
             _sceneChanged = false;
         }
 
@@ -229,15 +231,10 @@ namespace Atlanticide
         /// </summary>
         public void ResetLevel()
         {
-            foreach (PlayerCharacter pc in _players)
-            {
-                pc.Respawn();
-            }
-
-            foreach (NonPlayerCharacter npc in _npcs)
-            {
-                npc.Respawn();
-            }
+            _players.ForEach(pc => pc.Respawn());
+            _npcs.ForEach(npc => npc.Respawn());
+            _pickups.ForEach(p => p.ResetPickup());
+            SetScore(0);
         }
 
         /// <summary>
@@ -275,7 +272,7 @@ namespace Atlanticide
             {
                 Debug.Log("Loading scene: " + sceneName);
 
-                Utils.ForEach(_players, p => p.CancelActions());
+                _players.ForEach(p => p.CancelActions());
 
                 SceneChanging = true;
                 _nextSceneName = sceneName;

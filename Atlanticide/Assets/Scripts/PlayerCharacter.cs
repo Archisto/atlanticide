@@ -126,7 +126,6 @@ namespace Atlanticide
                             //movement.x = Utils.WeighValue(movement.x, 0, slopeSpeedDampening);
                             movement.z = movement.z * ratio;
                             //movement.z = Utils.WeighValue(movement.z, 0, slopeSpeedDampening);
-                            GameManager.Instance.SetScore((int) (groundHeightDiff * 100));
 
                             newPosition = transform.position + movement;
 
