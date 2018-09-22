@@ -170,6 +170,8 @@ namespace Atlanticide
 
         protected Vector3? GetPositionOffWall(Vector3 oldPosition, Vector3 position)
         {
+            // TODO: Fix awkward bumping
+
             Vector3 result = position;
             RaycastHit hit;
             bool touchingWall =
@@ -178,7 +180,7 @@ namespace Atlanticide
                 Physics.Raycast(new Ray(position + Vector3.left * _wallHitDist, Vector3.right), out hit, 2 * _wallHitDist, _wallLayerMask) ||
                 Physics.Raycast(new Ray(position + Vector3.forward * _wallHitDist, Vector3.back), out hit, 2 * _wallHitDist, _wallLayerMask);
 
-            if (touchingWall && hit.transform.gameObject != _myWall)
+            if (touchingWall && hit.transform.gameObject != _myWall && hit.transform.gameObject != gameObject)
             {
                 Vector3 hitDirection = hit.point - position;
 
@@ -267,6 +269,10 @@ namespace Atlanticide
             _distFallen = 0;
             transform.position = _respawnPosition;
             Debug.Log(name + " respawned.");
+        }
+
+        public virtual void CancelActions()
+        {
         }
 
         protected virtual void OnDrawGizmos()

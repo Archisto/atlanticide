@@ -8,4 +8,10 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Lauri's Colosseum.unity
     guid: e0803ffc2901a9444bd4c1f553b935d3
+  - enabled: 1
+    path: Assets/Scenes/Level1.unity
+    guid: e026804eca421d049a49fdba90c17054
+  - enabled: 1
+    path: Assets/Scenes/Level2.unity
+    guid: fcdab2f525b0ddb4693c687a004e5016
   m_configObjects: {}

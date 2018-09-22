@@ -16,6 +16,9 @@ namespace Atlanticide
         [SerializeField]
         private Slider _energyBar2;
 
+        [SerializeField]
+        private Image _fade;
+
         /// <summary>
         /// Initializes the object.
         /// </summary>
@@ -56,6 +59,11 @@ namespace Atlanticide
                     return null;
                 }
             }
+        }
+
+        public Image GetFade()
+        {
+            return _fade;
         }
     }
 }

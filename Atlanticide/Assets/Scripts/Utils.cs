@@ -85,5 +85,39 @@ namespace Atlanticide
 
             return null;
         }
+
+        public static float Ratio(float value, float lowBound, float highBound)
+        {
+            if (value <= lowBound)
+            {
+                return 0;
+            }
+            else if (value >= highBound)
+            {
+                return 1;
+            }
+            else
+            {
+                return ((value - lowBound) / (highBound - lowBound));
+            }
+        }
+
+        public static float ReverseRatio(float value, float lowBound, float highBound)
+        {
+            return (1 - Ratio(value, lowBound, highBound));
+        }
+
+        public static float WeighValue(float value, float heavyValue, float amount)
+        {
+            return value + (heavyValue - value) * amount;
+        }
+
+        public static void ForEach<T>(this T[] array, Action<T> action)
+        {
+            foreach (T obj in array)
+            {
+                action(obj);
+            }
+        }
     }
 }

@@ -37,7 +37,7 @@ namespace Atlanticide
                 Vector3 newPosition = transform.position + avoidVector;
                 _avoidDist += avoidVector.magnitude;
 
-                if (!CheckGroundCollision(newPosition, false) || _avoidDist > _maxAvoidDist)
+                if (GroundHeightDifference(newPosition) <= -10 || _avoidDist > _maxAvoidDist)
                 {
                     _touchedByOtherChar = false;
                     _avoidDist = 0;

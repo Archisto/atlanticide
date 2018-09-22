@@ -21,15 +21,18 @@ namespace Atlanticide
         /// </summary>
         private void Update()
         {
-            CheckInput();
-            CheckDebugInput();
+            if (!GameManager.Instance.FadeActive)
+            {
+                CheckInput();
+                CheckDebugInput();
+            }
         }
 
         private void CheckInput()
         {
             for (int i = 0; i < _players.Length; i++)
             {
-                if (_players[i] != null && _players[i].gameObject.activeSelf && i <= 1) // TODO: Remove 2-player limit
+                if (_players[i] != null && _players[i].gameObject.activeSelf)
                 {
                     // Moving the player character
                     Vector3 movingDirection = _players[i].Input.GetMoveInput();
@@ -59,17 +62,19 @@ namespace Atlanticide
 
         private void CheckDebugInput()
         {
-            // Respawn
+            // Reset
             if (Input.GetKeyDown(KeyCode.R))
             {
-                foreach (PlayerCharacter pc in GameManager.Instance.GetPlayers())
-                {
-                    pc.Respawn();
-                }
+                GameManager.Instance.ResetLevel();
+            }
 
-                foreach (NonPlayerCharacter npc in GameManager.Instance.GetNPCs())
+            // Fade out/in
+            if (Input.GetKeyDown(KeyCode.G))
+            {
+                FadeToColor fade = FindObjectOfType<FadeToColor>();
+                if (fade != null)
                 {
-                    npc.Respawn();
+                    fade.StartNextFade();
                 }
             }
 
@@ -105,6 +110,20 @@ namespace Atlanticide
             else if (Input.GetKeyDown(KeyCode.Alpha4))
             {
                 GameManager.Instance.ActivatePlayers(4);
+            }
+
+            // Change scene
+            if (Input.GetKeyDown(KeyCode.Keypad1))
+            {
+                GameManager.Instance.LoadLevel(1);
+            }
+            if (Input.GetKeyDown(KeyCode.Keypad2))
+            {
+                GameManager.Instance.LoadLevel(2);
+            }
+            if (Input.GetKeyDown(KeyCode.Keypad0))
+            {
+                GameManager.Instance.StartLoadingScene("Lauri's Colosseum");
             }
         }
 

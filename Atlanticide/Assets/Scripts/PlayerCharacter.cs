@@ -23,7 +23,7 @@ namespace Atlanticide
         private float _minRechargedEnergy;
 
         private Weapon _weapon;
-        private bool _useEnergy; // TODO: Use for what?
+        private bool _useEnergy;
         private bool _outOfEnergy;
         private float _energy = 1;
 
@@ -69,9 +69,8 @@ namespace Atlanticide
         {
             if (!IsImmobile)
             {
-                Vector3 newPosition = transform.position;
-                newPosition.x += direction.x * _speed * Time.deltaTime;
-                newPosition.z += direction.y * _speed * Time.deltaTime;
+                Vector3 movement = new Vector3(direction.x, 0, direction.y) * _speed * Time.deltaTime;
+                Vector3 newPosition = transform.position + movement;
 
                 if (_isRising)
                 {
@@ -81,12 +80,39 @@ namespace Atlanticide
                 {
                     float groundHeightDiff = GroundHeightDifference(newPosition);
 
-                    if (groundHeightDiff < 0.5 * _characterSize.y)
+                    // If the slope is too steep upwards, the character doesn't move
+                    if (groundHeightDiff < 0.5f * _characterSize.y)
                     {
-                        if (groundHeightDiff > -0.1 * _characterSize.y &&
-                            groundHeightDiff < 0.2 * _characterSize.y)
+                        // If the slope is too steep upwards or downwards, the height difference is ignored.
+                        // Slopes that are too steep upwards are handled with the Rise method.
+                        // Super minimal height differences are also ignored.
+                        if (groundHeightDiff > -0.1f * _characterSize.y &&
+                            groundHeightDiff < 0.2f * _characterSize.y &&
+                            (groundHeightDiff < -0.0001f * _characterSize.y ||
+                            groundHeightDiff > 0.0001f * _characterSize.y))
                         {
-                            newPosition.y += groundHeightDiff;
+                            movement.y = groundHeightDiff;
+                            float maxGroundHeiDiff = (groundHeightDiff > 0 ? 0.2f : -0.1f) * _characterSize.y;
+                            float ratio = Utils.ReverseRatio(groundHeightDiff, 0, maxGroundHeiDiff);
+                            ratio = (ratio < 0.4f ? 0.4f : ratio);
+
+                            // Very steep slope: groundHeightDiff = +-0.03
+                            //float slopeSpeedDampening = Utils.Ratio(Mathf.Abs(groundHeightDiff), 0, 1f);
+                            //float slopeSpeedDampening = (Mathf.Abs(groundHeightDiff) > 0.07f ? 0.25f : 0.1f);
+                            //float slopeSpeedDampening = 0f;
+
+                            movement.x = movement.x * ratio;
+                            //movement.x = Utils.WeighValue(movement.x, 0, slopeSpeedDampening);
+                            movement.z = movement.z * ratio;
+                            //movement.z = Utils.WeighValue(movement.z, 0, slopeSpeedDampening);
+                            GameManager.Instance.SetScore((int) (groundHeightDiff * 100));
+
+                            newPosition = transform.position + movement;
+
+                            //newPosition =
+                            //    transform.position +
+                            //    new Vector3(direction.x, groundHeightDiff, direction.y).normalized * _speed * Time.deltaTime;
+                            //newPosition.y = transform.position.y + groundHeightDiff;
                         }
 
                         //transform.position = GetPositionOffWall(transform.position, newPosition);
@@ -121,7 +147,6 @@ namespace Atlanticide
 
         public void SpendEnergy(bool active)
         {
-            // TODO: For what?
             _useEnergy = active && !_outOfEnergy;
 
             // Push beam
@@ -162,6 +187,12 @@ namespace Atlanticide
             base.Respawn();
             _energy = 1;
             _outOfEnergy = false;
+        }
+
+        public override void CancelActions()
+        {
+            base.CancelActions();
+            SpendEnergy(false);
         }
 
         protected override void OnDrawGizmos()
