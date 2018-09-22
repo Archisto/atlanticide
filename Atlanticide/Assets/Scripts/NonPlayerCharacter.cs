@@ -55,6 +55,9 @@ namespace Atlanticide
             //gameObject.SetActive(false);
         }
 
+        /// <summary>
+        /// Kills the character.
+        /// </summary>
         protected override void Die()
         {
             base.Die();
@@ -62,10 +65,13 @@ namespace Atlanticide
             gameObject.SetActive(false);
         }
 
-        public override void Respawn()
+        /// <summary>
+        /// Resets the character's base values.
+        /// </summary>
+        protected override void ResetBaseValues()
         {
-            base.Respawn();
-            gameObject.SetActive(true);
+            base.ResetBaseValues();
+            _touchedByOtherChar = false;
         }
 
         private void OnCollisionEnter(Collision collision)

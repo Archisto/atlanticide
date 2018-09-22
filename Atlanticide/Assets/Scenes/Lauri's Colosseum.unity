@@ -416,6 +416,11 @@ Prefab:
       propertyPath: telegrabRadius
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: 114430242178735550, guid: e370b286f64f11b4faf9c3287e90b691,
+        type: 2}
+      propertyPath: gravity
+      value: 8
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e370b286f64f11b4faf9c3287e90b691, type: 2}
   m_IsPrefabAsset: 0
@@ -1061,11 +1066,6 @@ MonoBehaviour:
   _lockX: 0
   _lockY: 1
   _lockZ: 1
---- !u!20 &271442027 stripped
-Camera:
-  m_CorrespondingSourceObject: {fileID: 20095619736797518, guid: 5a3c912421e028f448e81c69aa73a240,
-    type: 2}
-  m_PrefabInternal: {fileID: 1696386066}
 --- !u!1001 &286901086
 Prefab:
   m_ObjectHideFlags: 0
@@ -6286,21 +6286,6 @@ Prefab:
     - target: {fileID: 4109859290790634, guid: 6843a9f87191ac84ea951e29395336b0, type: 2}
       propertyPath: m_RootOrder
       value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: 114240849765634108, guid: 6843a9f87191ac84ea951e29395336b0,
-        type: 2}
-      propertyPath: _followedCamera
-      value: 
-      objectReference: {fileID: 271442027}
-    - target: {fileID: 114240849765634108, guid: 6843a9f87191ac84ea951e29395336b0,
-        type: 2}
-      propertyPath: _fadeOutTime
-      value: 0.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 114240849765634108, guid: 6843a9f87191ac84ea951e29395336b0,
-        type: 2}
-      propertyPath: _fadeInTime
-      value: 0.5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 6843a9f87191ac84ea951e29395336b0, type: 2}

@@ -48,13 +48,26 @@ namespace Atlanticide
                         _players[i].LookInput(lookingDirection);
                     }
 
-                    // Spend energy (for what?)
+                    // Jumping
+                    if (_players[i].Input.GetJumpInput())
+                    {
+                        _players[i].Jump();
+                    }
+
+                    // Using an ability
                     _players[i].SpendEnergy(_players[i].Input.GetActionInput());
 
-                    // Fire weapon
+                    // Firing a weapon
                     if (_players[i].Input.GetAltActionInput())
                     {
                         _players[i].FireWeapon();
+                    }
+
+                    // Pausing the game
+                    if (_players[i].Input.GetPauseInput())
+                    {
+                        // TODO
+                        Debug.Log("Game paused");
                     }
                 }
             }

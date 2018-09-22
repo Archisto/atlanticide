@@ -128,6 +128,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _baseTelegrabSpeed: 8
+  _active: 1
 --- !u!136 &136612571501005834
 CapsuleCollider:
   m_ObjectHideFlags: 1

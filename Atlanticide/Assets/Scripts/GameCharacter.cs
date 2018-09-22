@@ -49,7 +49,7 @@ namespace Atlanticide
         /// </summary>
         protected virtual void Start()
         {
-            _hitpoints = _maxHitpoints;
+            ResetBaseValues();
             _respawnPosition = transform.position;
             _characterSize = GetComponent<Renderer>().bounds.size;
             _groundHitDist = _characterSize.y / 2;
@@ -59,6 +59,17 @@ namespace Atlanticide
             _platformLayerMask = LayerMask.GetMask("Platform");
             _wallLayerMask = LayerMask.GetMask("Wall");
             _telegrabability = GetComponent<Telegrabable>();
+        }
+
+        /// <summary>
+        /// Resets the character's base values.
+        /// </summary>
+        protected virtual void ResetBaseValues()
+        {
+            IsDead = false;
+            _hitpoints = _maxHitpoints;
+            _isRising = false;
+            _distFallen = 0;
         }
 
         /// <summary>
@@ -75,19 +86,22 @@ namespace Atlanticide
             {
                 if (_isRising)
                 {
+                    // Rising if inside the ground
                     Rise(5f);
 
-                    if (!Physics.Raycast(GetTopOfHeadDownRay(), _maxRiseDist, _platformLayerMask))
+                    if (!CheckSimpleGroundCollision())
                     {
                         _isRising = false;
                     }
                 }
                 else
                 {
+                    // Ground collisions
                     CheckGroundCollision(transform.position, true);
                 }
             }
 
+            // Wall collisions
             Vector3? newPosition = GetPositionOffWall(transform.position, transform.position);
             if (newPosition != null)
             {
@@ -131,7 +145,12 @@ namespace Atlanticide
             }
         }
 
-        protected bool CheckGroundCollision(Vector3 position, bool currPos)
+        protected bool CheckSimpleGroundCollision()
+        {
+            return Physics.Raycast(GetTopOfHeadDownRay(), _maxRiseDist, _platformLayerMask);
+        }
+
+        protected virtual bool CheckGroundCollision(Vector3 position, bool currPos)
         {
             Vector3 p1 = position + new Vector3(-0.5f * _characterSize.x, 0, 0.5f * _characterSize.z);
             Vector3 p2 = position + new Vector3(-0.5f * _characterSize.x, 0, 0.5f * _characterSize.z);
@@ -208,6 +227,9 @@ namespace Atlanticide
             return new Ray(transform.position + new Vector3(0, 0.5f * _characterSize.y, 0), Vector3.down);
         }
 
+        /// <summary>
+        /// Makes the character fall.
+        /// </summary>
         protected virtual void Fall()
         {
             if (_isRising)
@@ -215,11 +237,11 @@ namespace Atlanticide
                 return;
             }
 
-            float fallDistance =
+            float fallSpeed =
                 World.Instance.gravity * Time.deltaTime + 0.05f * _distFallen;
             Vector3 newPosition = transform.position;
-            newPosition.y -= fallDistance;
-            _distFallen += fallDistance;
+            newPosition.y -= fallSpeed;
+            _distFallen += fallSpeed;
             transform.position = newPosition;
 
             if (_distFallen > 20)
@@ -228,6 +250,9 @@ namespace Atlanticide
             }
         }
 
+        /// <summary>
+        /// Makes the character rise.
+        /// </summary>
         protected virtual void Rise(float speed)
         {
             Vector3 newPosition = transform.position;
@@ -254,19 +279,24 @@ namespace Atlanticide
             return false;
         }
 
+        /// <summary>
+        /// Kills the character.
+        /// </summary>
         protected virtual void Die()
         {
             IsDead = true;
-            _telegrabability.Telegrabbed = false;
+            _telegrabability.SetActive(false);
             Debug.Log(name + " died.");
         }
 
+        /// <summary>
+        /// Respawns the character.
+        /// </summary>
         public virtual void Respawn()
         {
-            IsDead = false;
-            _hitpoints = _maxHitpoints;
-            _isRising = false;
-            _distFallen = 0;
+            ResetBaseValues();
+            gameObject.SetActive(true);
+            _telegrabability.SetActive(true);
             transform.position = _respawnPosition;
             Debug.Log(name + " respawned.");
         }

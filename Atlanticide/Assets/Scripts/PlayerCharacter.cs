@@ -13,6 +13,9 @@ namespace Atlanticide
         [SerializeField]
         private GameObject _telegrab;
 
+        [SerializeField, Range(0.2f, 20f)]
+        private float _jumpHeight = 1f;
+
         [SerializeField, Range(0.01f, 2f)]
         private float _energyDrainSpeed;
 
@@ -22,10 +25,17 @@ namespace Atlanticide
         [SerializeField, Range(0.01f, 1f)]
         private float _minRechargedEnergy;
 
+        [SerializeField]
+        private float _respawnTime = 1f;
+
         private Weapon _weapon;
+        private bool _jumping;
+        private bool _onGround;
         private bool _useEnergy;
         private bool _outOfEnergy;
         private float _energy = 1;
+        private float _jumpForce;
+        private float _elapsedRespawnTime;
 
         public int ID { get; set; }
 
@@ -39,8 +49,15 @@ namespace Atlanticide
         protected override void Start()
         {
             base.Start();
+            ResetBaseValues();
             _myWall = _pushBeam;
             _weapon = GetComponentInChildren<Weapon>();
+        }
+
+        protected override void ResetBaseValues()
+        {
+            base.ResetBaseValues();
+            _jumping = false;
         }
 
         /// <summary>
@@ -52,12 +69,16 @@ namespace Atlanticide
 
             if (IsDead)
             {
-                return;
+                UpdateRespawnTimer();
             }
-
-            if (EnergyBar != null)
+            else
             {
-                UpdateEnergy();
+                UpdateJump();
+
+                if (EnergyBar != null)
+                {
+                    UpdateEnergy();
+                }
             }
         }
 
@@ -72,7 +93,7 @@ namespace Atlanticide
                 Vector3 movement = new Vector3(direction.x, 0, direction.y) * _speed * Time.deltaTime;
                 Vector3 newPosition = transform.position + movement;
 
-                if (_isRising)
+                if (_isRising || _jumping)
                 {
                     transform.position = newPosition;
                 }
@@ -113,6 +134,8 @@ namespace Atlanticide
                             //    transform.position +
                             //    new Vector3(direction.x, groundHeightDiff, direction.y).normalized * _speed * Time.deltaTime;
                             //newPosition.y = transform.position.y + groundHeightDiff;
+
+                            _onGround = true;
                         }
 
                         //transform.position = GetPositionOffWall(transform.position, newPosition);
@@ -132,6 +155,52 @@ namespace Atlanticide
         }
 
         /// <summary>
+        /// Makes the character fall.
+        /// </summary>
+        protected override void Fall()
+        {
+            if (!_jumping)
+            {
+                base.Fall();
+                _onGround = false;
+            }
+        }
+
+        /// <summary>
+        /// Makes the player character jump.
+        /// </summary>
+        public void Jump()
+        {
+            if (!_jumping && _onGround)
+            {
+                _jumping = true;
+                _jumpForce = _jumpHeight * 4;
+                _onGround = false;
+            }
+        }
+
+        /// <summary>
+        /// Updates jumping.
+        /// </summary>
+        private void UpdateJump()
+        {
+            if (_jumping)
+            {
+                if (_jumpForce > 0)
+                {
+                    Rise(_jumpForce);
+                    _jumpForce -= 5 * World.Instance.gravity * Time.deltaTime;
+                }
+
+                if (_jumpForce <= 0)
+                {
+                    _jumpForce = 0;
+                    _jumping = false;
+                }
+            }
+        }
+
+        /// <summary>
         /// Updates the player's energy.
         /// </summary>
         private void UpdateEnergy()
@@ -142,6 +211,19 @@ namespace Atlanticide
             if (EnergyBar != null)
             {
                 EnergyBar.value = _energy;
+            }
+        }
+
+        /// <summary>
+        /// Updates the respawn timer.
+        /// </summary>
+        private void UpdateRespawnTimer()
+        {
+            _elapsedRespawnTime += Time.deltaTime;
+            if (_elapsedRespawnTime >= _respawnTime)
+            {
+                _elapsedRespawnTime = 0;
+                TryRespawn();
             }
         }
 
@@ -157,15 +239,25 @@ namespace Atlanticide
             GameManager.Instance.UpdateTelegrab(ID, _telegrab.transform, _useEnergy);
         }
 
+        /// <summary>
+        /// Fires the player character's weapon.
+        /// </summary>
         public void FireWeapon()
         {
             _weapon.Fire();
         }
 
+        /// <summary>
+        /// Kills the character.
+        /// </summary>
         protected override void Die()
         {
             base.Die();
+            GameManager.Instance.UpdateTelegrab(ID, _telegrab.transform, false);
+        }
 
+        public void TryRespawn()
+        {
             NonPlayerCharacter[] npcs = GameManager.Instance.GetNPCs();
             NonPlayerCharacter npc = Utils.GetFirstActiveOrInactiveObject(npcs, true) as NonPlayerCharacter;
             if (npc != null)
@@ -178,6 +270,10 @@ namespace Atlanticide
             }
         }
 
+        /// <summary>
+        /// Respawns the character.
+        /// </summary>
+        /// <param name="npc">The NPC that takes the player character's place.</param>
         public void Respawn(NonPlayerCharacter npc)
         {
             // Promotes an NPC to a player character
@@ -189,9 +285,22 @@ namespace Atlanticide
             _outOfEnergy = false;
         }
 
+        protected override bool CheckGroundCollision(Vector3 position, bool currPos)
+        {
+            bool result = base.CheckGroundCollision(position, currPos);
+
+            if (result && !_jumping)
+            {
+                _onGround = true;
+            }
+
+            return result;
+        }
+
         public override void CancelActions()
         {
             base.CancelActions();
+            _jumping = false;
             SpendEnergy(false);
         }
 
@@ -199,7 +308,12 @@ namespace Atlanticide
         {
             base.OnDrawGizmos();
 
-            if (_useEnergy)
+            if (IsDead)
+            {
+                Gizmos.color = Color.red;
+                Gizmos.DrawWireSphere(transform.position, 1);
+            }
+            else if (_useEnergy)
             {
                 Gizmos.color = Color.blue;
                 Gizmos.DrawWireSphere(_telegrab.transform.position, World.Instance.telegrabRadius);

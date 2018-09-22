@@ -9,6 +9,9 @@ namespace Atlanticide
         [SerializeField, Range(0.1f, 20f)]
         private float _baseTelegrabSpeed = 1;
 
+        [SerializeField]
+        private bool _active = true;
+
         private float _telegrabSpeed;
         private int _telegrabID;
         private Vector3 _telegrabPosition;
@@ -17,8 +20,11 @@ namespace Atlanticide
 
         private void Update()
         {
-            UpdateTelegrabState();
-            Move();
+            if (_active)
+            {
+                UpdateTelegrabState();
+                Move();
+            }
         }
 
         private void UpdateTelegrabState()
@@ -61,6 +67,16 @@ namespace Atlanticide
                 transform.position =
                     Vector3.MoveTowards(transform.position, _telegrabPosition, _telegrabSpeed * Time.deltaTime);
             }
+        }
+
+        public void SetActive(bool active)
+        {
+            if (!active && Telegrabbed)
+            {
+                Telegrabbed = false;
+            }
+
+            _active = active;
         }
     }
 }

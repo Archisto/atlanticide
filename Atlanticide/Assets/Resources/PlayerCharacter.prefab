@@ -382,9 +382,11 @@ MonoBehaviour:
   _maxHitpoints: 1
   _pushBeam: {fileID: 1860198998906878}
   _telegrab: {fileID: 1787108829491718}
+  _jumpHeight: 5
   _energyDrainSpeed: 0.1
   _energyRechargeSpeed: 2
   _minRechargedEnergy: 0.3
+  _respawnTime: 1
 --- !u!114 &114647026059868110
 MonoBehaviour:
   m_ObjectHideFlags: 1
