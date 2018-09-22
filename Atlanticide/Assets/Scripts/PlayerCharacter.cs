@@ -34,7 +34,7 @@ namespace Atlanticide
         private Weapon _weapon;
         private bool _jumping;
         private bool _onGround;
-        private bool _useEnergy;
+        private bool _abilityActive;
         private bool _outOfEnergy;
         private float _energy = 1;
         private float _jumpForce;
@@ -208,7 +208,7 @@ namespace Atlanticide
         /// </summary>
         private void UpdateEnergy()
         {
-            _energy = Utils.DrainOrRecharge(_energy, _useEnergy, _energyDrainSpeed,
+            _energy = Utils.DrainOrRecharge(_energy, _abilityActive, _energyDrainSpeed,
                 _energyRechargeSpeed, _minRechargedEnergy, _outOfEnergy, out _outOfEnergy);
 
             if (_outOfEnergy)
@@ -237,8 +237,8 @@ namespace Atlanticide
 
         public void SpendEnergy(bool active)
         {
-            _useEnergy = active && !_outOfEnergy;
-            SetAbilityActive(active);
+            _abilityActive = active && !_outOfEnergy;
+            SetAbilityActive(_abilityActive);
         }
 
         private void SetAbilityActive(bool active)
@@ -259,7 +259,10 @@ namespace Atlanticide
         /// </summary>
         public void FireWeapon()
         {
-            _weapon.Fire();
+            if (!_abilityActive)
+            {
+                _weapon.Fire();
+            }
         }
 
         /// <summary>
@@ -328,7 +331,7 @@ namespace Atlanticide
                 Gizmos.color = Color.red;
                 Gizmos.DrawWireSphere(transform.position, 1);
             }
-            else if (_useEnergy)
+            else if (_abilityActive)
             {
                 Gizmos.color = Color.blue;
                 Gizmos.DrawWireSphere(_telegrab.transform.position, World.Instance.telegrabRadius);

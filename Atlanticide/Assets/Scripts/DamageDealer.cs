@@ -27,19 +27,21 @@ namespace Atlanticide
         private void OnCollisionEnter(Collision collision)
         {
             Collider immediateCollider = collision.contacts[0].otherCollider;
+            bool hit = false;
 
             if (_damageCharacters)
             {
                 GameCharacter character = immediateCollider.gameObject.GetComponent<GameCharacter>();
-                DealDamage(character);
-            }
-            if (_damageDestructibleObjects)
-            {
-                Destructible destructible = collision.gameObject.GetComponent<Destructible>();
-                DealDamage(destructible);
+                hit = Hit(character);
             }
 
-            if (_deactivateOnCollision)
+            if (!hit && _damageDestructibleObjects)
+            {
+                Destructible destructible = collision.gameObject.GetComponent<Destructible>();
+                hit = Hit(destructible);
+            }
+
+            if (_deactivateOnCollision && hit)
             {
                 gameObject.SetActive(false);
             }
@@ -49,12 +51,13 @@ namespace Atlanticide
         /// Deals damage to a game character.
         /// </summary>
         /// <param name="character">A game character</param>
-        /// <returns>Did the game character take damage.</returns>
-        private bool DealDamage(GameCharacter character)
+        /// <returns>Was the character hit.</returns>
+        private bool Hit(GameCharacter character)
         {
-            if (character != null)
+            if (character != null && !character.IsDead)
             {
-                return character.TakeDamage(damage);
+                character.TakeDamage(damage);
+                return true;
             }
 
             return false;
@@ -64,12 +67,13 @@ namespace Atlanticide
         /// Deals damage to a destructible object.
         /// </summary>
         /// <param name="destructible">A destructible object<param>
-        /// <returns>Did the object take damage.</returns>
-        private bool DealDamage(Destructible destructible)
+        /// <returns>Was the object hit.</returns>
+        private bool Hit(Destructible destructible)
         {
             if (destructible != null)
             {
-                return destructible.TakeDamage(damage);
+                destructible.TakeDamage(damage);
+                return true;
             }
 
             return false;
