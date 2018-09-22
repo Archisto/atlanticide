@@ -213,6 +213,11 @@ namespace Atlanticide
             }
         }
 
+        public void UpdateScore(int score)
+        {
+            SetScore(CurrentScore + score);
+        }
+
         public void SetScore(int score)
         {
             CurrentScore = score;
