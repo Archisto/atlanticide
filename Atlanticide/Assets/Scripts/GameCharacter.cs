@@ -301,10 +301,16 @@ namespace Atlanticide
             Debug.Log(name + " respawned.");
         }
 
+        /// <summary>
+        /// Cancels the character's current actions.
+        /// </summary>
         public virtual void CancelActions()
         {
         }
 
+        /// <summary>
+        /// Draws gizmos.
+        /// </summary>
         protected virtual void OnDrawGizmos()
         {
             // Character dimensions

@@ -115,7 +115,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   damage: 1
-  _continuousDamage: 0
+  _damageCharacters: 1
+  _damageDestructibleObjects: 1
   _deactivateOnCollision: 1
 --- !u!114 &114204464223301432
 MonoBehaviour:
