@@ -40,7 +40,9 @@ namespace Atlanticide
         private UIController _UI;
         private Pickup[] _pickups;
         private Transform[] _telegrabs;
+        private SettingsManager _settings;
         private FadeToColor _fade;
+        private int _playerCount;
         private bool _sceneChanged;
         private string _nextSceneName;
 
@@ -76,7 +78,7 @@ namespace Atlanticide
             {
                 DontDestroyOnLoad(gameObject);
                 SceneManager.activeSceneChanged += InitScene;
-
+                InitSettings();
                 CurrentLevel = 1;
             }
         }
@@ -90,6 +92,11 @@ namespace Atlanticide
             {
                 LoadScene(_nextSceneName);
             }
+        }
+
+        private void InitSettings()
+        {
+            _settings = new SettingsManager();
         }
 
         private void InitScene()
@@ -146,12 +153,13 @@ namespace Atlanticide
         /// <summary>
         /// Activates a player character for each player and deactives the rest.
         /// </summary>
-        /// <param name="playerCount">The player count</param>
-        public void ActivatePlayers(int playerCount)
+        /// <param name="newPlayerCount">The player count</param>
+        public void ActivatePlayers(int newPlayerCount)
         {
+            _playerCount = (newPlayerCount < MaxPlayers ? newPlayerCount : MaxPlayers);
             for (int i = 0; i < MaxPlayers; i++)
             {
-                _players[i].gameObject.SetActive(i < playerCount);
+                _players[i].gameObject.SetActive(i < _playerCount);
             }
         }
 
@@ -236,36 +244,46 @@ namespace Atlanticide
         }
 
         /// <summary>
+        /// Checks how many players there are within range.
+        /// </summary>
+        /// <param name="position">A position</param>
+        /// <param name="range">Allowed distance from the position</param>
+        /// <returns>How many players are there within range.</returns>
+        public int PlayersWithinRange(Vector3 position, float range)
+        {
+            int result = 0;
+
+            foreach (PlayerCharacter pc in _players)
+            {
+                if (!pc.IsDead &&
+                    Vector3.Distance(position, pc.transform.position) <= range)
+                {
+                    result++;
+                }
+            }
+
+            return result;
+        }
+
+        /// <summary>
         /// Checks if there is one or all players within range.
-        /// If all players must be in range, the first one that isn't causes the result to be false.
-        /// Otherwise the first player in range causes the result to be true.
         /// </summary>
         /// <param name="position">A position</param>
         /// <param name="range">Allowed distance from the position</param>
         /// <param name="allPlayers">Are all players needed</param>
         /// <returns>Are there any/all players in range.</returns>
-        public bool PlayersWithinRange(Vector3 position, float range, bool allPlayers)
+        public bool PlayersAreWithinRange(Vector3 position, float range, bool allPlayers)
         {
-            bool result = allPlayers;
+            int playersWithinRange = PlayersWithinRange(position, range);
 
-            foreach (PlayerCharacter pc in _players)
+            if (allPlayers)
             {
-                if (Vector3.Distance(position, pc.transform.position) <= range)
-                {
-                    if (!allPlayers)
-                    {
-                        result = true;
-                        break;
-                    }
-                }
-                else if (allPlayers)
-                {
-                    result = false;
-                    break;
-                }
+                return playersWithinRange == _playerCount;
             }
-
-            return result;
+            else
+            {
+                return playersWithinRange >= 1;
+            }
         }
 
         /// <summary>

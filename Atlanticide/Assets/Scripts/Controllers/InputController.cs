@@ -7,6 +7,9 @@ namespace Atlanticide
     public class InputController : MonoBehaviour
     {
         private PlayerCharacter[] _players;
+        private PlayerCharacter _pausingPlayer;
+        
+        public bool Paused { get; private set; }
 
         /// <summary>
         /// Initializes the object.
@@ -23,55 +26,76 @@ namespace Atlanticide
         {
             if (!GameManager.Instance.FadeActive)
             {
-                CheckInput();
+                CheckPlayerInput();
                 CheckDebugInput();
+
+                if (Paused)
+                {
+                    CheckMenuInput();
+                }
             }
         }
 
-        private void CheckInput()
+        private void CheckPlayerInput()
         {
             for (int i = 0; i < _players.Length; i++)
             {
-                if (_players[i] != null && _players[i].gameObject.activeSelf &&
-                    !_players[i].IsDead)
+                if (_players[i] != null)
                 {
-                    // Moving the player character
-                    Vector3 movingDirection = _players[i].Input.GetMoveInput();
-                    Vector3 lookingDirection = _players[i].Input.GetLookInput();
-
-                    if (movingDirection != Vector3.zero)
+                    // Pausing and unpausing the game
+                    if ((!Paused ||_pausingPlayer == _players[i]) && _players[i].Input.GetPauseInput())
                     {
-                        _players[i].MoveInput(movingDirection);
+                        Paused = !Paused;
+                        _pausingPlayer = (Paused ? _players[i] : null);
+
+                        if (Paused)
+                        {
+                            Debug.Log("Game paused by " + _pausingPlayer.name);
+                        }
+                        else
+                        {
+                            Debug.Log("Game unpaused");
+                        }
                     }
 
-                    if (lookingDirection != Vector3.zero)
+                    if (!Paused && !_players[i].IsDead)
                     {
-                        _players[i].LookInput(lookingDirection);
-                    }
+                        // Moving the player character
+                        Vector3 movingDirection = _players[i].Input.GetMoveInput();
+                        Vector3 lookingDirection = _players[i].Input.GetLookInput();
 
-                    // Jumping
-                    if (_players[i].Input.GetJumpInput())
-                    {
-                        _players[i].Jump();
-                    }
+                        if (movingDirection != Vector3.zero)
+                        {
+                            _players[i].MoveInput(movingDirection);
+                        }
 
-                    // Using an ability
-                    _players[i].UseAbility(_players[i].Input.GetActionInput());
+                        if (lookingDirection != Vector3.zero)
+                        {
+                            _players[i].LookInput(lookingDirection);
+                        }
 
-                    // Firing a weapon
-                    if (_players[i].Input.GetAltActionInput())
-                    {
-                        _players[i].FireWeapon();
-                    }
+                        // Jumping
+                        if (_players[i].Input.GetJumpInput())
+                        {
+                            _players[i].Jump();
+                        }
 
-                    // Pausing the game
-                    if (_players[i].Input.GetPauseInput())
-                    {
-                        // TODO
-                        Debug.Log("Game paused");
+                        // Using an ability
+                        _players[i].UseAbility(_players[i].Input.GetActionInput());
+
+                        // Firing a weapon
+                        if (_players[i].Input.GetAltActionInput())
+                        {
+                            _players[i].FireWeapon();
+                        }
                     }
                 }
             }
+        }
+
+        private void CheckMenuInput()
+        {
+
         }
 
         private void CheckDebugInput()

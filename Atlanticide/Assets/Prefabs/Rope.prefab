@@ -112,8 +112,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 17ada4bd1d3e1194aab180b29eb89190, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _topPoint: {x: 0, y: 4, z: 0}
-  _bottomPoint: {x: 0, y: -2, z: 0}
+  _topPoint: {x: 0, y: 5, z: 0}
+  _bottomPoint: {x: 0, y: -3, z: 0}
 --- !u!136 &136882782579171238
 CapsuleCollider:
   m_ObjectHideFlags: 1

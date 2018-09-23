@@ -119,5 +119,26 @@ namespace Atlanticide
                 action(obj);
             }
         }
+
+        /// <summary>
+        /// Sets the value of the preference identified by key.
+        /// </summary>
+        /// <param name="key">The key</param>
+        /// <param name="value">The value</param>
+        public static void SetBool(string key, bool value)
+        {
+            PlayerPrefs.SetInt(key, (value ? 1 : 0));
+        }
+
+        /// <summary>
+        /// Returns the value corresponding to the key in the preference file if it exists.
+        /// </summary>
+        /// <param name="key">The key</param>
+        /// <param name="defaultValue">The default value</param>
+        public static bool GetBool(string key, bool defaultValue)
+        {
+            int value = PlayerPrefs.GetInt(key, (defaultValue ? 1 : 0));
+            return (value == 1);
+        }
     }
 }
