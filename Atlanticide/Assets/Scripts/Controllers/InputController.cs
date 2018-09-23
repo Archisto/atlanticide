@@ -56,7 +56,7 @@ namespace Atlanticide
                     }
 
                     // Using an ability
-                    _players[i].SpendEnergy(_players[i].Input.GetActionInput());
+                    _players[i].UseAbility(_players[i].Input.GetActionInput());
 
                     // Firing a weapon
                     if (_players[i].Input.GetAltActionInput())

@@ -19,6 +19,9 @@ namespace Atlanticide
         [SerializeField, Range(0.2f, 20f)]
         private float _jumpHeight = 1f;
 
+        [SerializeField, Range(0.1f, 20f)]
+        private float _climbSpeed = 1f;
+
         [SerializeField, Range(0.01f, 2f)]
         private float _energyDrainSpeed;
 
@@ -32,6 +35,7 @@ namespace Atlanticide
         private float _respawnTime = 1f;
 
         private Weapon _weapon;
+        private Climbable _climbable;
         private bool _jumping;
         private bool _onGround;
         private bool _abilityActive;
@@ -45,6 +49,8 @@ namespace Atlanticide
         public PlayerInput Input { get; set; }
 
         public Slider EnergyBar { get; set; }
+
+        public bool Climbing { get; private set; }
 
         /// <summary>
         /// Initializes the object.
@@ -94,57 +100,85 @@ namespace Atlanticide
         {
             if (!IsImmobile)
             {
-                Vector3 movement = new Vector3(direction.x, 0, direction.y) * _speed * Time.deltaTime;
-                Vector3 newPosition = transform.position + movement;
-
-                if (_isRising || _jumping)
+                if (!Climbing)
                 {
-                    transform.position = newPosition;
+                    Move(direction);
                 }
                 else
                 {
-                    float groundHeightDiff = GroundHeightDifference(newPosition);
-
-                    // If the slope is too steep upwards, the character doesn't move
-                    if (groundHeightDiff < 0.5f * _characterSize.y)
-                    {
-                        // If the slope is too steep upwards or downwards, the height difference is ignored.
-                        // Slopes that are too steep upwards are handled with the Rise method.
-                        // Super minimal height differences are also ignored.
-                        if (groundHeightDiff > -0.1f * _characterSize.y &&
-                            groundHeightDiff < 0.2f * _characterSize.y &&
-                            (groundHeightDiff < -0.0001f * _characterSize.y ||
-                            groundHeightDiff > 0.0001f * _characterSize.y))
-                        {
-                            movement.y = groundHeightDiff;
-                            float maxGroundHeiDiff = (groundHeightDiff > 0 ? 0.2f : -0.1f) * _characterSize.y;
-                            float ratio = Utils.ReverseRatio(groundHeightDiff, 0, maxGroundHeiDiff);
-                            ratio = (ratio < 0.4f ? 0.4f : ratio);
-
-                            // Very steep slope: groundHeightDiff = +-0.03
-                            //float slopeSpeedDampening = Utils.Ratio(Mathf.Abs(groundHeightDiff), 0, 1f);
-                            //float slopeSpeedDampening = (Mathf.Abs(groundHeightDiff) > 0.07f ? 0.25f : 0.1f);
-                            //float slopeSpeedDampening = 0f;
-
-                            movement.x = movement.x * ratio;
-                            //movement.x = Utils.WeighValue(movement.x, 0, slopeSpeedDampening);
-                            movement.z = movement.z * ratio;
-                            //movement.z = Utils.WeighValue(movement.z, 0, slopeSpeedDampening);
-
-                            newPosition = transform.position + movement;
-
-                            //newPosition =
-                            //    transform.position +
-                            //    new Vector3(direction.x, groundHeightDiff, direction.y).normalized * _speed * Time.deltaTime;
-                            //newPosition.y = transform.position.y + groundHeightDiff;
-
-                            _onGround = true;
-                        }
-
-                        //transform.position = GetPositionOffWall(transform.position, newPosition);
-                        transform.position = newPosition;
-                    }
+                    Climb(direction);
                 }
+            }
+        }
+
+        private void Move(Vector3 direction)
+        {
+            Vector3 movement = new Vector3(direction.x, 0, direction.y) * _speed * Time.deltaTime;
+            Vector3 newPosition = transform.position + movement;
+
+            if (_isRising || _jumping)
+            {
+                transform.position = newPosition;
+            }
+            else
+            {
+                float groundHeightDiff = GroundHeightDifference(newPosition);
+
+                // If the slope is too steep upwards, the character doesn't move
+                if (groundHeightDiff < 0.5f * _characterSize.y)
+                {
+                    // If the slope is too steep upwards or downwards, the height difference is ignored.
+                    // Slopes that are too steep upwards are handled with the Rise method.
+                    // Super minimal height differences are also ignored.
+                    if (groundHeightDiff > -0.1f * _characterSize.y &&
+                        groundHeightDiff < 0.2f * _characterSize.y &&
+                        (groundHeightDiff < -0.0001f * _characterSize.y ||
+                        groundHeightDiff > 0.0001f * _characterSize.y))
+                    {
+                        movement.y = groundHeightDiff;
+                        float maxGroundHeiDiff = (groundHeightDiff > 0 ? 0.2f : -0.1f) * _characterSize.y;
+                        float ratio = Utils.ReverseRatio(groundHeightDiff, 0, maxGroundHeiDiff);
+                        ratio = (ratio < 0.4f ? 0.4f : ratio);
+
+                        // Very steep slope: groundHeightDiff = +-0.03
+                        //float slopeSpeedDampening = Utils.Ratio(Mathf.Abs(groundHeightDiff), 0, 1f);
+                        //float slopeSpeedDampening = (Mathf.Abs(groundHeightDiff) > 0.07f ? 0.25f : 0.1f);
+                        //float slopeSpeedDampening = 0f;
+
+                        movement.x = movement.x * ratio;
+                        //movement.x = Utils.WeighValue(movement.x, 0, slopeSpeedDampening);
+                        movement.z = movement.z * ratio;
+                        //movement.z = Utils.WeighValue(movement.z, 0, slopeSpeedDampening);
+
+                        newPosition = transform.position + movement;
+
+                        //newPosition =
+                        //    transform.position +
+                        //    new Vector3(direction.x, groundHeightDiff, direction.y).normalized * _speed * Time.deltaTime;
+                        //newPosition.y = transform.position.y + groundHeightDiff;
+
+                        _onGround = true;
+                    }
+
+                    //transform.position = GetPositionOffWall(transform.position, newPosition);
+                    transform.position = newPosition;
+                }
+            }
+        }
+
+        private void Climb(Vector3 direction)
+        {
+            Vector3 movement = Vector3.zero;
+            movement.y = direction.y * _climbSpeed * Time.deltaTime;
+            float climbProgress = _climbable.GetClimbProgress(transform.position + movement);
+
+            Debug.Log(climbProgress);
+
+            transform.position = _climbable.GetPositionOnClimbable(climbProgress);
+
+            if ((climbProgress >= 1 && direction.y > 0) || (climbProgress <= 0 && direction.y < 0))
+            {
+                EndClimb();
             }
         }
 
@@ -162,7 +196,7 @@ namespace Atlanticide
         /// </summary>
         protected override void Fall()
         {
-            if (!_jumping)
+            if (!_jumping && !Climbing)
             {
                 base.Fall();
                 _onGround = false;
@@ -174,8 +208,13 @@ namespace Atlanticide
         /// </summary>
         public void Jump()
         {
-            if (!_jumping && _onGround)
+            if ((!_jumping && _onGround) || Climbing)
             {
+                if (Climbing)
+                {
+                    EndClimb();
+                }
+
                 _jumping = true;
                 _jumpForce = _jumpHeight * 4;
                 _onGround = false;
@@ -235,7 +274,7 @@ namespace Atlanticide
             }
         }
 
-        public void SpendEnergy(bool active)
+        public void UseAbility(bool active)
         {
             _abilityActive = active && !_outOfEnergy;
             SetAbilityActive(_abilityActive);
@@ -263,6 +302,20 @@ namespace Atlanticide
             {
                 _weapon.Fire();
             }
+        }
+
+        public void StartClimb(Climbable climbable)
+        {
+            Debug.Log(name + " started climbing " + climbable + ".");
+            Climbing = true;
+            _climbable = climbable;
+        }
+
+        public void EndClimb()
+        {
+            Debug.Log(name + " stopped climbing.");
+            Climbing = false;
+            _climbable = null;
         }
 
         /// <summary>
@@ -319,7 +372,8 @@ namespace Atlanticide
         {
             base.CancelActions();
             _jumping = false;
-            SpendEnergy(false);
+            UseAbility(false);
+            EndClimb();
         }
 
         protected override void OnDrawGizmos()

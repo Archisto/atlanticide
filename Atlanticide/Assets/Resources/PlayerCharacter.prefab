@@ -458,6 +458,7 @@ MonoBehaviour:
   _telegrab: {fileID: 1787108829491718}
   _shield: {fileID: 1132760294019386}
   _jumpHeight: 5
+  _climbSpeed: 4
   _energyDrainSpeed: 0.1
   _energyRechargeSpeed: 2
   _minRechargedEnergy: 0.3

@@ -167,17 +167,26 @@ namespace Atlanticide
             }
         }
 
+        /// <summary>
+        /// Initializes fading to a color.
+        /// </summary>
         private void InitFade()
         {
             _fade = FindObjectOfType<FadeToColor>();
-            _fade.Init(_UI.GetFade());
-
-            if (_sceneChanged)
+            if (_fade != null)
             {
-                _fade.StartFadeIn();
+                _fade.Init(_UI.GetFade());
+
+                if (_sceneChanged)
+                {
+                    _fade.StartFadeIn();
+                }
             }
         }
 
+        /// <summary>
+        /// Did the players lose.
+        /// </summary>
         public bool GameOver
         {
             get { return false; }
@@ -224,6 +233,59 @@ namespace Atlanticide
         {
             CurrentScore = score;
             _UI.UpdateUI();
+        }
+
+        /// <summary>
+        /// Checks if there is one or all players within range.
+        /// If all players must be in range, the first one that isn't causes the result to be false.
+        /// Otherwise the first player in range causes the result to be true.
+        /// </summary>
+        /// <param name="position">A position</param>
+        /// <param name="range">Allowed distance from the position</param>
+        /// <param name="allPlayers">Are all players needed</param>
+        /// <returns>Are there any/all players in range.</returns>
+        public bool PlayersWithinRange(Vector3 position, float range, bool allPlayers)
+        {
+            bool result = allPlayers;
+
+            foreach (PlayerCharacter pc in _players)
+            {
+                if (Vector3.Distance(position, pc.transform.position) <= range)
+                {
+                    if (!allPlayers)
+                    {
+                        result = true;
+                        break;
+                    }
+                }
+                else if (allPlayers)
+                {
+                    result = false;
+                    break;
+                }
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Gets the first player within range.
+        /// </summary>
+        /// <param name="position">A position</param>
+        /// <param name="range">Allowed distance from the position</param>
+        /// <returns>A player character within range.</returns>
+        public PlayerCharacter GetPlayerWithinRange(Vector3 position, float range)
+        {
+            foreach (PlayerCharacter pc in _players)
+            {
+                if (!pc.IsDead &&
+                    Vector3.Distance(position, pc.transform.position) <= range)
+                {
+                    return pc;
+                }
+            }
+
+            return null;
         }
 
         /// <summary>
