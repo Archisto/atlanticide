@@ -42,9 +42,10 @@ namespace Atlanticide
         private Transform[] _telegrabs;
         private SettingsManager _settings;
         private FadeToColor _fade;
-        private int _playerCount;
         private bool _sceneChanged;
         private string _nextSceneName;
+
+        public int PlayerCount { get; private set; }
 
         public int CurrentLevel { get; set; }
 
@@ -156,10 +157,10 @@ namespace Atlanticide
         /// <param name="newPlayerCount">The player count</param>
         public void ActivatePlayers(int newPlayerCount)
         {
-            _playerCount = (newPlayerCount < MaxPlayers ? newPlayerCount : MaxPlayers);
+            PlayerCount = (newPlayerCount < MaxPlayers ? newPlayerCount : MaxPlayers);
             for (int i = 0; i < MaxPlayers; i++)
             {
-                _players[i].gameObject.SetActive(i < _playerCount);
+                _players[i].gameObject.SetActive(i < PlayerCount);
             }
         }
 
@@ -278,7 +279,7 @@ namespace Atlanticide
 
             if (allPlayers)
             {
-                return playersWithinRange == _playerCount;
+                return playersWithinRange == PlayerCount;
             }
             else
             {

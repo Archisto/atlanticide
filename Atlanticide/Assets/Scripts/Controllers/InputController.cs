@@ -7,8 +7,11 @@ namespace Atlanticide
     public class InputController : MonoBehaviour
     {
         private PlayerCharacter[] _players;
-        private PlayerCharacter _pausingPlayer;
+        private int _pausingPlayerNum;
         
+        /// <summary>
+        /// Is the game paused.
+        /// </summary>
         public bool Paused { get; private set; }
 
         /// <summary>
@@ -27,77 +30,86 @@ namespace Atlanticide
             if (!GameManager.Instance.FadeActive)
             {
                 CheckPlayerInput();
-                CheckDebugInput();
 
                 if (Paused)
                 {
                     CheckMenuInput();
                 }
+
+                // Testing
+                CheckDebugInput();
             }
         }
 
+        /// <summary>
+        /// Checks player specific input.
+        /// </summary>
         private void CheckPlayerInput()
         {
-            for (int i = 0; i < _players.Length; i++)
+            for (int i = 0; i < GameManager.Instance.PlayerCount; i++)
             {
-                if (_players[i] != null)
+                // Pausing and unpausing the game
+                if (_players[i].Input.GetPauseInput() &&
+                    (!Paused || IsAllowedToUnpause(i)))
                 {
-                    // Pausing and unpausing the game
-                    if ((!Paused ||_pausingPlayer == _players[i]) && _players[i].Input.GetPauseInput())
-                    {
-                        Paused = !Paused;
-                        _pausingPlayer = (Paused ? _players[i] : null);
+                    Paused = !Paused;
+                    _pausingPlayerNum = (Paused ? i : -1);
 
-                        if (Paused)
-                        {
-                            Debug.Log("Game paused by " + _pausingPlayer.name);
-                        }
-                        else
-                        {
-                            Debug.Log("Game unpaused");
-                        }
+                    if (Paused)
+                    {
+                        Debug.Log("Game paused by " + _players[_pausingPlayerNum].name);
+                    }
+                    else
+                    {
+                        Debug.Log("Game unpaused");
+                    }
+                }
+
+                if (!Paused && !_players[i].IsDead)
+                {
+                    // Moving the player character
+                    Vector3 movingDirection = _players[i].Input.GetMoveInput();
+                    Vector3 lookingDirection = _players[i].Input.GetLookInput();
+
+                    if (movingDirection != Vector3.zero)
+                    {
+                        _players[i].MoveInput(movingDirection);
                     }
 
-                    if (!Paused && !_players[i].IsDead)
+                    if (lookingDirection != Vector3.zero)
                     {
-                        // Moving the player character
-                        Vector3 movingDirection = _players[i].Input.GetMoveInput();
-                        Vector3 lookingDirection = _players[i].Input.GetLookInput();
+                        _players[i].LookInput(lookingDirection);
+                    }
 
-                        if (movingDirection != Vector3.zero)
-                        {
-                            _players[i].MoveInput(movingDirection);
-                        }
+                    // Jumping
+                    if (_players[i].Input.GetJumpInput())
+                    {
+                        _players[i].Jump();
+                    }
 
-                        if (lookingDirection != Vector3.zero)
-                        {
-                            _players[i].LookInput(lookingDirection);
-                        }
+                    // Using an ability
+                    _players[i].UseAbility(_players[i].Input.GetActionInput());
 
-                        // Jumping
-                        if (_players[i].Input.GetJumpInput())
-                        {
-                            _players[i].Jump();
-                        }
-
-                        // Using an ability
-                        _players[i].UseAbility(_players[i].Input.GetActionInput());
-
-                        // Firing a weapon
-                        if (_players[i].Input.GetAltActionInput())
-                        {
-                            _players[i].FireWeapon();
-                        }
+                    // Firing a weapon
+                    if (_players[i].Input.GetAltActionInput())
+                    {
+                        _players[i].FireWeapon();
                     }
                 }
             }
         }
-
+        
+        /// <summary>
+        /// Checks menu input.
+        /// </summary>
         private void CheckMenuInput()
         {
-
+            // TODO
         }
 
+        /// <summary>
+        /// Checks debugging input.
+        /// </summary>
         private void CheckDebugInput()
         {
             // Reset
@@ -190,6 +202,24 @@ namespace Atlanticide
                 }
 
                 _players[playerNum].Input.InputDevice = inputDevice;
+            }
+        }
+
+        /// <summary>
+        /// Returns whether the given player can unpause the game.
+        /// If the player is unavailable, anyone can unpause.
+        /// </summary>
+        /// <param name="playerNum">A player number</param>
+        /// <returns>Can the player unpause.</returns>
+        private bool IsAllowedToUnpause(int playerNum)
+        {
+            if (_pausingPlayerNum >= GameManager.Instance.PlayerCount)
+            {
+                return true;
+            }
+            else
+            {
+                return _pausingPlayerNum == playerNum;
             }
         }
     }

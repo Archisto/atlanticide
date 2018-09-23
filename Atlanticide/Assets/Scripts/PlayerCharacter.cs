@@ -306,16 +306,22 @@ namespace Atlanticide
 
         public void StartClimb(Climbable climbable)
         {
-            Debug.Log(name + " started climbing " + climbable + ".");
-            Climbing = true;
-            _climbable = climbable;
+            if (!Climbing)
+            {
+                Debug.Log(name + " started climbing " + climbable + ".");
+                Climbing = true;
+                _climbable = climbable;
+            }
         }
 
         public void EndClimb()
         {
-            Debug.Log(name + " stopped climbing.");
-            Climbing = false;
-            _climbable = null;
+            if (Climbing)
+            {
+                Debug.Log(name + " stopped climbing.");
+                Climbing = false;
+                _climbable = null;
+            }
         }
 
         /// <summary>

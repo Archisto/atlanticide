@@ -22,12 +22,12 @@ namespace Atlanticide
         {
             Vector3 newPosition = Vector3.zero;
 
-            foreach (PlayerCharacter player in _players)
+            for (int i = 0; i < GameManager.Instance.PlayerCount; i++)
             {
-                newPosition += player.transform.position;
+                newPosition += _players[i].transform.position;
             }
 
-            newPosition = newPosition / _players.Length;
+            newPosition = newPosition / GameManager.Instance.PlayerCount;
             newPosition.y = _startPosition.y;
             newPosition.z = _startPosition.z;
             transform.position = newPosition;
