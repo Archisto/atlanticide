@@ -32,6 +32,8 @@ namespace Atlanticide
         [SerializeField, Range(0.1f, 5f)]
         public float telegrabRadius = 1;
 
+        public List<int> keyCodes = new List<int>();
+
         /// <summary>
         /// Initializes the singleton instance.
         /// </summary>

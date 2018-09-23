@@ -80,6 +80,7 @@ namespace Atlanticide
                 DontDestroyOnLoad(gameObject);
                 SceneManager.activeSceneChanged += InitScene;
                 InitSettings();
+                PlayerCount = 2;
                 CurrentLevel = 1;
             }
         }
@@ -118,7 +119,7 @@ namespace Atlanticide
             _players = new PlayerCharacter[MaxPlayers];
             _playerPrefab = Resources.Load<PlayerCharacter>("PlayerCharacter");
             CreatePlayers();
-            ActivatePlayers(2);
+            ActivatePlayers(PlayerCount);
 
             // Test
             _telegrabs = new Transform[MaxPlayers];

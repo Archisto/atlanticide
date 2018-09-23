@@ -12,6 +12,11 @@ namespace Atlanticide
             return string.Format("An instance of {0} could not be found in the scene.", obj);
         }
 
+        public static string GetComponentMissingString(string comp)
+        {
+            return string.Format("Component {0} could not be found in the object.", comp);
+        }
+
         public static float DrainOrRecharge(float value,
                                             bool drain,
                                             float drainSpeed,
@@ -139,6 +144,20 @@ namespace Atlanticide
         {
             int value = PlayerPrefs.GetInt(key, (defaultValue ? 1 : 0));
             return (value == 1);
+        }
+
+        public static bool AddIfNew<T>(this List<T> list, T itemToAdd)
+        {
+            foreach (T item in list)
+            {
+                if (item.Equals(itemToAdd))
+                {
+                    return false;
+                }
+            }
+
+            list.Add(itemToAdd);
+            return true;
         }
     }
 }

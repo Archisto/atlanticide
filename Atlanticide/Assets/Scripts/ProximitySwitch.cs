@@ -7,7 +7,7 @@ namespace Atlanticide
     public class ProximitySwitch : MonoBehaviour
     {
         [SerializeField]
-        private float _range;
+        private float _range = 3f;
 
         [SerializeField]
         private bool _allPlayersNeeded;
