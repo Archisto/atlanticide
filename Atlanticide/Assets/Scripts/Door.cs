@@ -87,9 +87,9 @@ namespace Atlanticide
         /// </summary>
         private void OnDrawGizmos()
         {
-            if (open)
+            if (unlocked)
             {
-                Gizmos.color = Color.green;
+                Gizmos.color = (open ? Color.green : Color.yellow);
                 Gizmos.DrawSphere(transform.position, 0.5f);
             }
         }
