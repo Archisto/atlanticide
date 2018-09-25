@@ -1,21 +1,14 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Atlanticide
 {
-    public class ProximitySwitch : MonoBehaviour
+    public class PlayerProximitySwitch : Switch
     {
         [SerializeField]
         private float _range = 3f;
 
         [SerializeField]
         private bool _allPlayersNeeded;
-
-        [SerializeField]
-        private bool _permanent;
-
-        public bool Activated { get; private set; }
 
         /// <summary>
         /// Updates the object once per frame.
@@ -41,9 +34,9 @@ namespace Atlanticide
         /// <summary>
         /// Draws gizmos.
         /// </summary>
-        private void OnDrawGizmos()
+        protected override void OnDrawGizmos()
         {
-            Gizmos.color = (Activated ? Color.green : Color.black);
+            base.OnDrawGizmos();
             Gizmos.DrawWireSphere(transform.position, _range);
         }
     }

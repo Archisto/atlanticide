@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 namespace Atlanticide
 {
-    public class GameCharacter : MonoBehaviour
+    public abstract class GameCharacter : MonoBehaviour
     {
         [SerializeField]
         protected float _speed;

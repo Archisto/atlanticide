@@ -7,6 +7,11 @@ namespace Atlanticide
 {
     public static class Utils
     {
+        public static string GetFieldNullString(string obj)
+        {
+            return string.Format("{0} is not set.", obj);
+        }
+
         public static string GetObjectMissingString(string obj)
         {
             return string.Format("An instance of {0} could not be found in the scene.", obj);

@@ -12,14 +12,14 @@ namespace Atlanticide
         public bool unlocked;
         public bool open;
 
-        private ProximitySwitch _proxSwitch;
+        private PlayerProximitySwitch _proxSwitch;
 
         /// <summary>
         /// Initializes the object.
         /// </summary>
         private void Start()
         {
-            _proxSwitch = GetComponent<ProximitySwitch>();
+            _proxSwitch = GetComponent<PlayerProximitySwitch>();
             if (_proxSwitch == null)
             {
                 Debug.LogError(Utils.GetComponentMissingString("ProximitySwitch"));
