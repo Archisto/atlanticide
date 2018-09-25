@@ -10,25 +10,29 @@ namespace Atlanticide
         /// The top point (local position)
         /// </summary>
         [SerializeField]
-        protected Vector3 _topPoint;
+        private Vector3 _topPoint;
 
         /// <summary>
         /// The bottom point (local position)
         /// </summary>
         [SerializeField]
-        protected Vector3 _bottomPoint;
+        public Vector3 _bottomPoint;
 
-        public Vector3 TopPoint { get; protected set; }
+        public Vector3 TopPointWorldSpace
+        {
+            get { return _topPoint + transform.position; }
+        }
 
-        public Vector3 BottomPoint { get; protected set; }
+        public Vector3 BottomPointWorldSpace
+        {
+            get { return _bottomPoint + transform.position; }
+        }
 
         /// <summary>
         /// Initializes the object.
         /// </summary>
         private void Start()
         {
-            TopPoint = transform.position + _topPoint;
-            BottomPoint = transform.position + _bottomPoint;
         }
 
         /// <summary>
@@ -36,7 +40,12 @@ namespace Atlanticide
         /// </summary>
         private void Update()
         {
+        }
 
+        public void SetPoints(Vector3 globalTopPoint, Vector3 globalBottomPoint)
+        {
+            _topPoint = globalTopPoint - transform.position;
+            _bottomPoint = globalBottomPoint - transform.position;
         }
 
         /// <summary>
@@ -54,12 +63,18 @@ namespace Atlanticide
 
         public float GetClimbProgress(Vector3 position)
         {
-            return Utils.Ratio(position.y, BottomPoint.y, TopPoint.y);
+            return Utils.Ratio(position.y, BottomPointWorldSpace.y, TopPointWorldSpace.y);
         }
 
         public Vector3 GetPositionOnClimbable(float climbProgress)
         {
-            return Vector3.Lerp(BottomPoint, TopPoint, climbProgress);
+            return Vector3.Lerp(BottomPointWorldSpace, TopPointWorldSpace, climbProgress);
+        }
+
+        private void Reset()
+        {
+            _topPoint = Vector3.up * 1;
+            _bottomPoint = Vector3.up * -1;
         }
     }
 }
