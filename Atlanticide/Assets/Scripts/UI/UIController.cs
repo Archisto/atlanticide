@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Atlanticide
+namespace Atlanticide.UI
 {
     public class UIController : MonoBehaviour
     {
@@ -19,12 +19,27 @@ namespace Atlanticide
         [SerializeField]
         private Image _fade;
 
+        private PauseScreen _pauseScreen;
+
         /// <summary>
         /// Initializes the object.
         /// </summary>
         private void Start()
         {
+            InitUI();
             UpdateUI();
+        }
+
+        /// <summary>
+        /// Initializes the UI.
+        /// </summary>
+        private void InitUI()
+        {
+            _pauseScreen = GetComponentInChildren<PauseScreen>(true);
+            if (_pauseScreen == null)
+            {
+                Debug.LogError(Utils.GetComponentMissingString("PauseScreen"));
+            }
         }
 
         /// <summary>
@@ -64,6 +79,12 @@ namespace Atlanticide
         public Image GetFade()
         {
             return _fade;
+        }
+
+        public void ActivatePauseScreen(bool activate, string playerName)
+        {
+            _pauseScreen.gameObject.SetActive(activate);
+            _pauseScreen.pausingPlayerText.text = playerName;
         }
     }
 }

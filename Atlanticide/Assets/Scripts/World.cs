@@ -34,6 +34,18 @@ namespace Atlanticide
 
         public List<int> keyCodes = new List<int>();
 
+        private bool _gamePaused;
+
+        public bool GamePaused
+        {
+            get { return _gamePaused; }
+        }
+
+        public float DeltaTime
+        {
+            get { return (_gamePaused ? 0f : Time.deltaTime); }
+        }
+
         /// <summary>
         /// Initializes the singleton instance.
         /// </summary>
@@ -63,6 +75,28 @@ namespace Atlanticide
         /// </summary>
         private void Update()
         {
+        }
+
+        /// <summary>
+        /// Pauses or unpauses the game.
+        /// </summary>
+        /// <param name="paused">Should the game be paused</param>
+        /// <param name="playerName">The name of the player
+        /// who paused the game</param>
+        public void PauseGame(bool paused, string playerName)
+        {
+            _gamePaused = paused;
+
+            //if (_gamePaused)
+            //{
+            //    Debug.Log("Game paused by " + playerName);
+            //}
+            //else
+            //{
+            //    Debug.Log("Game unpaused");
+            //}
+
+            GameManager.Instance.ActivatePauseScreen(_gamePaused, playerName);
         }
     }
 }

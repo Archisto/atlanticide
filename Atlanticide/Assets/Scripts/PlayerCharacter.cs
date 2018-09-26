@@ -113,7 +113,7 @@ namespace Atlanticide
 
         private void Move(Vector3 direction)
         {
-            Vector3 movement = new Vector3(direction.x, 0, direction.y) * _speed * Time.deltaTime;
+            Vector3 movement = new Vector3(direction.x, 0, direction.y) * _speed * World.Instance.DeltaTime;
             Vector3 newPosition = transform.position + movement;
 
             if (_isRising || _jumping)
@@ -154,7 +154,7 @@ namespace Atlanticide
 
                         //newPosition =
                         //    transform.position +
-                        //    new Vector3(direction.x, groundHeightDiff, direction.y).normalized * _speed * Time.deltaTime;
+                        //    new Vector3(direction.x, groundHeightDiff, direction.y).normalized * _speed * World.Instance.DeltaTime;
                         //newPosition.y = transform.position.y + groundHeightDiff;
 
                         _onGround = true;
@@ -169,7 +169,7 @@ namespace Atlanticide
         private void Climb(Vector3 direction)
         {
             Vector3 movement = Vector3.zero;
-            movement.y = direction.y * _climbSpeed * Time.deltaTime;
+            movement.y = direction.y * _climbSpeed * World.Instance.DeltaTime;
             float climbProgress = _climbable.GetClimbProgress(transform.position + movement);
 
             Debug.Log(climbProgress);
@@ -231,7 +231,7 @@ namespace Atlanticide
                 if (_jumpForce > 0)
                 {
                     Rise(_jumpForce);
-                    _jumpForce -= 5 * World.Instance.gravity * Time.deltaTime;
+                    _jumpForce -= 5 * World.Instance.gravity * World.Instance.DeltaTime;
                 }
 
                 if (_jumpForce <= 0)
@@ -266,7 +266,7 @@ namespace Atlanticide
         /// </summary>
         private void UpdateRespawnTimer()
         {
-            _elapsedRespawnTime += Time.deltaTime;
+            _elapsedRespawnTime += World.Instance.DeltaTime;
             if (_elapsedRespawnTime >= _respawnTime)
             {
                 _elapsedRespawnTime = 0;

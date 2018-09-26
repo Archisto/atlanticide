@@ -37,7 +37,7 @@ namespace Atlanticide
             Vector3 start = ascendRelCenter;
             Vector3 target = descendRelCenter;
 
-            elapsedTime += Time.deltaTime;
+            elapsedTime += World.Instance.DeltaTime;
             float ratio = elapsedTime / (orbitTime * 0.5f);
 
             if (reverse)

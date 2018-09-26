@@ -8,11 +8,11 @@ namespace Atlanticide
     {
         private PlayerCharacter[] _players;
         private int _pausingPlayerNum;
-        
+
         /// <summary>
-        /// Is the game paused.
+        /// Is the game paused
         /// </summary>
-        public bool Paused { get; private set; }
+        private bool _paused;
 
         /// <summary>
         /// Initializes the object.
@@ -31,7 +31,7 @@ namespace Atlanticide
             {
                 CheckPlayerInput();
 
-                if (Paused)
+                if (_paused)
                 {
                     CheckMenuInput();
                 }
@@ -50,22 +50,23 @@ namespace Atlanticide
             {
                 // Pausing and unpausing the game
                 if (_players[i].Input.GetPauseInput() &&
-                    (!Paused || IsAllowedToUnpause(i)))
+                    (!_paused || IsAllowedToUnpause(i)))
                 {
-                    Paused = !Paused;
-                    _pausingPlayerNum = (Paused ? i : -1);
+                    _paused = !_paused;
 
-                    if (Paused)
+                    if (_paused)
                     {
-                        Debug.Log("Game paused by " + _players[_pausingPlayerNum].name);
+                        _pausingPlayerNum = i;
+                        World.Instance.PauseGame(true, _players[_pausingPlayerNum].name);
                     }
                     else
                     {
-                        Debug.Log("Game unpaused");
+                        _pausingPlayerNum = -1;
+                        World.Instance.PauseGame(false, "");
                     }
                 }
 
-                if (!Paused && !_players[i].IsDead)
+                if (!_paused && !_players[i].IsDead)
                 {
                     // Moving the player character
                     Vector3 movingDirection = _players[i].Input.GetMoveInput();
@@ -133,14 +134,14 @@ namespace Atlanticide
             {
                 foreach (NonPlayerCharacter npc in GameManager.Instance.GetNPCs())
                 {
-                    npc.transform.position += Vector3.left * 5 * Time.deltaTime;
+                    npc.transform.position += Vector3.left * 5 * World.Instance.DeltaTime;
                 }
             }
             else if (Input.GetKey(KeyCode.L))
             {
                 foreach (NonPlayerCharacter npc in GameManager.Instance.GetNPCs())
                 {
-                    npc.transform.position += Vector3.right * 5 * Time.deltaTime;
+                    npc.transform.position += Vector3.right * 5 * World.Instance.DeltaTime;
                 }
             }
 

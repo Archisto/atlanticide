@@ -7,6 +7,13 @@ namespace Atlanticide
 {
     public static class Utils
     {
+        public enum Axis
+        {
+            X,
+            Y,
+            Z
+        }
+
         public static string GetFieldNullString(string obj)
         {
             return string.Format("{0} is not set.", obj);
@@ -37,7 +44,7 @@ namespace Atlanticide
             {
                 depleted = false;
 
-                value -= drainSpeed * Time.deltaTime;
+                value -= drainSpeed * World.Instance.DeltaTime;
                 if (value <= 0)
                 {
                     value = 0;
@@ -47,7 +54,7 @@ namespace Atlanticide
             // Recharge
             else if (value < 1)
             {
-                value += rechargeSpeed * Time.deltaTime;
+                value += rechargeSpeed * World.Instance.DeltaTime;
 
                 if (depleted && value >= minRecharge)
                 {
@@ -163,6 +170,53 @@ namespace Atlanticide
 
             list.Add(itemToAdd);
             return true;
+        }
+
+        public static Vector3 GetRotationOnAxis(Axis axis, float angle)
+        {
+            Vector3 result = Vector3.zero;
+
+            switch (axis)
+            {
+                case Axis.X:
+                {
+                    result.x = angle;
+                    break;
+                }
+                case Axis.Y:
+                {
+                    result.y = angle;
+                    break;
+                }
+                case Axis.Z:
+                {
+                    result.z = angle;
+                    break;
+                }
+            }
+
+            return result;
+        }
+
+        public static float GetAngleOnAxis(Axis axis, Vector3 rotation)
+        {
+            switch (axis)
+            {
+                case Axis.X:
+                {
+                    return rotation.x;
+                }
+                case Axis.Y:
+                {
+                    return rotation.y;
+                }
+                case Axis.Z:
+                {
+                    return rotation.z;
+                }
+            }
+
+            return 0;
         }
     }
 }

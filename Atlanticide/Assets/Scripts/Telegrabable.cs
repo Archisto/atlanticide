@@ -65,7 +65,7 @@ namespace Atlanticide
                 _telegrabSpeed = _baseTelegrabSpeed + Vector3.Distance(transform.position, _telegrabPosition) * 3f;
 
                 transform.position =
-                    Vector3.MoveTowards(transform.position, _telegrabPosition, _telegrabSpeed * Time.deltaTime);
+                    Vector3.MoveTowards(transform.position, _telegrabPosition, _telegrabSpeed * World.Instance.DeltaTime);
             }
         }
 

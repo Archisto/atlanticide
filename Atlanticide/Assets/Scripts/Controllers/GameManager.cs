@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Atlanticide.UI;
 
 namespace Atlanticide
 {
@@ -382,6 +383,11 @@ namespace Atlanticide
 
             //Debug.Log("Loaded: " + next.name);
             InitScene();
+        }
+
+        public void ActivatePauseScreen(bool activate, string playerName)
+        {
+            _UI.ActivatePauseScreen(activate, playerName);
         }
 
         private void OnDisable()

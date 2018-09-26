@@ -37,7 +37,7 @@ namespace Atlanticide
                 Activated = false;
             }
 
-            _elapsedTime += Time.deltaTime;
+            _elapsedTime += World.Instance.DeltaTime;
             Progress = (_elapsedTime / _duration);
             if (_elapsedTime >= _duration)
             {

@@ -33,7 +33,7 @@ namespace Atlanticide
         {
             if (_touchedByOtherChar)
             {
-                Vector3 avoidVector = _avoidOtherCharDir * _speed * Time.deltaTime;
+                Vector3 avoidVector = _avoidOtherCharDir * _speed * World.Instance.DeltaTime;
                 Vector3 newPosition = transform.position + avoidVector;
                 _avoidDist += avoidVector.magnitude;
 

@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -7,27 +8,13 @@ namespace Atlanticide
     /// <summary>
     /// Makes the object move.
     /// </summary>
-    public class Move : MonoBehaviour
+    public class Move : Motion
     {
         [SerializeField]
         private Vector3 _topSpeed;
 
-        [SerializeField, Range(0.01f, 10f)]
-        private float _acceleration;
-
-        [SerializeField, Range(-10f, -0.01f)]
-        private float _deceleration;
-
         [SerializeField]
-        private float _decayDistance = 0;
-
-        [SerializeField]
-        private bool _active;
-
-        [SerializeField]
-        private bool _hasInstantTopSpeedByDefault;
-
-        private float _movedDistance;
+        private float _decayDistance = 0f;
 
         /// <summary>
         /// The top speed vector.
@@ -62,55 +49,17 @@ namespace Atlanticide
         public Vector3 CurrentSpeed { get; private set; }
 
         /// <summary>
-        /// Is the object moving.
-        /// </summary>
-        public bool Moving { get; private set; }
-
-        /// <summary>
-        /// The speed factor.
-        /// </summary>
-        public float SpeedRatio { get; private set; }
-
-        /// <summary>
-        /// Has the object reached the target speed.
-        /// </summary>
-        public bool ReachedTargetSpeed { get; private set; }
-
-        /// <summary>
-        /// Initializes the object.
-        /// </summary>
-        private void Start()
-        {
-            if (_active)
-            {
-                StartMoving(_hasInstantTopSpeedByDefault);
-            }
-        }
-
-        /// <summary>
-        /// Updates the object once per frame.
-        /// </summary>
-        private void Update()
-        {
-            if (Moving)
-            {
-                UpdateCurrentSpeed();
-                MoveObject();
-            }
-        }
-
-        /// <summary>
         /// Moves the object.
         /// </summary>
-        private void MoveObject()
+        protected override void MoveObject()
         {
-            Vector3 movement = CurrentSpeed * Time.deltaTime;
+            Vector3 movement = CurrentSpeed * World.Instance.DeltaTime;
             _movedDistance += movement.magnitude;
             transform.position += movement;
 
-            if (DecayDistance > 0 && _movedDistance >= DecayDistance)
+            if (DecayDistance > 0f && _movedDistance >= DecayDistance)
             {
-                _movedDistance = 0;
+                _movedDistance = 0f;
                 gameObject.SetActive(false);
             }
         }
@@ -119,7 +68,7 @@ namespace Atlanticide
         /// Updates the current speed.
         /// Accelerates or decelerates until the top speed is reached.
         /// </summary>
-        private void UpdateCurrentSpeed()
+        protected override void UpdateCurrentSpeed()
         {
             if (ReachedTargetSpeed)
             {
@@ -128,22 +77,22 @@ namespace Atlanticide
 
             if (_active)
             {
-                SpeedRatio += _acceleration * Time.deltaTime;
+                SpeedRatio += _acceleration * World.Instance.DeltaTime;
 
-                if (SpeedRatio >= 1)
+                if (SpeedRatio >= 1f)
                 {
-                    SpeedRatio = 1;
+                    SpeedRatio = 1f;
                     CurrentSpeed = TopSpeed;
                     ReachedTargetSpeed = true;
                 }
             }
             else
             {
-                SpeedRatio += _deceleration * Time.deltaTime;
+                SpeedRatio += _deceleration * World.Instance.DeltaTime;
 
-                if (SpeedRatio <= 0)
+                if (SpeedRatio <= 0f)
                 {
-                    SpeedRatio = 0;
+                    SpeedRatio = 0f;
                     CurrentSpeed = Vector3.zero;
                     ReachedTargetSpeed = true;
                     Moving = false;
@@ -162,23 +111,10 @@ namespace Atlanticide
         /// </summary>
         /// <param name="instant">Should the object instantly
         /// have the top speed</param>
-        public void StartMoving(bool instant)
+        public override void StartMoving(bool instant)
         {
-            if (instant)
-            {
-                SpeedRatio = 1;
-                CurrentSpeed = TopSpeed;
-            }
-            else
-            {
-                SpeedRatio = 0;
-                CurrentSpeed = Vector3.zero;
-            }
-
-            ReachedTargetSpeed = instant;
-            _movedDistance = 0;
-            _active = true;
-            Moving = true;
+            CurrentSpeed = (instant ? TopSpeed : Vector3.zero);
+            base.StartMoving(instant);
         }
 
         /// <summary>
@@ -186,28 +122,14 @@ namespace Atlanticide
         /// If <paramref name="instant"/> is true, the object instantly stops.
         /// </summary>
         /// <param name="instant">Should the object instantly stop</param>
-        public void StopMoving(bool instant)
+        public override void StopMoving(bool instant)
         {
             if (instant)
             {
-                SpeedRatio = 0;
                 CurrentSpeed = Vector3.zero;
-                ReachedTargetSpeed = true;
-                Moving = false;
             }
 
-            ReachedTargetSpeed = instant;
-            _active = false;
-        }
-
-        /// <summary>
-        /// Sets default values when the object is reset in the editor.
-        /// </summary>
-        private void Reset()
-        {
-            _active = true;
-            _acceleration = 1;
-            _deceleration = -1;
+            base.StopMoving(instant);
         }
     }
 }

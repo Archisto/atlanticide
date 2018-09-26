@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Atlanticide
 {
-    public class Cart : MonoBehaviour
+    public class AnEmptyScript : MonoBehaviour
     {
         /// <summary>
         /// Initializes the object.

@@ -59,7 +59,7 @@ namespace Atlanticide
         /// </summary>
         private void MoveObject()
         {
-            _elapsedTime += Time.deltaTime;
+            _elapsedTime += World.Instance.DeltaTime;
             float ratio = _elapsedTime / _orbitTime;
             if (ratio >= 1f)
             {

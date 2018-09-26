@@ -10,7 +10,7 @@ namespace Atlanticide
         private Vector3 _center;
 
         [SerializeField]
-        private Axis _axis;
+        private Utils.Axis _axis;
 
         [SerializeField]
         private float _radius = 3f;
@@ -23,13 +23,6 @@ namespace Atlanticide
 
         private float _angle;
 
-        private enum Axis
-        {
-            X,
-            Y,
-            Z
-        }
-
         private void Update()
         {
             UpdateAngle();
@@ -40,7 +33,7 @@ namespace Atlanticide
         {
             if (_clockwise)
             {
-                _angle += 2 * Mathf.PI * Time.deltaTime / _orbitTime;
+                _angle += 2 * Mathf.PI * World.Instance.DeltaTime / _orbitTime;
                 if (_angle >= 2 * Mathf.PI)
                 {
                     _angle -= 2 * Mathf.PI;
@@ -48,7 +41,7 @@ namespace Atlanticide
             }
             else
             {
-                _angle -= 2 * Mathf.PI * Time.deltaTime / _orbitTime;
+                _angle -= 2 * Mathf.PI * World.Instance.DeltaTime / _orbitTime;
                 if (_angle <= 0)
                 {
                     _angle += 2 * Mathf.PI;
@@ -62,17 +55,17 @@ namespace Atlanticide
 
             switch (_axis)
             {
-                case Axis.X:
+                case Utils.Axis.X:
                 {
                     pointAroundCenter = new Vector3(Mathf.Sin(_angle), Mathf.Cos(_angle), 0);
                     break;
                 }
-                case Axis.Y:
+                case Utils.Axis.Y:
                 {
                     pointAroundCenter = new Vector3(Mathf.Sin(_angle), 0, Mathf.Cos(_angle));
                     break;
                 }
-                case Axis.Z:
+                case Utils.Axis.Z:
                 {
                     pointAroundCenter = new Vector3(0, Mathf.Sin(_angle), Mathf.Cos(_angle));
                     break;

@@ -238,7 +238,7 @@ namespace Atlanticide
             }
 
             float fallSpeed =
-                World.Instance.gravity * Time.deltaTime + 0.05f * _distFallen;
+                (World.Instance.gravity + 2 * _distFallen) * World.Instance.DeltaTime;
             Vector3 newPosition = transform.position;
             newPosition.y -= fallSpeed;
             _distFallen += fallSpeed;
@@ -256,7 +256,7 @@ namespace Atlanticide
         protected virtual void Rise(float speed)
         {
             Vector3 newPosition = transform.position;
-            newPosition.y += speed * Time.deltaTime;
+            newPosition.y += speed * World.Instance.DeltaTime;
             transform.position = newPosition;
         }
 

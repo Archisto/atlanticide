@@ -28,7 +28,7 @@ namespace Atlanticide
         /// </summary>
         private void Update()
         {
-            _elapsedTime += Time.deltaTime;
+            _elapsedTime += World.Instance.DeltaTime;
             if (_elapsedTime >= _lifeTime)
             {
                 Destroy();

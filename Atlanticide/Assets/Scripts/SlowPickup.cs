@@ -58,7 +58,7 @@ namespace Atlanticide
             if (_beingPickedUp)
             {
                 _pcPickingUpDist = Vector3.Distance(transform.position, _pcPickingUp.transform.position);
-                _elapsedTime += Time.deltaTime;
+                _elapsedTime += World.Instance.DeltaTime;
                 if (_elapsedTime >= _pickupTime)
                 {
                     Collect(_pcPickingUp);

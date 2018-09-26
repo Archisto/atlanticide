@@ -194,7 +194,7 @@ namespace Atlanticide
             if (Active)
             {
                 // Increases the elapsed time
-                _elapsedTime += Time.deltaTime;
+                _elapsedTime += World.Instance.DeltaTime;
 
                 // Updates the fade's progress
                 UpdateFadeProgress();

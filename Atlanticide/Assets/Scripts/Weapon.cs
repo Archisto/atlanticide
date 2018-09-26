@@ -47,7 +47,7 @@ namespace Atlanticide
         {
             if (_fired)
             {
-                _elapsedFiringTime += Time.deltaTime;
+                _elapsedFiringTime += World.Instance.DeltaTime;
                 if (_elapsedFiringTime >= _fireRate)
                 {
                     _elapsedFiringTime = 0;
