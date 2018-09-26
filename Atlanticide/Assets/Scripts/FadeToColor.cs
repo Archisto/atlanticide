@@ -54,13 +54,6 @@ namespace Atlanticide
         {
             InitUsageInAllScenes();
             CheckForErrors();
-
-            // TODO: Disabled temporarily because this should not be used in the first scene when the game is started.
-            // 
-            //if (!UsedInAllScenes)
-            //{
-            //    InitAfterSceneChange();
-            //}
         }
 
         public void Init(Image image)
@@ -74,17 +67,7 @@ namespace Atlanticide
         /// </summary>
         private void InitUsageInAllScenes()
         {
-            //FadeCatcher catcher = FindObjectOfType<FadeCatcher>();
             UsedInAllScenes = false;
-            //if (catcher == null)
-            //{
-            //    UsedInAllScenes = true;
-            //    DontDestroyOnLoad(gameObject);
-            //}
-            //else
-            //{
-            //    UsedInAllScenes = false;
-            //}
         }
 
         /// <summary>
@@ -94,23 +77,7 @@ namespace Atlanticide
         public void InitAfterSceneChange()
         {
             StartFadeIn();
-            //SetCompatibleSwitches();
         }
-
-        //private void SetCompatibleSwitches()
-        //{
-        //    FadeActivator activator = GetComponent<FadeActivator>();
-
-        //    if (activator != null)
-        //    {
-        //        activator.FindCompatibleSwitches();
-        //    }
-        //    //else
-        //    //{
-        //    //    Debug.LogError("FadeActivator component could " +
-        //    //                   "not be found in the object.");
-        //    //}
-        //}
 
         /// <summary>
         /// Checks for any missing references and logs the errors.
@@ -121,8 +88,7 @@ namespace Atlanticide
             {
                 if (_uiImage == null)
                 {
-                    Debug.LogError("UI Image could not be " +
-                                   "found in the scene.");
+                    Debug.LogError(Utils.GetObjectMissingString("UI Image"));
                 }
             }
         }
@@ -194,7 +160,7 @@ namespace Atlanticide
             if (Active)
             {
                 // Increases the elapsed time
-                _elapsedTime += World.Instance.DeltaTime;
+                _elapsedTime += Time.deltaTime;
 
                 // Updates the fade's progress
                 UpdateFadeProgress();

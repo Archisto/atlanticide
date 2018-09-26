@@ -29,9 +29,13 @@ namespace Atlanticide
         {
             if (!GameManager.Instance.FadeActive)
             {
-                CheckPlayerInput();
+                if (GameManager.Instance.GameState == GameManager.State.Play)
+                {
+                    CheckPlayerInput();
+                }
 
-                if (_paused)
+                if (GameManager.Instance.GameState != GameManager.State.Play
+                    || _paused)
                 {
                     CheckMenuInput();
                 }
@@ -52,18 +56,7 @@ namespace Atlanticide
                 if (_players[i].Input.GetPauseInput() &&
                     (!_paused || IsAllowedToUnpause(i)))
                 {
-                    _paused = !_paused;
-
-                    if (_paused)
-                    {
-                        _pausingPlayerNum = i;
-                        World.Instance.PauseGame(true, _players[_pausingPlayerNum].name);
-                    }
-                    else
-                    {
-                        _pausingPlayerNum = -1;
-                        World.Instance.PauseGame(false, "");
-                    }
+                    TogglePause(i);
                 }
 
                 if (!_paused && !_players[i].IsDead)
@@ -174,7 +167,30 @@ namespace Atlanticide
             }
             if (Input.GetKeyDown(KeyCode.Keypad0))
             {
+                GameManager.Instance.GameState = GameManager.State.Play;
                 GameManager.Instance.StartLoadingScene("Lauri's Colosseum");
+            }
+
+            // Pause play mode
+            if (Input.GetKeyDown(KeyCode.Break))
+            {
+                Debug.Break();
+            }
+        }
+
+        public void TogglePause(int pausingPlayer)
+        {
+            _paused = !_paused;
+
+            if (_paused)
+            {
+                _pausingPlayerNum = pausingPlayer;
+                World.Instance.PauseGame(true, _players[_pausingPlayerNum].name);
+            }
+            else
+            {
+                _pausingPlayerNum = -1;
+                World.Instance.PauseGame(false, "");
             }
         }
 

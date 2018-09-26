@@ -51,4 +51,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b6773909c955ba4469e236fd1d6c364f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gravity: 5
+  gravity: 8
+  gamePaused: 0
+  telegrabRadius: 2
+  keyCodes: 

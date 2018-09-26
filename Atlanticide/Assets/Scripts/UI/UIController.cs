@@ -36,10 +36,6 @@ namespace Atlanticide.UI
         private void InitUI()
         {
             _pauseScreen = GetComponentInChildren<PauseScreen>(true);
-            if (_pauseScreen == null)
-            {
-                Debug.LogError(Utils.GetComponentMissingString("PauseScreen"));
-            }
         }
 
         /// <summary>
@@ -54,7 +50,10 @@ namespace Atlanticide.UI
         /// </summary>
         public void UpdateUI()
         {
-            _scoreText.text = "Score: " + GameManager.Instance.CurrentScore;
+            if (_scoreText != null)
+            {
+                _scoreText.text = "Score: " + GameManager.Instance.CurrentScore;
+            }
         }
 
         public Slider GetEnergyBar(int playerNum)

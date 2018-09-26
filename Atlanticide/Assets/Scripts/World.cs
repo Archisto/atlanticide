@@ -27,6 +27,7 @@ namespace Atlanticide
         }
         #endregion Statics
 
+        public bool gamePaused;
         public float gravity = 1;
 
         [SerializeField, Range(0.1f, 5f)]
@@ -34,16 +35,10 @@ namespace Atlanticide
 
         public List<int> keyCodes = new List<int>();
 
-        private bool _gamePaused;
-
-        public bool GamePaused
-        {
-            get { return _gamePaused; }
-        }
 
         public float DeltaTime
         {
-            get { return (_gamePaused ? 0f : Time.deltaTime); }
+            get { return (gamePaused ? 0f : Time.deltaTime); }
         }
 
         /// <summary>
@@ -85,7 +80,7 @@ namespace Atlanticide
         /// who paused the game</param>
         public void PauseGame(bool paused, string playerName)
         {
-            _gamePaused = paused;
+            gamePaused = paused;
 
             //if (_gamePaused)
             //{
@@ -96,7 +91,7 @@ namespace Atlanticide
             //    Debug.Log("Game unpaused");
             //}
 
-            GameManager.Instance.ActivatePauseScreen(_gamePaused, playerName);
+            GameManager.Instance.ActivatePauseScreen(gamePaused, playerName);
         }
     }
 }

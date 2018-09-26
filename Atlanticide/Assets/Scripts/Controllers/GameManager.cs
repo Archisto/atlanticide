@@ -46,6 +46,15 @@ namespace Atlanticide
         private bool _sceneChanged;
         private string _nextSceneName;
 
+        public enum State
+        {
+            MainMenu = 0,
+            Play = 1,
+            LevelEnd = 2
+        }
+
+        public State GameState { get; set; }
+
         public int PlayerCount { get; private set; }
 
         public int CurrentLevel { get; set; }
@@ -53,6 +62,11 @@ namespace Atlanticide
         public int CurrentScore { get; private set; }
 
         public bool SceneChanging { get; private set; }
+
+        public SettingsManager Settings
+        {
+            get { return _settings; }
+        }
 
         public bool FadeActive
         {
@@ -81,6 +95,7 @@ namespace Atlanticide
                 DontDestroyOnLoad(gameObject);
                 SceneManager.activeSceneChanged += InitScene;
                 InitSettings();
+                GameState = State.Play;
                 PlayerCount = 2;
                 CurrentLevel = 1;
             }
@@ -326,6 +341,7 @@ namespace Atlanticide
         public void LoadMainMenu()
         {
             StartLoadingScene(MainMenuKey);
+            GameState = State.MainMenu;
         }
 
         /// <summary>
@@ -338,6 +354,7 @@ namespace Atlanticide
             {
                 CurrentLevel = levelNum;
                 StartLoadingScene(LevelKey + levelNum);
+                GameState = State.Play;
             }
             else
             {
@@ -387,7 +404,10 @@ namespace Atlanticide
 
         public void ActivatePauseScreen(bool activate, string playerName)
         {
-            _UI.ActivatePauseScreen(activate, playerName);
+            if (activate || !SceneChanging)
+            {
+                _UI.ActivatePauseScreen(activate, playerName);
+            }
         }
 
         private void OnDisable()
