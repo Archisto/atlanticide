@@ -19,7 +19,6 @@ namespace Atlanticide
         protected int _hitpoints;
         protected bool _isRising;
         protected float _distFallen;
-        protected Vector3 _respawnPosition;
         protected GameObject _myWall;
         protected Vector3 _characterSize;
         private float _groundHitDist;
@@ -44,13 +43,15 @@ namespace Atlanticide
             }
         }
 
+        public Vector3 RespawnPosition { get; set; }
+
         /// <summary>
         /// Initializes the object.
         /// </summary>
         protected virtual void Start()
         {
             ResetBaseValues();
-            _respawnPosition = transform.position;
+            RespawnPosition = transform.position;
             _characterSize = GetComponent<Renderer>().bounds.size;
             _groundHitDist = _characterSize.y / 2;
             _wallHitDist = _characterSize.x / 2;
@@ -189,8 +190,6 @@ namespace Atlanticide
 
         protected Vector3? GetPositionOffWall(Vector3 oldPosition, Vector3 position)
         {
-            // TODO: Fix awkward bumping
-
             Vector3 result = position;
             RaycastHit hit;
             bool touchingWall =
@@ -202,17 +201,12 @@ namespace Atlanticide
             if (touchingWall && hit.transform.gameObject != _myWall && hit.transform.gameObject != gameObject)
             {
                 Vector3 hitDirection = hit.point - position;
+                hitDirection.Normalize();
+                result = hit.point - hitDirection * World.Instance.wallBuffer;
+                result.y = position.y;
 
-                if (hitDirection.x != 0)
-                {
-                    //result.x = oldPosition.x;
-                    result.x -= hitDirection.x;
-                }
-                if (hitDirection.z != 0)
-                {
-                    //result.z = oldPosition.z;
-                    result.z -= hitDirection.z;
-                }
+                // TODO: Prevent the movement from being faster than normal movement
+                // speed after colliding with two walls at the same time.
 
                 return result;
             }
@@ -297,7 +291,7 @@ namespace Atlanticide
             ResetBaseValues();
             gameObject.SetActive(true);
             _telegrabability.SetActive(true);
-            transform.position = _respawnPosition;
+            transform.position = RespawnPosition;
             Debug.Log(name + " respawned.");
         }
 

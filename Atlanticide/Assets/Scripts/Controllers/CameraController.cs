@@ -20,6 +20,14 @@ namespace Atlanticide
 
         private void LateUpdate()
         {
+            if (GameManager.Instance.PlayReady)
+            {
+                SetPositionInPlay();
+            }
+        }
+
+        private void SetPositionInPlay()
+        {
             Vector3 newPosition = Vector3.zero;
 
             for (int i = 0; i < GameManager.Instance.PlayerCount; i++)

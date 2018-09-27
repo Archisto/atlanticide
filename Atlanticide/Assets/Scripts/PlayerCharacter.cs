@@ -58,7 +58,6 @@ namespace Atlanticide
         protected override void Start()
         {
             base.Start();
-            ResetBaseValues();
             _myWall = _pushBeam;
             _weapon = GetComponentInChildren<Weapon>();
         }
@@ -354,7 +353,7 @@ namespace Atlanticide
         public void Respawn(NonPlayerCharacter npc)
         {
             // Promotes an NPC to a player character
-            _respawnPosition = npc.transform.position;
+            RespawnPosition = npc.transform.position;
             npc.PromoteToPlayer();
 
             base.Respawn();

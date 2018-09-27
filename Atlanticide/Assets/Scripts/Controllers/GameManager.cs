@@ -35,6 +35,7 @@ namespace Atlanticide
         private const string MainMenuKey = "MainMenu";
         private const string LevelKey = "Level";
 
+        private Level _level;
         private PlayerCharacter _playerPrefab;
         private PlayerCharacter[] _players;
         private NonPlayerCharacter[] _npcs;
@@ -43,7 +44,8 @@ namespace Atlanticide
         private Transform[] _telegrabs;
         private SettingsManager _settings;
         private FadeToColor _fade;
-        private bool _sceneChanged;
+        private bool _exitingScene;
+        private bool _startingScene;
         private string _nextSceneName;
 
         public enum State
@@ -61,11 +63,17 @@ namespace Atlanticide
 
         public int CurrentScore { get; private set; }
 
-        public bool SceneChanging { get; private set; }
-
         public SettingsManager Settings
         {
             get { return _settings; }
+        }
+
+        public bool SceneChanging
+        {
+            get
+            {
+                return _exitingScene || _startingScene;
+            }
         }
 
         public bool FadeActive
@@ -73,6 +81,15 @@ namespace Atlanticide
             get
             {
                 return _fade.Active;
+            }
+        }
+
+        public bool PlayReady
+        {
+            get
+            {
+                return GameState == State.Play &&
+                       !SceneChanging;
             }
         }
 
@@ -95,7 +112,16 @@ namespace Atlanticide
                 DontDestroyOnLoad(gameObject);
                 SceneManager.activeSceneChanged += InitScene;
                 InitSettings();
-                GameState = State.Play;
+
+                if (SceneManager.GetActiveScene().name == MainMenuKey)
+                {
+                    GameState = State.MainMenu;
+                }
+                else
+                {
+                    GameState = State.Play;
+                }
+
                 PlayerCount = 2;
                 CurrentLevel = 1;
             }
@@ -106,7 +132,7 @@ namespace Atlanticide
         /// </summary>
         private void Update()
         {
-            if (SceneChanging && _fade.FadedOut)
+            if (_exitingScene && _fade.FadedOut)
             {
                 LoadScene(_nextSceneName);
             }
@@ -120,11 +146,29 @@ namespace Atlanticide
         private void InitScene()
         {
             InitUI();
-            InitPlayers();
-            InitNPCs();
             InitFade();
-            _pickups = FindObjectsOfType<Pickup>();
-            _sceneChanged = false;
+
+            if (GameState == State.Play)
+            {
+                InitLevel();
+                InitPlayers();
+                InitNPCs();
+                _pickups = FindObjectsOfType<Pickup>();
+            }
+
+            _startingScene = false;
+        }
+
+        /// <summary>
+        /// Initializes the level controller.
+        /// </summary>
+        private void InitLevel()
+        {
+            _level = FindObjectOfType<Level>();
+            if (_level == null)
+            {
+                Debug.LogError(Utils.GetFieldNullString("Level controller"));
+            }
         }
 
         /// <summary>
@@ -162,9 +206,7 @@ namespace Atlanticide
                 _players[i].name = "Player " + (i + 1);
                 _players[i].Input = new PlayerInput(i);
                 _players[i].EnergyBar = _UI.GetEnergyBar(i);
-
-                // Testing
-                _players[i].transform.position = new Vector3(i * 2 - 4, 0.5f, 4);
+                _players[i].transform.position = _level.GetSpawnPoint(i);
             }
         }
 
@@ -174,6 +216,11 @@ namespace Atlanticide
         /// <param name="newPlayerCount">The player count</param>
         public void ActivatePlayers(int newPlayerCount)
         {
+            // TODO: Are player characters set inactive when they die?
+            // Do they die? Can player count be changed at any point?
+            // Setting a dead PC inactive and then active again
+            // should not make them respawn.
+
             PlayerCount = (newPlayerCount < MaxPlayers ? newPlayerCount : MaxPlayers);
             for (int i = 0; i < MaxPlayers; i++)
             {
@@ -203,7 +250,7 @@ namespace Atlanticide
             {
                 _fade.Init(_UI.GetFade());
 
-                if (_sceneChanged)
+                if (_startingScene)
                 {
                     _fade.StartFadeIn();
                 }
@@ -350,16 +397,33 @@ namespace Atlanticide
         /// <param name="levelNum">The level number</param>
         public void LoadLevel(int levelNum)
         {
-            if (!SceneChanging && levelNum >= 1 && levelNum <= LastLevel)
+            if (!SceneChanging)
             {
-                CurrentLevel = levelNum;
-                StartLoadingScene(LevelKey + levelNum);
-                GameState = State.Play;
+                if (levelNum >= 1 && levelNum <= LastLevel)
+                {
+                    CurrentLevel = levelNum;
+                    StartLoadingScene(LevelKey + levelNum);
+                    GameState = State.Play;
+                }
+                else
+                {
+                    Debug.LogWarning(string.Format("Invalid level number ({0}).", levelNum));
+                }
             }
             else
             {
-                Debug.LogWarning(string.Format("Invalid level number ({0}).", levelNum));
+                Debug.LogWarning("Scene is already changing.");
             }
+        }
+
+        /// <summary>
+        /// Testing.
+        /// Loads a level: Lauri's Colosseum.
+        /// </summary>
+        public void LoadTestLevel()
+        {
+            StartLoadingScene("Lauri's Colosseum");
+            GameState = State.Play;
         }
 
         /// <summary>
@@ -368,13 +432,16 @@ namespace Atlanticide
         /// <param name="sceneName">The scene's name</param>
         public void StartLoadingScene(string sceneName)
         {
-            if (!SceneChanging)
+            if (!_exitingScene)
             {
                 Debug.Log("Loading scene: " + sceneName);
 
-                _players.ForEach(p => p.CancelActions());
+                if (GameState == State.Play)
+                {
+                    _players.ForEach(p => p.CancelActions());
+                }
 
-                SceneChanging = true;
+                _exitingScene = true;
                 _nextSceneName = sceneName;
                 _fade.StartFadeOut();
             }
@@ -386,8 +453,8 @@ namespace Atlanticide
         /// <param name="sceneName">The scene's name</param>
         private void LoadScene(string sceneName)
         {
-            SceneChanging = false;
-            _sceneChanged = true;
+            _exitingScene = false;
+            _startingScene = true;
             SceneManager.LoadScene(sceneName);
         }
 
@@ -398,13 +465,12 @@ namespace Atlanticide
                 return;
             }
 
-            //Debug.Log("Loaded: " + next.name);
             InitScene();
         }
 
         public void ActivatePauseScreen(bool activate, string playerName)
         {
-            if (activate || !SceneChanging)
+            if (activate || !_exitingScene)
             {
                 _UI.ActivatePauseScreen(activate, playerName);
             }

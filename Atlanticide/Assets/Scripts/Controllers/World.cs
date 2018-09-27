@@ -28,13 +28,13 @@ namespace Atlanticide
         #endregion Statics
 
         public bool gamePaused;
-        public float gravity = 1;
+        public float gravity = 1f;
+        public float wallBuffer = 1f;
 
         [SerializeField, Range(0.1f, 5f)]
         public float telegrabRadius = 1;
 
         public List<int> keyCodes = new List<int>();
-
 
         public float DeltaTime
         {

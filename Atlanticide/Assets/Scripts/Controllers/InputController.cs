@@ -29,7 +29,7 @@ namespace Atlanticide
         {
             if (!GameManager.Instance.FadeActive)
             {
-                if (GameManager.Instance.GameState == GameManager.State.Play)
+                if (GameManager.Instance.PlayReady)
                 {
                     CheckPlayerInput();
                 }
@@ -106,22 +106,6 @@ namespace Atlanticide
         /// </summary>
         private void CheckDebugInput()
         {
-            // Reset
-            if (Input.GetKeyDown(KeyCode.R))
-            {
-                GameManager.Instance.ResetLevel();
-            }
-
-            // Fade out/in
-            if (Input.GetKeyDown(KeyCode.G))
-            {
-                FadeToColor fade = FindObjectOfType<FadeToColor>();
-                if (fade != null)
-                {
-                    fade.StartNextFade();
-                }
-            }
-
             // Move NPCs
             if (Input.GetKey(KeyCode.J))
             {
@@ -167,8 +151,7 @@ namespace Atlanticide
             }
             if (Input.GetKeyDown(KeyCode.Keypad0))
             {
-                GameManager.Instance.GameState = GameManager.State.Play;
-                GameManager.Instance.StartLoadingScene("Lauri's Colosseum");
+                GameManager.Instance.LoadTestLevel();
             }
 
             // Pause play mode
