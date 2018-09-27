@@ -13,20 +13,17 @@ namespace Atlanticide.UI
         [SerializeField]
         public Text pausingPlayerText;
 
-        private InputController _input;
-
         /// <summary>
         /// Initializes the object.
         /// </summary>
         private void Start()
         {
-            _input = FindObjectOfType<InputController>();
-            title.text = "Game paused";
+            title.text = "Game Paused";
         }
 
         public void ResumeGame()
         {
-            _input.TogglePause(-1);
+            World.Instance.PauseGame(false);
         }
 
         public void RestartLevel()

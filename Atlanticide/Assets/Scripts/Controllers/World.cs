@@ -27,7 +27,6 @@ namespace Atlanticide
         }
         #endregion Statics
 
-        public bool gamePaused;
         public float gravity = 1f;
         public float wallBuffer = 1f;
 
@@ -35,10 +34,16 @@ namespace Atlanticide
         public float telegrabRadius = 1;
 
         public List<int> keyCodes = new List<int>();
+        private bool _gamePaused;
+
+        public bool GamePaused
+        {
+            get { return _gamePaused; }
+        }
 
         public float DeltaTime
         {
-            get { return (gamePaused ? 0f : Time.deltaTime); }
+            get { return (GamePaused ? 0f : Time.deltaTime); }
         }
 
         /// <summary>
@@ -75,23 +80,13 @@ namespace Atlanticide
         /// <summary>
         /// Pauses or unpauses the game.
         /// </summary>
-        /// <param name="paused">Should the game be paused</param>
-        /// <param name="playerName">The name of the player
+        /// <param name="pause">Should the game be paused</param>
+        /// <param name="playerName">[Optional] The name of the player
         /// who paused the game</param>
-        public void PauseGame(bool paused, string playerName)
+        public void PauseGame(bool pause, string playerName = "")
         {
-            gamePaused = paused;
-
-            //if (_gamePaused)
-            //{
-            //    Debug.Log("Game paused by " + playerName);
-            //}
-            //else
-            //{
-            //    Debug.Log("Game unpaused");
-            //}
-
-            GameManager.Instance.ActivatePauseScreen(gamePaused, playerName);
+            _gamePaused = pause;
+            GameManager.Instance.ActivatePauseScreen(GamePaused, playerName);
         }
     }
 }

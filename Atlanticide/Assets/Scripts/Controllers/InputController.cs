@@ -10,11 +10,6 @@ namespace Atlanticide
         private int _pausingPlayerNum;
 
         /// <summary>
-        /// Is the game paused
-        /// </summary>
-        private bool _paused;
-
-        /// <summary>
         /// Initializes the object.
         /// </summary>
         private void Start()
@@ -35,7 +30,7 @@ namespace Atlanticide
                 }
 
                 if (GameManager.Instance.GameState != GameManager.State.Play
-                    || _paused)
+                    || World.Instance.GamePaused)
                 {
                     CheckMenuInput();
                 }
@@ -54,12 +49,12 @@ namespace Atlanticide
             {
                 // Pausing and unpausing the game
                 if (_players[i].Input.GetPauseInput() &&
-                    (!_paused || IsAllowedToUnpause(i)))
+                    (!World.Instance.GamePaused || IsAllowedToUnpause(i)))
                 {
                     TogglePause(i);
                 }
 
-                if (!_paused && !_players[i].IsDead)
+                if (!World.Instance.GamePaused && !_players[i].IsDead)
                 {
                     // Moving the player character
                     Vector3 movingDirection = _players[i].Input.GetMoveInput();
@@ -155,7 +150,7 @@ namespace Atlanticide
             }
 
             // Pause play mode
-            if (Input.GetKeyDown(KeyCode.Break))
+            if (Input.GetKeyDown(KeyCode.P))
             {
                 Debug.Break();
             }
@@ -163,9 +158,7 @@ namespace Atlanticide
 
         public void TogglePause(int pausingPlayer)
         {
-            _paused = !_paused;
-
-            if (_paused)
+            if (!World.Instance.GamePaused)
             {
                 _pausingPlayerNum = pausingPlayer;
                 World.Instance.PauseGame(true, _players[_pausingPlayerNum].name);
@@ -173,7 +166,7 @@ namespace Atlanticide
             else
             {
                 _pausingPlayerNum = -1;
-                World.Instance.PauseGame(false, "");
+                World.Instance.PauseGame(false);
             }
         }
 

@@ -20,7 +20,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4109859290790634}
   - component: {fileID: 114240849765634108}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: FadeToColor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -54,4 +54,3 @@ MonoBehaviour:
   _color: {r: 0, g: 0, b: 0, a: 0}
   _fadeOutTime: 0.5
   _fadeInTime: 0.5
-  _uiImage: {fileID: 0}

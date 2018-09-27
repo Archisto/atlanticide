@@ -257,14 +257,6 @@ namespace Atlanticide
             }
         }
 
-        /// <summary>
-        /// Did the players lose.
-        /// </summary>
-        public bool GameOver
-        {
-            get { return false; }
-        }
-
         public UIController GetUI()
         {
             return _UI;

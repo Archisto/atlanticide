@@ -64,6 +64,5 @@ namespace Atlanticide
         {
             return _levelCenter.position;
         }
-
     }
 }

@@ -39,13 +39,6 @@ namespace Atlanticide.UI
         }
 
         /// <summary>
-        /// Updates the object once per frame.
-        /// </summary>
-        private void Update()
-        {
-        }
-
-        /// <summary>
         /// Updates the UI.
         /// </summary>
         public void UpdateUI()

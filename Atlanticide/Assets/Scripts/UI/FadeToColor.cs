@@ -17,17 +17,10 @@ namespace Atlanticide
         [SerializeField]
         private float _fadeInTime = 1;
 
-        public Image _uiImage;
-
+        private Image _screenCoverImage;
         private bool _fadeOut;
         private float _fadeProgress;
         private float _elapsedTime;
-
-        /// <summary>
-        /// Is the same fade object still used
-        /// even after the scene changes.
-        /// </summary>
-        public bool UsedInAllScenes { get; private set; }
 
         public bool Active { get; private set; }
 
@@ -50,33 +43,14 @@ namespace Atlanticide
         /// <summary>
         /// Initializes the object.
         /// </summary>
-        private void Awake()
+        private void Start()
         {
-            InitUsageInAllScenes();
             CheckForErrors();
         }
 
         public void Init(Image image)
         {
-            _uiImage = image;
-        }
-
-        /// <summary>
-        /// Checks if there's a FadeCatcher object in the original scene.
-        /// If not, the fade will be transferred between scenes.
-        /// </summary>
-        private void InitUsageInAllScenes()
-        {
-            UsedInAllScenes = false;
-        }
-
-        /// <summary>
-        /// After the scene has changed, initializes the fade.
-        /// Starts fading in, continuing the fade-out before the scene change.
-        /// </summary>
-        public void InitAfterSceneChange()
-        {
-            StartFadeIn();
+            _screenCoverImage = image;
         }
 
         /// <summary>
@@ -84,12 +58,9 @@ namespace Atlanticide
         /// </summary>
         private void CheckForErrors()
         {
-            if (UsedInAllScenes)
+            if (_screenCoverImage == null)
             {
-                if (_uiImage == null)
-                {
-                    Debug.LogError(Utils.GetObjectMissingString("UI Image"));
-                }
+                Debug.LogError(Utils.GetObjectMissingString("Screen cover image"));
             }
         }
 
@@ -152,11 +123,6 @@ namespace Atlanticide
         /// </summary>
         private void Update()
         {
-            if (UsedInAllScenes)
-            {
-                InitAfterSceneChange();
-            }
-
             if (Active)
             {
                 // Increases the elapsed time
@@ -209,7 +175,7 @@ namespace Atlanticide
         /// </summary>
         private void UpdateTransparency()
         {
-            if (_uiImage != null)
+            if (_screenCoverImage != null)
             {
                 Color newColor = _color;
 
@@ -222,7 +188,7 @@ namespace Atlanticide
                     newColor.a = 1f - _fadeProgress;
                 }
 
-                _uiImage.color = newColor;
+                _screenCoverImage.color = newColor;
             }
         }
     }
