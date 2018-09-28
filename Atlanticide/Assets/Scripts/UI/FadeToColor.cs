@@ -60,7 +60,7 @@ namespace Atlanticide
         {
             if (_screenCoverImage == null)
             {
-                Debug.LogError(Utils.GetObjectMissingString("Screen cover image"));
+                Debug.LogError(Utils.GetFieldNullString("Screen cover image"));
             }
         }
 
