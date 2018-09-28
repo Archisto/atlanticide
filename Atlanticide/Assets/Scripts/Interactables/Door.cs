@@ -4,13 +4,26 @@ using UnityEngine;
 
 namespace Atlanticide
 {
-    public class Door : MonoBehaviour
+    public class Door : LevelObject
     {
         [SerializeField]
-        private int keyCode;
+        private int _keyCode;
+
+        [SerializeField]
+        private float _openTime = 1f;
+
+        [SerializeField]
+        private Vector3 _openRotation;
 
         public bool unlocked;
         public bool open;
+        private bool _defaultUnlocked;
+        private bool _defaultOpen;
+        private bool _changingOpenState;
+        private float _openProgress;
+        private float _elapsedTime;
+        private Quaternion _closedRotation;
+        private Quaternion _openRotationQ;
 
         private PlayerProximitySwitch _proxSwitch;
 
@@ -24,6 +37,14 @@ namespace Atlanticide
             {
                 Debug.LogError(Utils.GetComponentMissingString("ProximitySwitch"));
             }
+
+            if (open)
+            {
+                _openProgress = 1f;
+            }
+
+            _closedRotation = transform.rotation;
+            _openRotationQ = Quaternion.Euler(_openRotation);
         }
 
         /// <summary>
@@ -31,16 +52,38 @@ namespace Atlanticide
         /// </summary>
         private void Update()
         {
-            if (open)
+            if (_changingOpenState && _openTime > 0f)
             {
-                return;
+                UpdateOpenProgress();
+            }
+            else if (!open)
+            {
+                CheckForKey();
+            }
+        }
+
+        private void UpdateOpenProgress()
+        {
+            _openProgress = (open ? _elapsedTime / _openTime : (_openTime - _elapsedTime) / _openTime);
+            _elapsedTime += World.Instance.DeltaTime;
+            if (_elapsedTime >= _openTime)
+            {
+                _elapsedTime = 0f;
+                _changingOpenState = false;
+                _openProgress = Mathf.Clamp01(_openProgress);
             }
 
+            Quaternion newRotation = Quaternion.Lerp(_closedRotation, _openRotationQ, _openProgress);
+            transform.rotation = newRotation;
+        }
+
+        private void CheckForKey()
+        {
             if (_proxSwitch != null && _proxSwitch.Activated)
             {
                 foreach (int ownedKeyCode in World.Instance.keyCodes)
                 {
-                    if (keyCode == ownedKeyCode)
+                    if (_keyCode == ownedKeyCode)
                     {
                         Unlock();
                         Open();
@@ -54,6 +97,7 @@ namespace Atlanticide
             if (unlocked && !open)
             {
                 open = true;
+                _changingOpenState = true;
             }
         }
 
@@ -62,6 +106,7 @@ namespace Atlanticide
             if (open)
             {
                 open = false;
+                _changingOpenState = true;
             }
         }
 
@@ -80,6 +125,18 @@ namespace Atlanticide
                 Close();
                 unlocked = false;
             }
+        }
+
+        /// <summary>
+        /// Resets the object to its default state.
+        /// </summary>
+        public override void ResetObject()
+        {
+            unlocked = _defaultUnlocked;
+            open = _defaultOpen;
+            _changingOpenState = false;
+            _openProgress = (open ? 1f : 0f);
+            transform.rotation = (open ? _openRotationQ : _closedRotation);
         }
 
         /// <summary>

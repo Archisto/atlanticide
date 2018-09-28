@@ -24,9 +24,9 @@ namespace Atlanticide
         /// <summary>
         /// Resets the pickup.
         /// </summary>
-        public override void ResetPickup()
+        public override void ResetObject()
         {
-            base.ResetPickup();
+            base.ResetObject();
             _beingPickedUp = false;
             _pcPickingUp = null;
             _pcPickingUpDist = 0;
@@ -65,7 +65,7 @@ namespace Atlanticide
                 }
                 else if (_pcPickingUpDist > _pickupMaxDistance)
                 {
-                    ResetPickup();
+                    ResetObject();
                 }
             }
         }

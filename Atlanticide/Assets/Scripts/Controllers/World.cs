@@ -28,6 +28,7 @@ namespace Atlanticide
         #endregion Statics
 
         public float gravity = 1f;
+        public float pushSpeed = 1f;
         public float wallBuffer = 1f;
 
         [SerializeField, Range(0.1f, 5f)]
@@ -87,6 +88,14 @@ namespace Atlanticide
         {
             _gamePaused = pause;
             GameManager.Instance.ActivatePauseScreen(GamePaused, playerName);
+        }
+
+        /// <summary>
+        /// Resets the world to its default state.
+        /// </summary>
+        public void ResetWorld()
+        {
+            keyCodes.Clear();
         }
     }
 }

@@ -17,9 +17,9 @@ namespace Atlanticide
         /// <summary>
         /// Resets the pickup.
         /// </summary>
-        public override void ResetPickup()
+        public override void ResetObject()
         {
-            base.ResetPickup();
+            base.ResetObject();
             _elapsedTime = 0;
         }
 

@@ -7,7 +7,7 @@ namespace Atlanticide
     /// <summary>
     /// A score pickup that is collected by walking over it.
     /// </summary>
-    public class Pickup : MonoBehaviour
+    public class Pickup : LevelObject
     {
         [SerializeField]
         private int _score = 100;
@@ -21,13 +21,13 @@ namespace Atlanticide
         private void Start()
         {
             _originalPosition = transform.position;
-            ResetPickup();
+            ResetObject();
         }
 
         /// <summary>
         /// Resets the pickup.
         /// </summary>
-        public virtual void ResetPickup()
+        public override void ResetObject()
         {
             _collected = false;
             gameObject.SetActive(true);

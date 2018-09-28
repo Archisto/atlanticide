@@ -40,7 +40,7 @@ namespace Atlanticide
         private PlayerCharacter[] _players;
         private NonPlayerCharacter[] _npcs;
         private UIController _UI;
-        private Pickup[] _pickups;
+        private LevelObject[] _levelObjects;
         private Transform[] _telegrabs;
         private SettingsManager _settings;
         private FadeToColor _fade;
@@ -153,7 +153,7 @@ namespace Atlanticide
                 InitLevel();
                 InitPlayers();
                 InitNPCs();
-                _pickups = FindObjectsOfType<Pickup>();
+                _levelObjects = FindObjectsOfType<LevelObject>();
             }
 
             _startingScene = false;
@@ -368,9 +368,10 @@ namespace Atlanticide
         /// </summary>
         public void ResetLevel()
         {
+            World.Instance.ResetWorld();
             _players.ForEach(pc => pc.Respawn());
             _npcs.ForEach(npc => npc.Respawn());
-            _pickups.ForEach(p => p.ResetPickup());
+            _levelObjects.ForEach(obj => obj.ResetObject());
             SetScore(0);
         }
 

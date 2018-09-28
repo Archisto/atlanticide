@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Atlanticide
 {
-    public class Destructible : MonoBehaviour
+    public class Destructible : LevelObject
     {
         [SerializeField]
         protected int _maxHitpoints = 3;
@@ -20,13 +20,13 @@ namespace Atlanticide
         private void Start()
         {
             _originalPosition = transform.position;
-            ResetDestructible();
+            ResetObject();
         }
 
         /// <summary>
-        /// Resets the object.
+        /// Resets the object to its default state.
         /// </summary>
-        public virtual void ResetDestructible()
+        public override void ResetObject()
         {
             Destroyed = false;
             gameObject.SetActive(true);

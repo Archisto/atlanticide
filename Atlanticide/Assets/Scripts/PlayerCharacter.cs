@@ -36,6 +36,7 @@ namespace Atlanticide
 
         private Weapon _weapon;
         private Climbable _climbable;
+        private Pushable _pushable;
         private bool _jumping;
         private bool _onGround;
         private bool _abilityActive;
@@ -51,6 +52,8 @@ namespace Atlanticide
         public Slider EnergyBar { get; set; }
 
         public bool Climbing { get; private set; }
+
+        public bool Pushing { get; private set; }
 
         /// <summary>
         /// Initializes the object.
@@ -99,13 +102,17 @@ namespace Atlanticide
         {
             if (!IsImmobile)
             {
-                if (!Climbing)
+                if (Climbing)
                 {
-                    Move(direction);
+                    Climb(direction);
+                }
+                else if (Pushing)
+                {
+                    Push(direction);
                 }
                 else
                 {
-                    Climb(direction);
+                    Move(direction);
                 }
             }
         }
@@ -165,22 +172,6 @@ namespace Atlanticide
             }
         }
 
-        private void Climb(Vector3 direction)
-        {
-            Vector3 movement = Vector3.zero;
-            movement.y = direction.y * _climbSpeed * World.Instance.DeltaTime;
-            float climbProgress = _climbable.GetClimbProgress(transform.position + movement);
-
-            Debug.Log(climbProgress);
-
-            transform.position = _climbable.GetPositionOnClimbable(climbProgress);
-
-            if ((climbProgress >= 1 && direction.y > 0) || (climbProgress <= 0 && direction.y < 0))
-            {
-                EndClimb();
-            }
-        }
-
         /// <summary>
         /// Rotates the player character.
         /// </summary>
@@ -212,6 +203,10 @@ namespace Atlanticide
                 if (Climbing)
                 {
                     EndClimb();
+                }
+                if (Pushing)
+                {
+                    EndPush();
                 }
 
                 _jumping = true;
@@ -308,7 +303,7 @@ namespace Atlanticide
         {
             if (!Climbing)
             {
-                Debug.Log(name + " started climbing " + climbable + ".");
+                Debug.Log(name + " started climbing " + climbable.name + ".");
                 Climbing = true;
                 _climbable = climbable;
             }
@@ -321,6 +316,62 @@ namespace Atlanticide
                 Debug.Log(name + " stopped climbing.");
                 Climbing = false;
                 _climbable = null;
+            }
+        }
+
+        private void Climb(Vector3 direction)
+        {
+            Vector3 movement = Vector3.zero;
+            movement.y = direction.y * _climbSpeed * World.Instance.DeltaTime;
+            float climbProgress = _climbable.GetClimbProgress(transform.position + movement);
+
+            transform.position = _climbable.GetPositionOnClimbable(climbProgress);
+
+            if ((climbProgress >= 1 && direction.y > 0) || (climbProgress <= 0 && direction.y < 0))
+            {
+                EndClimb();
+            }
+        }
+
+        public void StartPush(Pushable pushable)
+        {
+            if (!Pushing)
+            {
+                Debug.Log(name + " started pushing " + pushable.name + ".");
+                Pushing = true;
+                _pushable = pushable;
+            }
+        }
+
+        public void EndPush()
+        {
+            if (Pushing)
+            {
+                Debug.Log(name + " stopped pushing.");
+                Pushing = false;
+                _pushable.EndPush();
+                _pushable = null;
+            }
+        }
+
+        private void Push(Vector3 direction)
+        {
+            direction = new Vector3(direction.x, 0, direction.z);
+            //Debug.Log("dir: " + direction);
+            //Debug.Log("pushDir: " + _pushable.PushDirection);
+            //Debug.Log("angle: " + Vector3.Angle(direction, _pushable.PushDirection));
+            if (Vector3.Angle(direction, _pushable.PushDirection) < 90)
+            {
+                _pushable.Move();
+
+                float pushDist = 1f;
+                Vector3 newPosition = _pushable.transform.position - _pushable.PushDirection * pushDist;
+                newPosition.y = transform.position.y;
+                transform.position = newPosition;
+            }
+            else
+            {
+                EndPush();
             }
         }
 
