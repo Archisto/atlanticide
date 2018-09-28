@@ -63,17 +63,6 @@ namespace Atlanticide
         }
 
         /// <summary>
-        /// Resets the character's base values.
-        /// </summary>
-        protected virtual void ResetBaseValues()
-        {
-            IsDead = false;
-            _hitpoints = _maxHitpoints;
-            _isRising = false;
-            _distFallen = 0;
-        }
-
-        /// <summary>
         /// Updates the object once per frame.
         /// </summary>
         protected virtual void Update()
@@ -279,6 +268,7 @@ namespace Atlanticide
         protected virtual void Die()
         {
             IsDead = true;
+            CancelActions();
             _telegrabability.SetActive(false);
             Debug.Log(name + " died.");
         }
@@ -289,10 +279,26 @@ namespace Atlanticide
         public virtual void Respawn()
         {
             ResetBaseValues();
+            ResetPosition();
             gameObject.SetActive(true);
             _telegrabability.SetActive(true);
-            transform.position = RespawnPosition;
             Debug.Log(name + " respawned.");
+        }
+
+        /// <summary>
+        /// Resets the character's base values.
+        /// </summary>
+        protected virtual void ResetBaseValues()
+        {
+            IsDead = false;
+            _hitpoints = _maxHitpoints;
+            _isRising = false;
+            _distFallen = 0;
+        }
+
+        public void ResetPosition()
+        {
+            transform.position = RespawnPosition;
         }
 
         /// <summary>

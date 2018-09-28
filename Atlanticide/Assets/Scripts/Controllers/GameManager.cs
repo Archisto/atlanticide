@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -222,9 +223,20 @@ namespace Atlanticide
             // should not make them respawn.
 
             PlayerCount = (newPlayerCount < MaxPlayers ? newPlayerCount : MaxPlayers);
+            Debug.Log("New player count: " + PlayerCount);
+
             for (int i = 0; i < MaxPlayers; i++)
             {
-                _players[i].gameObject.SetActive(i < PlayerCount);
+                bool activate = (i < PlayerCount);
+                bool alreadyActive = _players[i].gameObject.activeSelf;
+
+                if (!activate && alreadyActive)
+                {
+                    _players[i].CancelActions();
+                    _players[i].Respawn();
+                }
+
+                _players[i].gameObject.SetActive(activate);
             }
         }
 
@@ -310,10 +322,10 @@ namespace Atlanticide
         {
             int result = 0;
 
-            foreach (PlayerCharacter pc in _players)
+            for (int i = 0; i < PlayerCount; i++)
             {
-                if (!pc.IsDead &&
-                    Vector3.Distance(position, pc.transform.position) <= range)
+                if (!_players[i].IsDead &&
+                    Vector3.Distance(position, _players[i].transform.position) <= range)
                 {
                     result++;
                 }
@@ -344,6 +356,18 @@ namespace Atlanticide
         }
 
         /// <summary>
+        /// Invokes an action on each active player character.
+        /// </summary>
+        /// <param name="action">An action</param>
+        public void ForEachActivePlayerChar(Action<PlayerCharacter> action)
+        {
+            for (int i = 0; i < PlayerCount; i++)
+            {
+                action(_players[i]);
+            }
+        }
+
+        /// <summary>
         /// Gets the first player within range.
         /// </summary>
         /// <param name="position">A position</param>
@@ -368,8 +392,10 @@ namespace Atlanticide
         /// </summary>
         public void ResetLevel()
         {
+            Debug.Log("Restarting level");
             World.Instance.ResetWorld();
-            _players.ForEach(pc => pc.Respawn());
+            _players.ForEach(pc => pc.CancelActions());
+            ForEachActivePlayerChar(pc => pc.Respawn());
             _npcs.ForEach(npc => npc.Respawn());
             _levelObjects.ForEach(obj => obj.ResetObject());
             SetScore(0);

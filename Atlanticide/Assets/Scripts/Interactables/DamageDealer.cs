@@ -41,7 +41,7 @@ namespace Atlanticide
                 hit = Hit(destructible);
             }
 
-            if (_deactivateOnCollision && hit)
+            if (_deactivateOnCollision)
             {
                 gameObject.SetActive(false);
             }

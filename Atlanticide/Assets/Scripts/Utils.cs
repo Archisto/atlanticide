@@ -129,6 +129,12 @@ namespace Atlanticide
             return value + (heavyValue - value) * amount;
         }
 
+        /// <summary>
+        /// Invokes an action on each item of the array.
+        /// </summary>
+        /// <param name="array">An array</param>
+        /// <param name="action">An action</param>
+        /// <typeparam name="T">A type</typeparam>
         public static void ForEach<T>(this T[] array, Action<T> action)
         {
             foreach (T obj in array)

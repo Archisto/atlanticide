@@ -45,6 +45,8 @@ namespace Atlanticide
 
             _closedRotation = transform.rotation;
             _openRotationQ = Quaternion.Euler(_openRotation);
+            _defaultUnlocked = unlocked;
+            _defaultOpen = open;
         }
 
         /// <summary>

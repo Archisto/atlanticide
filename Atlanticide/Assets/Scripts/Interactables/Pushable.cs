@@ -9,7 +9,7 @@ namespace Atlanticide
         [SerializeField]
         private bool _cardinalDirsOnly = true;
 
-        [SerializeField]
+        [SerializeField, Range(0.01f, 10f)]
         private float _weight = 1f;
 
         private PlayerCharacter _pc;
@@ -44,19 +44,15 @@ namespace Atlanticide
 
         public void Move()
         {
-            Vector3 movement = _pushDirection *
+            // TODO: Player speed is the minimum speed
+
+            Vector3 movement = (1f / _weight) * _pushDirection *
                 World.Instance.pushSpeed * World.Instance.DeltaTime;
             movement.y = 0f;
 
             // TODO: Check for wall collisions
 
             transform.position += movement;
-        }
-
-        private bool PlayerCanPush(PlayerCharacter character)
-        {
-            return (character!= null && !character.IsDead &&
-                    !character.IsImmobile && !character.Climbing);
         }
 
         /// <summary>
@@ -68,7 +64,7 @@ namespace Atlanticide
             if (!IsBeingPushed)
             {
                 PlayerCharacter pc = collision.gameObject.GetComponent<PlayerCharacter>();
-                if (PlayerCanPush(pc))
+                if (pc != null && pc.IsAvailableForActions())
                 {
                     _pc = pc;
                     _pushDirection = (transform.position - collision.transform.position).normalized;

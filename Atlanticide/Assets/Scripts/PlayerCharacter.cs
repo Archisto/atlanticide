@@ -55,6 +55,13 @@ namespace Atlanticide
 
         public bool Pushing { get; private set; }
 
+
+        public bool IsAvailableForActions()
+        {
+            return (!IsDead && !IsImmobile && 
+                    !Climbing && !Pushing);
+        }
+
         /// <summary>
         /// Initializes the object.
         /// </summary>
@@ -63,13 +70,6 @@ namespace Atlanticide
             base.Start();
             _myWall = _pushBeam;
             _weapon = GetComponentInChildren<Weapon>();
-        }
-
-        protected override void ResetBaseValues()
-        {
-            base.ResetBaseValues();
-            _jumping = false;
-            SetAbilityActive(false);
         }
 
         /// <summary>
@@ -181,6 +181,18 @@ namespace Atlanticide
             RotateTowards(direction);
         }
 
+        protected override bool CheckGroundCollision(Vector3 position, bool currPos)
+        {
+            bool result = base.CheckGroundCollision(position, currPos);
+
+            if (result && !_jumping)
+            {
+                _onGround = true;
+            }
+
+            return result;
+        }
+
         /// <summary>
         /// Makes the character fall.
         /// </summary>
@@ -263,7 +275,6 @@ namespace Atlanticide
             _elapsedRespawnTime += World.Instance.DeltaTime;
             if (_elapsedRespawnTime >= _respawnTime)
             {
-                _elapsedRespawnTime = 0;
                 //TryRespawnToNPC(); // Only if the game has NPCs the player takes control of
                 Respawn();
             }
@@ -375,15 +386,6 @@ namespace Atlanticide
             }
         }
 
-        /// <summary>
-        /// Kills the character.
-        /// </summary>
-        protected override void Die()
-        {
-            base.Die();
-            SetAbilityActive(false);
-        }
-
         public void TryRespawnToNPC()
         {
             NonPlayerCharacter[] npcs = GameManager.Instance.GetNPCs();
@@ -394,6 +396,7 @@ namespace Atlanticide
             }
             else
             {
+                Respawn();
                 gameObject.SetActive(false);
             }
         }
@@ -411,34 +414,28 @@ namespace Atlanticide
         }
 
         /// <summary>
-        /// Respawns the character.
+        /// Resets the player character's base values when respawning.
         /// </summary>
-        /// <param name="npc">The NPC that takes the player character's place.</param>
-        public override void Respawn()
+        protected override void ResetBaseValues()
         {
-            base.Respawn();
-            _energy = 1;
+            base.ResetBaseValues();
+            _jumping = false;
+            _energy = 1f;
             _outOfEnergy = false;
+            _elapsedRespawnTime = 0f;
+            SetAbilityActive(false);
         }
 
-        protected override bool CheckGroundCollision(Vector3 position, bool currPos)
-        {
-            bool result = base.CheckGroundCollision(position, currPos);
-
-            if (result && !_jumping)
-            {
-                _onGround = true;
-            }
-
-            return result;
-        }
-
+        /// <summary>
+        /// Cancels any running actions if the player dies or the level is reset.
+        /// </summary>
         public override void CancelActions()
         {
             base.CancelActions();
             _jumping = false;
-            UseAbility(false);
+            SetAbilityActive(false);
             EndClimb();
+            EndPush();
         }
 
         protected override void OnDrawGizmos()
