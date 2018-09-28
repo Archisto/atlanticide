@@ -7,13 +7,10 @@ namespace Atlanticide
     /// <summary>
     /// Controls the object's transparency.
     /// </summary>
-    public class Transparency : MonoBehaviour
+    public class Transparency : Visuals
     {
         [SerializeField]
         private float _alpha = 1f;
-
-        private Material material;
-        private Renderer _renderer;
 
         public float Alpha
         {
@@ -26,25 +23,15 @@ namespace Atlanticide
         }
 
         /// <summary>
-        /// Initializes the object.
-        /// </summary>
-        private void Start()
-        {
-            _renderer = GetComponent<Renderer>();
-            material = new Material(_renderer.material);
-        }
-
-        /// <summary>
-        /// Sets the object's material's transparency.
+        /// Sets the object's material's alpha.
         /// </summary>
         /// <param name="alpha">An alpha value</param>
         public void SetAlpha(float alpha)
         {
             _alpha = Mathf.Clamp01(alpha);
-            Color newColor = material.color;
+            Color newColor = _material.color;
             newColor.a = _alpha;
-            material.color = newColor;
-            _renderer.material = material;
+            _material.color = newColor;
         }
     }
 }

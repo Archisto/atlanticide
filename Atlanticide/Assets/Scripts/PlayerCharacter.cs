@@ -269,7 +269,8 @@ namespace Atlanticide
             if (_elapsedRespawnTime >= _respawnTime)
             {
                 _elapsedRespawnTime = 0;
-                TryRespawn();
+                //TryRespawnToNPC(); // Only if the game has NPCs the player takes control of
+                Respawn();
             }
         }
 
@@ -332,13 +333,13 @@ namespace Atlanticide
             SetAbilityActive(false);
         }
 
-        public void TryRespawn()
+        public void TryRespawnToNPC()
         {
             NonPlayerCharacter[] npcs = GameManager.Instance.GetNPCs();
             NonPlayerCharacter npc = Utils.GetFirstActiveOrInactiveObject(npcs, true) as NonPlayerCharacter;
             if (npc != null)
             {
-                Respawn(npc);
+                RespawnToNPC(npc);
             }
             else
             {
@@ -347,15 +348,23 @@ namespace Atlanticide
         }
 
         /// <summary>
-        /// Respawns the character.
+        /// Respawns the player by promoting an NPC to a player character.
         /// </summary>
         /// <param name="npc">The NPC that takes the player character's place.</param>
-        public void Respawn(NonPlayerCharacter npc)
+        public void RespawnToNPC(NonPlayerCharacter npc)
         {
             // Promotes an NPC to a player character
             RespawnPosition = npc.transform.position;
             npc.PromoteToPlayer();
+            Respawn();
+        }
 
+        /// <summary>
+        /// Respawns the character.
+        /// </summary>
+        /// <param name="npc">The NPC that takes the player character's place.</param>
+        public override void Respawn()
+        {
             base.Respawn();
             _energy = 1;
             _outOfEnergy = false;

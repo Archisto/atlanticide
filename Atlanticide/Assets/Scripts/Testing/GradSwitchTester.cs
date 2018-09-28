@@ -21,6 +21,9 @@ namespace Atlanticide
         [SerializeField]
         Scale _scale;
 
+        [SerializeField]
+        Dissolve _dissolve;
+
         GradualSwitch _mySwitch;
         PlayerCharacter[] _players;
         bool _stayedOn;
@@ -79,6 +82,11 @@ namespace Atlanticide
             if (_scale != null)
             {
                 _scale.SetScale(_mySwitch.Progress, 0, 0);
+            }
+
+            if (_dissolve != null)
+            {
+                _dissolve.SetProgress(_mySwitch.Progress);
             }
         }
     }
