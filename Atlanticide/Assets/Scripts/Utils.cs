@@ -234,5 +234,15 @@ namespace Atlanticide
 
             return Vector3.Lerp(Vector3.Lerp(p0, p1, t), Vector3.Lerp(p1, p2, t), t);
         }
+
+        public static Vector3[] Get4CardinalDirections()
+        {
+            Vector3[] cardinalDirs = new Vector3[4];
+            cardinalDirs[0] = Vector3.forward;
+            cardinalDirs[1] = Vector3.back;
+            cardinalDirs[2] = Vector3.left;
+            cardinalDirs[3] = Vector3.right;
+            return cardinalDirs;
+        }
     }
 }

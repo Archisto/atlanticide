@@ -8,9 +8,6 @@ namespace Atlanticide
     public class PlayerCharacter : GameCharacter
     {
         [SerializeField]
-        private GameObject _pushBeam;
-
-        [SerializeField]
         private GameObject _telegrab;
 
         [SerializeField]
@@ -38,7 +35,6 @@ namespace Atlanticide
         private Climbable _climbable;
         private Pushable _pushable;
         private bool _jumping;
-        private bool _onGround;
         private bool _abilityActive;
         private bool _outOfEnergy;
         private float _energy = 1;
@@ -68,7 +64,6 @@ namespace Atlanticide
         protected override void Start()
         {
             base.Start();
-            _myWall = _pushBeam;
             _weapon = GetComponentInChildren<Weapon>();
         }
 
@@ -288,9 +283,6 @@ namespace Atlanticide
 
         private void SetAbilityActive(bool active)
         {
-            // Push beam
-            //_pushBeam.SetActive(active);
-
             // Telegrab
             //_telegrab.SetActive(active);
             //GameManager.Instance.UpdateTelegrab(ID, _telegrab.transform, active);
