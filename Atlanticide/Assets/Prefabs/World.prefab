@@ -54,4 +54,5 @@ MonoBehaviour:
   gravity: 8
   pushSpeed: 1
   telegrabRadius: 2
+  energyCollectRadius: 2
   keyCodes: 

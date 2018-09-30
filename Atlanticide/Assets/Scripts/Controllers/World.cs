@@ -31,7 +31,10 @@ namespace Atlanticide
         public float pushSpeed = 1f;
 
         [SerializeField, Range(0.1f, 5f)]
-        public float telegrabRadius = 1;
+        public float telegrabRadius = 1f;
+
+        [SerializeField, Range(0.1f, 5f)]
+        public float energyCollectRadius = 1f;
 
         public List<int> keyCodes = new List<int>();
         private bool _gamePaused;

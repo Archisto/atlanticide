@@ -7,7 +7,7 @@ namespace Atlanticide
     public class TimedSwitch : Switch
     {
         [SerializeField]
-        private float _duration = 1;
+        private float _duration = 1f;
 
         private float _elapsedTime;
 
@@ -48,23 +48,23 @@ namespace Atlanticide
         }
 
         /// <summary>
+        /// Resets the switch.
+        /// </summary>
+        public override void ResetObject()
+        {
+            base.ResetObject();
+            Progress = 0f;
+            _elapsedTime = 0f;
+        }
+
+        /// <summary>
         /// Draws gizmos.
         /// </summary>
         protected override void OnDrawGizmos()
         {
             base.OnDrawGizmos();
-
-            // Draws a progress bar
-            float length = 2;
-            float height = 0.5f;
-            Vector3 pos1 = transform.position + Vector3.right * -0.5f * length;
-            Vector3 pos2 = transform.position + Vector3.right * 0.5f * length;
-            Vector3 pos3 = transform.position + new Vector3(length * (Progress - 0.5f), 0.5f * height, 0);
-            Vector3 pos4 = transform.position + new Vector3(length * (Progress - 0.5f), -0.5f * height, 0);
-            Gizmos.DrawLine(pos1, pos2);
-
-            Gizmos.color = Color.yellow;
-            Gizmos.DrawLine(pos3, pos4);
+            Utils.DrawProgressBarGizmo(transform.position,
+                Progress, Gizmos.color, Color.yellow);
         }
     }
 }

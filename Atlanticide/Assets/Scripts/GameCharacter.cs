@@ -181,7 +181,7 @@ namespace Atlanticide
 
             if (currPos && !_onGround)
             {
-                Debug.Log("Fall");
+                //Debug.Log("Fall");
                 Fall();
             }
 

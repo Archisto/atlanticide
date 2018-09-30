@@ -32,6 +32,7 @@ namespace Atlanticide
         private float _respawnTime = 1f;
 
         private Weapon _weapon;
+        private EnergyCollector _energyCollector;
         private Climbable _climbable;
         private Pushable _pushable;
         private bool _jumping;
@@ -46,6 +47,8 @@ namespace Atlanticide
         public PlayerInput Input { get; set; }
 
         public Slider EnergyBar { get; set; }
+
+        public EnergyCollector EnergyCollector { get { return _energyCollector; } }
 
         public bool Climbing { get; private set; }
 
@@ -65,6 +68,12 @@ namespace Atlanticide
         {
             base.Start();
             _weapon = GetComponentInChildren<Weapon>();
+            _energyCollector = GetComponentInChildren<EnergyCollector>();
+
+            if (_energyCollector != null)
+            {
+                UpdateEnergyBar();
+            }
         }
 
         /// <summary>
@@ -256,9 +265,17 @@ namespace Atlanticide
                 SetAbilityActive(false);
             }
 
-            if (EnergyBar != null)
+            //UpdateEnergyBar();
+        }
+
+        private void UpdateEnergyBar()
+        {
+            // TODO: Decide how the energy bar is used or even if at all.
+
+            if (EnergyBar != null && _energyCollector != null)
             {
-                EnergyBar.value = _energy;
+                //EnergyBar.value = _energy;
+                EnergyBar.value = ((float) _energyCollector.CurrentCharges / _energyCollector.MaxCharges);
             }
         }
 
@@ -296,10 +313,27 @@ namespace Atlanticide
         /// </summary>
         public void FireWeapon()
         {
-            if (!_abilityActive)
+            if (_weapon != null && !_abilityActive)
             {
                 _weapon.Fire();
             }
+        }
+
+        /// <summary>
+        /// Uses the energy collector.
+        /// </summary>
+        public void UseEnergyCollector()
+        {
+            if (_energyCollector != null && !_abilityActive)
+            {
+                _energyCollector.StartChargingOrEmitting();
+                UpdateEnergyBar();
+            }
+        }
+
+        public void UpdateClosestEnergyNode(EnergyNode node)
+        {
+            _energyCollector.SetTarget(node);
         }
 
         public void StartClimb(Climbable climbable)
@@ -416,6 +450,13 @@ namespace Atlanticide
             _outOfEnergy = false;
             _elapsedRespawnTime = 0f;
             SetAbilityActive(false);
+            
+            if (_energyCollector != null)
+            {
+                _energyCollector.ResetEnergyCollector();
+            }
+
+            UpdateEnergyBar();
         }
 
         /// <summary>

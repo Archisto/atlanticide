@@ -244,5 +244,20 @@ namespace Atlanticide
             cardinalDirs[3] = Vector3.right;
             return cardinalDirs;
         }
+
+        public static void DrawProgressBarGizmo(Vector3 position, float progress, Color barColor, Color indicatorColor)
+        {
+            Gizmos.color = barColor;
+            float length = 2;
+            float height = 0.5f;
+            Vector3 pos1 = position + Vector3.right * -0.5f * length;
+            Vector3 pos2 = position + Vector3.right * 0.5f * length;
+            Vector3 pos3 = position + new Vector3(length * (progress - 0.5f), 0.5f * height, 0);
+            Vector3 pos4 = position + new Vector3(length * (progress - 0.5f), -0.5f * height, 0);
+            Gizmos.DrawLine(pos1, pos2);
+
+            Gizmos.color = indicatorColor;
+            Gizmos.DrawLine(pos3, pos4);
+        }
     }
 }

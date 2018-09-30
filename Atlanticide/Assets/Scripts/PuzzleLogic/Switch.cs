@@ -5,13 +5,23 @@ namespace Atlanticide
     /// <summary>
     /// A tool for creating puzzles. Makes things happen based on player actions.
     /// </summary>
-    public abstract class Switch : MonoBehaviour
+    public abstract class Switch : LevelObject
     {
         [SerializeField,
             Tooltip("Does the switch once activated stay active forever.")]
         protected bool _permanent;
 
+        private bool _permanentByDefault;
+
         public bool Activated { get; protected set; }
+
+        /// <summary>
+        /// Initializes the object.
+        /// </summary>
+        protected virtual void Start()
+        {
+            _permanentByDefault = _permanent;
+        }
 
         /// <summary>
         /// Forces the switch to activate or deactivate.
@@ -32,6 +42,16 @@ namespace Atlanticide
         public void SetPermanent(bool permanent)
         {
             _permanent = permanent;
+        }
+
+        /// <summary>
+        /// Resets the switch.
+        /// </summary>
+        public override void ResetObject()
+        {
+            base.ResetObject();
+            Activated = false;
+            _permanent = _permanentByDefault;
         }
 
         /// <summary>

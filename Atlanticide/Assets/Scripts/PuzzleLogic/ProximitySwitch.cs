@@ -13,8 +13,10 @@ namespace Atlanticide
         /// <summary>
         /// Initializes the object.
         /// </summary>
-        private void Start()
+        protected override void Start()
         {
+            base.Start();
+
             if (_targetTransform == null)
             {
                 Debug.LogError(Utils.GetFieldNullString("Target transform"));

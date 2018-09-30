@@ -313,6 +313,30 @@ namespace Atlanticide
         }
 
         /// <summary>
+        /// Returns the player character closest to the given position.
+        /// The player character must be alive.
+        /// </summary>
+        /// <param name="position">A position</param>
+        /// <returns>A player character.</returns>
+        public PlayerCharacter GetClosestAblePlayer(Vector3 position)
+        {
+            PlayerCharacter result = null;
+            float closestDist = 0f;
+
+            for (int i = 0; i < PlayerCount; i++)
+            {
+                float distance = Vector3.Distance(position, _players[i].transform.position);
+                if (!_players[i].IsDead && (result == null || distance < closestDist))
+                {
+                    result = _players[i];
+                    closestDist = distance;
+                }
+            }
+
+            return result;
+        }
+
+        /// <summary>
         /// Checks how many players there are within range.
         /// </summary>
         /// <param name="position">A position</param>

@@ -79,10 +79,12 @@ namespace Atlanticide
                     // Using an ability
                     _players[i].UseAbility(_players[i].Input.GetActionInput());
 
-                    // Firing a weapon
+                    // Using the energy collector
+                    // OLD: Firing a weapon
                     if (_players[i].Input.GetAltActionInput())
                     {
-                        _players[i].FireWeapon();
+                        //_players[i].FireWeapon();
+                        _players[i].UseEnergyCollector();
                     }
                 }
             }

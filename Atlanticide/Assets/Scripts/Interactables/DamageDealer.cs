@@ -6,6 +6,8 @@ namespace Atlanticide
 {
     public class DamageDealer : MonoBehaviour
     {
+        private const string InvisibleKey = "Invisible";
+
         /// <summary>
         /// The amount of damage dealt on impact
         /// </summary>
@@ -26,6 +28,12 @@ namespace Atlanticide
         /// <param name="collision">The collision</param>
         private void OnCollisionEnter(Collision collision)
         {
+            // Passes through invisible walls
+            if (collision.gameObject.tag == InvisibleKey)
+            {
+                return;
+            }
+
             Collider immediateCollider = collision.contacts[0].otherCollider;
             bool hit = false;
 
