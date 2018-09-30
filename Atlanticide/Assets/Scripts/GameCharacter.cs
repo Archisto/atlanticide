@@ -25,9 +25,7 @@ namespace Atlanticide
         private float _minRiseDist;
         private float _maxRiseDist;
         private LayerMask _platformLayerMask;
-        private LayerMask _wallLayerMask;
         private Telegrabable _telegrabability;
-        private Vector3[] _cardinalDirs;
 
         public bool IsInvulnerable { get; set; }
 
@@ -45,6 +43,8 @@ namespace Atlanticide
 
         public Vector3 RespawnPosition { get; set; }
 
+        public Vector3 Size { get { return _characterSize; } }
+
         /// <summary>
         /// Initializes the object.
         /// </summary>
@@ -57,9 +57,7 @@ namespace Atlanticide
             _minRiseDist = 0.80f * _characterSize.y;
             _maxRiseDist = 0.99f * _characterSize.y;
             _platformLayerMask = LayerMask.GetMask("Platform");
-            _wallLayerMask = LayerMask.GetMask("Wall");
             _telegrabability = GetComponent<Telegrabable>();
-            _cardinalDirs = Utils.Get4CardinalDirections();
         }
 
         /// <summary>
@@ -90,17 +88,6 @@ namespace Atlanticide
                     CheckGroundCollision(transform.position, true);
                 }
             }
-
-            CheckWallCollisions();
-        }
-
-        protected virtual void CheckWallCollisions()
-        {
-            // TODO: Fix being lowered into the ground if the character's right side
-            // hangs off a ledge while colliding with a wall in front. 
-
-            Vector3 movement = GetMovementOffWall(transform.position);
-            transform.position += movement;
         }
 
         protected virtual void LookTowards(Vector3 direction)
@@ -186,65 +173,6 @@ namespace Atlanticide
             }
 
             return false;
-        }
-
-        protected Vector3 GetMovementOffWall(Vector3 position)
-        {
-            Vector3 movement = Vector3.zero;
-            RaycastHit hit;
-            bool xAxisChecked = false;
-            bool zAxisChecked = false;
-
-            foreach (Vector3 dir in _cardinalDirs)
-            {
-                Vector3 directionMovement = Vector3.zero;
-                hit = HitObjectInPositionInDirection(position, dir, _wallLayerMask);
-                if (hit.collider != null)
-                {
-                    directionMovement = hit.point - dir * (_characterSize.x * 0.5f) - position;
-
-                    if (dir.x != 0)
-                    {
-                        if (!xAxisChecked)
-                        {
-                            movement.x = directionMovement.x;
-                            xAxisChecked = true;
-                        }
-                        else
-                        {
-                            // TODO: Got squished by walls from both sides. Should the character die?
-                        }
-                    }
-                    else
-                    {
-                        if (!zAxisChecked)
-                        {
-                            movement.z = directionMovement.z;
-                            zAxisChecked = true;
-                        }
-                        else
-                        {
-                            // TODO: Got squished by walls from both sides. Should the character die?
-                        }
-                    }
-                }
-            }
-
-            return movement;
-        }
-
-        protected RaycastHit HitObjectInPositionInDirection(Vector3 position, Vector3 direction, LayerMask mask)
-        {
-            RaycastHit hit;
-            Physics.Raycast(new Ray(position - direction * (_characterSize.x * 0.5f), direction),
-                            out hit, _characterSize.x, mask);
-            return hit;
-        }
-
-        private Vector3 GetPositionOffTarget(Vector3 direction, Vector3 target, float distance)
-        {
-            Vector3 posOffTarget = target - direction * distance;
-            return posOffTarget;
         }
 
         private Ray GetTopOfHeadDownRay()

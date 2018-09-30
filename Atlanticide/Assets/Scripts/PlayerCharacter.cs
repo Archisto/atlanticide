@@ -34,7 +34,7 @@ namespace Atlanticide
         private Weapon _weapon;
         private EnergyCollector _energyCollector;
         private Climbable _climbable;
-        private Pushable _pushable;
+        //private Pushable _pushable;
         private bool _jumping;
         private bool _abilityActive;
         private bool _outOfEnergy;
@@ -110,10 +110,10 @@ namespace Atlanticide
                 {
                     Climb(direction);
                 }
-                else if (Pushing)
-                {
-                    Push(direction);
-                }
+                //else if (Pushing)
+                //{
+                //    Push(direction);
+                //}
                 else
                 {
                     Move(direction);
@@ -124,7 +124,7 @@ namespace Atlanticide
         private void Move(Vector3 direction)
         {
             Vector3 movement = new Vector3(direction.x, 0, direction.y) * _speed * World.Instance.DeltaTime;
-            Vector3 newPosition = transform.position + movement;
+            Vector3 newPosition = transform.position + movement * (Pushing ? 0.3f : 1f);
 
             if (_isRising || _jumping)
             {
@@ -374,9 +374,11 @@ namespace Atlanticide
         {
             if (!Pushing)
             {
+                // TODO: Use the pushable's weight
+
                 Debug.Log(name + " started pushing " + pushable.name + ".");
                 Pushing = true;
-                _pushable = pushable;
+                //_pushable = pushable;
             }
         }
 
@@ -386,31 +388,31 @@ namespace Atlanticide
             {
                 Debug.Log(name + " stopped pushing.");
                 Pushing = false;
-                _pushable.EndPush();
-                _pushable = null;
+                //_pushable.EndPush();
+                //_pushable = null;
             }
         }
 
-        private void Push(Vector3 direction)
-        {
-            direction = new Vector3(direction.x, 0, direction.z);
-            //Debug.Log("dir: " + direction);
-            //Debug.Log("pushDir: " + _pushable.PushDirection);
-            //Debug.Log("angle: " + Vector3.Angle(direction, _pushable.PushDirection));
-            if (Vector3.Angle(direction, _pushable.PushDirection) < 90)
-            {
-                _pushable.Move();
+        //private void Push(Vector3 direction)
+        //{
+        //    direction = new Vector3(direction.x, 0, direction.y);
+        //    //Debug.Log("dir: " + direction);
+        //    //Debug.Log("pushDir: " + _pushable.PushDirection);
+        //    //Debug.Log("angle: " + Vector3.Angle(direction, _pushable.PushDirection));
+        //    if (Vector3.Angle(direction, _pushable.PushDirection) < 80)
+        //    {
+        //        _pushable.Move();
 
-                float pushDist = 1f;
-                Vector3 newPosition = _pushable.transform.position - _pushable.PushDirection * pushDist;
-                newPosition.y = transform.position.y;
-                transform.position = newPosition;
-            }
-            else
-            {
-                EndPush();
-            }
-        }
+        //        float pushDist = 1f;
+        //        Vector3 newPosition = _pushable.transform.position - _pushable.PushDirection * pushDist;
+        //        newPosition.y = transform.position.y;
+        //        transform.position = newPosition;
+        //    }
+        //    else
+        //    {
+        //        EndPush();
+        //    }
+        //}
 
         public void TryRespawnToNPC()
         {

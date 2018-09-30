@@ -27,6 +27,11 @@ namespace Atlanticide
             get { return _pushDirection; }
         }
 
+        public float Weight
+        {
+            get { return _weight; }
+        }
+
         /// <summary>
         /// Initializes the object.
         /// </summary>
@@ -59,7 +64,7 @@ namespace Atlanticide
         /// Handles colliding with the player characters.
         /// </summary>
         /// <param name="collision">The collision</param>
-        protected virtual void OnCollisionStay(Collision collision)
+        protected virtual void OnCollisionEnter(Collision collision)
         {
             if (!IsBeingPushed)
             {
@@ -67,7 +72,9 @@ namespace Atlanticide
                 if (pc != null && pc.IsAvailableForActions())
                 {
                     _pc = pc;
-                    _pushDirection = (transform.position - collision.transform.position).normalized;
+                    _pushDirection = transform.position - collision.transform.position;
+                    _pushDirection.y = 0;
+                    _pushDirection.Normalize();
                     if (_cardinalDirsOnly)
                     {
                         if (Mathf.Abs(_pushDirection.x) > Mathf.Abs(_pushDirection.z))
@@ -80,7 +87,7 @@ namespace Atlanticide
                         }
                     }
 
-                    _pc.StartPush(this);
+                    //_pc.StartPush(this);
                 }
             }
         }
