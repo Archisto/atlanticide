@@ -23,50 +23,11 @@ namespace Atlanticide
         // in this specific order for the right sound
         // to be played at the right time
 
-        Spinner = 0,
-        SuoKOH = 1,
-        ScoreGained = 2,
-        KanteleheroError = 3,
-        DropDownTarget = 4,
-        Bumper = 5,
-        DroppingCoins = 6,
-        FlipperBarUp = 7,
-        FlipperBarDown = 8,
-        IlmarisenKOH = 9,
-        Slingshot = 10,
-        UkonKirves = 11,
-        GuitarA = 12,
-        GuitarD = 13,
-        GuitarE = 14,
-        GuitarF = 15,
-        GuitarG = 16,
-        BallSaved = 17,
-        BumperParticle = 18,
-        BallHitPlastic = 19,
-        BallRollTable = 20,
-        BallLost = 21
-
+        Jump = 0
     }
 
     public class SFXPlayer : MonoBehaviour
     {
-        private bool MustBePlayedOnceAtATime(int soundNum)
-        {
-            //if (soundNum == (int) Sound.Angelic ||
-            //    soundNum == (int) Sound.Magic ||
-            //    soundNum == (int) Sound.Knock ||
-            //    soundNum == (int) Sound.Suspense)
-            //{
-            //    return true;
-            //}
-            //else
-            //{
-            //    return false;
-            //}
-
-            return false;
-        }
-
         #region Statics
         private static SFXPlayer instance;
 
@@ -135,7 +96,6 @@ namespace Atlanticide
         private List<AudioSource> audioSrcPool;
 
         private float pitch; 
-        private int[] noDuplicates;
 
         /// <summary>
         /// The object is initialized on start.
@@ -163,13 +123,8 @@ namespace Atlanticide
             // Initializes the AudioSource pool
             InitPool();
 
-            // Sets the volume
             volume = GameManager.Instance.Settings.SFXVolume;
-
-            noDuplicates = new int[3];
-            noDuplicates[0] = -1;
-            noDuplicates[1] = -1;
-            noDuplicates[2] = -1;
+            pitch = 1;
 
             // Sets the SFX player to not be destroyed when changing scene
             DontDestroyOnLoad(gameObject);
@@ -225,8 +180,6 @@ namespace Atlanticide
                 audioObj.transform.position = transform.position;
                 audioSrc = audioObj.GetComponent<AudioSource>();
                 audioSrcPool.Add(audioSrc);
-
-                //Debug.Log("[SoundPlayer]: AudioSource created");
             }
 
             return audioSrc;
@@ -271,15 +224,8 @@ namespace Atlanticide
             if (soundNum >= 0 &&
                 soundNum < sounds.Count)
             {
-                // Prevents the same certain sound from being
-                // played more than once at the same time
-                //if (!IsForbiddenDuplicateSound(soundNum))
-                //{
-
                 // Plays the sound
                 return Play(sounds[soundNum]);
-
-                //}
             }
             else
             {
@@ -288,77 +234,6 @@ namespace Atlanticide
             }
 
             return null;
-        }
-
-        private bool IsForbiddenDuplicateSound(int soundNum)
-        {
-            if (MustBePlayedOnceAtATime(soundNum))
-            {
-                foreach (int num in noDuplicates)
-                {
-                    if (num == soundNum)
-                    {
-                        return true;
-                    }
-                }
-
-                AddForbiddenDuplicate(soundNum);
-            }
-
-            return false;
-        }
-
-        private bool AddForbiddenDuplicate(int soundNum)
-        {
-            for (int i = 0; i < noDuplicates.Length; i++)
-            {
-                if (noDuplicates[i] < 0)
-                {
-                    noDuplicates[i] = soundNum;
-
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        private bool RemoveForbiddenDuplicate(int soundNum)
-        {
-            if (MustBePlayedOnceAtATime(soundNum))
-            {
-                for (int i = 0; i < noDuplicates.Length; i++)
-                {
-                    if (noDuplicates[i] == soundNum)
-                    {
-                        noDuplicates[i] = -1;
-
-                        return true;
-                    }
-                }
-            }
-
-            return false;
-        }
-
-        private bool RemoveForbiddenDuplicate(string audioClipName)
-        {
-            int soundNum = -1;
-
-            for (int i = 0; i < sounds.Count; i++)
-            {
-                if (sounds[i].name.Equals(audioClipName))
-                {
-                    soundNum = i;
-                }
-            }
-
-            if (soundNum == -1)
-            {
-                return false;
-            }
-
-            return RemoveForbiddenDuplicate(soundNum);
         }
 
         /// <summary>

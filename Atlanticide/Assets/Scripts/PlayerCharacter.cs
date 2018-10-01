@@ -228,6 +228,7 @@ namespace Atlanticide
                 _jumping = true;
                 _jumpForce = _jumpHeight * 4;
                 _onGround = false;
+                SFXPlayer.Instance.Play(Sound.Jump);
             }
         }
 
