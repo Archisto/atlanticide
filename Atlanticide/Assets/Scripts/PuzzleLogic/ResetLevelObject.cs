@@ -5,7 +5,7 @@ using UnityEngine;
 namespace Atlanticide
 {
 
-    public class SwitchSpawn : MonoBehaviour
+    public class ResetLevelObject : MonoBehaviour
     {
 
         // Switch that activates spawning
@@ -14,7 +14,7 @@ namespace Atlanticide
 
         // Object to be spawned
         [SerializeField]
-        private TimedPickup _object;
+        private LevelObject _object;
 
         // whether object is spawned multiple times or only once
         [SerializeField]
