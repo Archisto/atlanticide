@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace Atlanticide
 {
@@ -49,7 +50,6 @@ namespace Atlanticide
         /// </summary>
         public override void ResetObject()
         {
-            base.ResetObject();
             Activated = false;
             _permanent = _permanentByDefault;
         }

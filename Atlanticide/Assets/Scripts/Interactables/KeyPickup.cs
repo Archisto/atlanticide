@@ -8,7 +8,7 @@ namespace Atlanticide
     {
         public int keyCode;
 
-        protected override void Collect(PlayerCharacter character)
+        public override void Collect(PlayerCharacter character)
         {
             base.Collect(character);
             World.Instance.keyCodes.AddIfNew(keyCode);

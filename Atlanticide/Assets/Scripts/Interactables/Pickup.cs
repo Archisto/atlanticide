@@ -12,26 +12,23 @@ namespace Atlanticide
         [SerializeField]
         private int _score = 100;
 
-        protected bool _collected;
-        private Vector3 _originalPosition;
+        protected PickupExpansion _expansion;
+
+        public bool IsCollected { get; protected set; }
 
         /// <summary>
         /// Initializes the object.
         /// </summary>
         private void Start()
         {
-            _originalPosition = transform.position;
+            _expansion = GetComponent<PickupExpansion>();
+            _defaultPosition = transform.position;
             ResetObject();
         }
 
-        /// <summary>
-        /// Resets the pickup.
-        /// </summary>
-        public override void ResetObject()
+        public void SetDefaultPosition(Vector3 position)
         {
-            _collected = false;
-            gameObject.SetActive(true);
-            transform.position = _originalPosition;
+            _defaultPosition = position;
         }
 
         /// <summary>
@@ -40,10 +37,13 @@ namespace Atlanticide
         /// <param name="collision">The collision</param>
         protected virtual void OnCollisionEnter(Collision collision)
         {
-            PlayerCharacter pc = collision.gameObject.GetComponent<PlayerCharacter>();
-            if (pc != null)
+            if (!IsCollected)
             {
-                Collect(pc);
+                PlayerCharacter pc = collision.gameObject.GetComponent<PlayerCharacter>();
+                if (pc != null)
+                {
+                    Collect(pc);
+                }
             }
         }
 
@@ -51,19 +51,45 @@ namespace Atlanticide
         /// Gives score and destroys the pickup.
         /// </summary>
         /// <param name="character">A player character</param>
-        protected virtual void Collect(PlayerCharacter character)
+        public virtual void Collect(PlayerCharacter character)
         {
             GameManager.Instance.UpdateScore(_score);
-            _collected = true;
+            IsCollected = true;
+
+            if (_expansion != null)
+            {
+                _expansion.OnPickupCollected();
+            }
+
             Destroy();
         }
 
         /// <summary>
         /// Destroys the pickup.
         /// </summary>
-        protected virtual void Destroy()
+        public override void Destroy()
         {
-            gameObject.SetActive(false);
+            if (_expansion != null)
+            {
+                _expansion.OnPickupDestroyed();
+            }
+
+            base.Destroy();
+        }
+
+        /// <summary>
+        /// Resets the pickup.
+        /// </summary>
+        public override void ResetObject()
+        {
+            IsCollected = false;
+            SetToDefaultPosition();
+            gameObject.SetActive(true);
+
+            if (_expansion != null)
+            {
+                _expansion.OnPickupReset();
+            }
         }
     }
 }

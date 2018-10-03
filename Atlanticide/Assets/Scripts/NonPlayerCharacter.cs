@@ -52,7 +52,6 @@ namespace Atlanticide
         public void PromoteToPlayer()
         {
             Die();
-            //gameObject.SetActive(false);
         }
 
         /// <summary>

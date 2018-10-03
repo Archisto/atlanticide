@@ -419,9 +419,12 @@ namespace Atlanticide
             Debug.Log("Restarting level");
             World.Instance.ResetWorld();
             _players.ForEach(pc => pc.CancelActions());
+            _players.ForEach(pc => pc.RespawnPosition = _level.GetSpawnPoint(pc.ID));
             ForEachActivePlayerChar(pc => pc.Respawn());
             _npcs.ForEach(npc => npc.Respawn());
             _levelObjects.ForEach(obj => obj.ResetObject());
+            _level.ResetLevel();
+            _UI.ResetUI();
             SetScore(0);
         }
 

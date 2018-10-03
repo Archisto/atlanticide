@@ -19,6 +19,9 @@ namespace Atlanticide.UI
         [SerializeField]
         private Image _fade;
 
+        private Vector2 _canvasSize;
+        private Vector2 _uiOffset;
+        private Camera _camera;
         private PauseScreen _pauseScreen;
 
         /// <summary>
@@ -35,6 +38,9 @@ namespace Atlanticide.UI
         /// </summary>
         private void InitUI()
         {
+            _canvasSize = GetComponent<Canvas>().pixelRect.size;
+            _uiOffset = new Vector2(-0.5f * _canvasSize.x, -0.5f * _canvasSize.y);
+            _camera = FindObjectOfType<CameraController>().GetComponent<Camera>();
             _pauseScreen = GetComponentInChildren<PauseScreen>(true);
         }
 
@@ -77,6 +83,18 @@ namespace Atlanticide.UI
         {
             _pauseScreen.gameObject.SetActive(activate);
             _pauseScreen.pausingPlayerText.text = playerName;
+        }
+
+        public void MoveUIObjToWorldPoint(Image uiObj, Vector3 worldPoint)
+        {
+            Vector2 viewPortPos = _camera.WorldToViewportPoint(worldPoint);
+            Vector2 proportionalPosition =
+                new Vector2(viewPortPos.x * _canvasSize.x, viewPortPos.y * _canvasSize.y);
+            uiObj.transform.localPosition = proportionalPosition + _uiOffset;
+        }
+
+        public void ResetUI()
+        {
         }
     }
 }

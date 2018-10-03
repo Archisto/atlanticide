@@ -40,5 +40,21 @@ namespace Atlanticide
             newPosition.z = _startPosition.z;
             transform.position = newPosition;
         }
+
+        public Vector3 GetCameraViewPosition(Vector3 camPosOffset)
+        {
+            Vector3 worldOffset = transform.right * camPosOffset.x +
+                                  transform.up * camPosOffset.y +
+                                  transform.forward * camPosOffset.z;
+            return transform.position + worldOffset;
+        }
+
+        public Quaternion GetRotationTowardsCamera()
+        {
+            return Quaternion.Euler(
+                transform.rotation.eulerAngles.x * -1,
+                transform.rotation.eulerAngles.y + 180,
+                transform.rotation.eulerAngles.z * -1);
+        }
     }
 }

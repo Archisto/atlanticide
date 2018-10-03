@@ -369,6 +369,23 @@ namespace Atlanticide
             {
                 EndClimb();
             }
+
+            // TODO: The climbable knows which direction is up/forward on it;
+            // use that information to determine the right input direction.
+
+            /*
+             Vector2 movement = direction * _climbSpeed *
+                _climbable.InputForwardVector * World.Instance.DeltaTime;
+            float climbProgress = _climbable.GetClimbProgress(transform.position + movement);
+
+            transform.position = _climbable.GetPositionOnClimbable(climbProgress);
+            bool goingForward = _climbable.ForwardDirection(direction);
+
+            if ((climbProgress >= 1 && goingForward) || (climbProgress <= 0 && !goingForward))
+            {
+                EndClimb();
+            }
+             */
         }
 
         public void StartPush(Pushable pushable)

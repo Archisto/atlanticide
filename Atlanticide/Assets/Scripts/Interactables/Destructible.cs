@@ -10,7 +10,6 @@ namespace Atlanticide
         protected int _maxHitpoints = 3;
 
         protected int _hitpoints;
-        private Vector3 _originalPosition;
 
         public bool Destroyed { get; protected set; }
 
@@ -19,19 +18,8 @@ namespace Atlanticide
         /// </summary>
         private void Start()
         {
-            _originalPosition = transform.position;
+            _defaultPosition = transform.position;
             ResetObject();
-        }
-
-        /// <summary>
-        /// Resets the object to its default state.
-        /// </summary>
-        public override void ResetObject()
-        {
-            Destroyed = false;
-            gameObject.SetActive(true);
-            _hitpoints = _maxHitpoints;
-            transform.position = _originalPosition;
         }
 
         /// <summary>
@@ -56,11 +44,23 @@ namespace Atlanticide
         /// <summary>
         /// Destroys the object.
         /// </summary>
-        protected virtual void Destroy()
+        public override void Destroy()
         {
             Debug.Log(name + " was destroyed.");
             Destroyed = true;
-            gameObject.SetActive(false);
+            base.Destroy();
+        }
+
+
+        /// <summary>
+        /// Resets the object to its default state.
+        /// </summary>
+        public override void ResetObject()
+        {
+            Destroyed = false;
+            gameObject.SetActive(true);
+            _hitpoints = _maxHitpoints;
+            SetToDefaultPosition();
         }
 
         /// <summary>
