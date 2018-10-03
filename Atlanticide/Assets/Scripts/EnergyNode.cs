@@ -148,7 +148,6 @@ namespace Atlanticide
 
         public override void ResetObject()
         {
-            base.ResetObject();
             Active = _activeByDefault;
             currentCharges = _startCharges;
         }

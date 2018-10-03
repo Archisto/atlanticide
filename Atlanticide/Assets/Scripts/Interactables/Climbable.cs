@@ -18,6 +18,9 @@ namespace Atlanticide
         [SerializeField]
         public Vector3 _bottomPoint;
 
+        [SerializeField]
+        public Vector2 _inputForwardVector = new Vector2(0f, 1f);
+
         public Vector3 TopPointWorldSpace
         {
             get { return _topPoint + transform.position; }
@@ -28,18 +31,9 @@ namespace Atlanticide
             get { return _bottomPoint + transform.position; }
         }
 
-        /// <summary>
-        /// Initializes the object.
-        /// </summary>
-        private void Start()
+        public Vector2 InputForwardVector
         {
-        }
-
-        /// <summary>
-        /// Updates the object once per frame.
-        /// </summary>
-        private void Update()
-        {
+            get { return _inputForwardVector; }
         }
 
         public void SetPoints(Vector3 globalTopPoint, Vector3 globalBottomPoint)
@@ -69,6 +63,11 @@ namespace Atlanticide
         public Vector3 GetPositionOnClimbable(float climbProgress)
         {
             return Vector3.Lerp(BottomPointWorldSpace, TopPointWorldSpace, climbProgress);
+        }
+
+        public bool ForwardDirection(Vector2 direction)
+        {
+            return (Vector3.Angle(direction, _inputForwardVector) < 80f);
         }
 
         private void Reset()

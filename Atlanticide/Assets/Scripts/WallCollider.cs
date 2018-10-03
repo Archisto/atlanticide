@@ -8,6 +8,7 @@ namespace Atlanticide
     {
         private const string WallKey = "Wall";
         private const string PlayerKey = "Player";
+        private const string NoCollisionKey = "NoCollision";
 
         [SerializeField]
         private LayerMask _mask;
@@ -64,7 +65,8 @@ namespace Atlanticide
                     Vector3 directionMovement = Vector3.zero;
                     hit = HitObjectInPositionInDirection(position, dir, _mask);
                     if (hit.collider != null && hit.collider.gameObject != gameObject &&
-                        !hit.collider.gameObject.tag.Equals(PlayerKey))
+                        !hit.collider.gameObject.tag.Equals(PlayerKey) &&
+                        !hit.collider.gameObject.tag.Equals(NoCollisionKey))
                     {
                         bool wallHit = (hit.collider.gameObject.layer == _wallLayerNum);
                         directionMovement = hit.point - dir * (_objectSize.x * 0.5f) - position;

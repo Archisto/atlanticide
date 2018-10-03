@@ -14,7 +14,6 @@ namespace Atlanticide
 
         private PlayerCharacter _pc;
         private Vector3 _pushDirection;
-        private Vector3 _startPosition;
         private Vector3 _playerPushPosition;
 
         public bool IsBeingPushed
@@ -37,7 +36,7 @@ namespace Atlanticide
         /// </summary>
         private void Start()
         {
-            _startPosition = transform.position;
+            _defaultPosition = transform.position;
         }
 
         /// <summary>
@@ -102,7 +101,7 @@ namespace Atlanticide
 
         public override void ResetObject()
         {
-            transform.position = _startPosition;
+            SetToDefaultPosition();
         }
     }
 }
