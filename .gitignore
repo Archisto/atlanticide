@@ -3,3 +3,7 @@ Atlanticide/Temp/
 *.csproj
 *.sln
 *.suo
+Atlanticide/.vs/
+Atlanticide/.csproj/
+Atlanticide/obj/Debug/
+Atlanticide/Debug/

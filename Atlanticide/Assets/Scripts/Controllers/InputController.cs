@@ -6,16 +6,8 @@ namespace Atlanticide
 {
     public class InputController : MonoBehaviour
     {
-        private const string HorizontalMoveKey = "HorizontalMove";
-        private const string VerticalMoveKey = "VerticalMove";
-        private const string HorizontalLookKey = "HorizontalLook";
-        private const string VerticalLookKey = "VerticalLook";
-        private const string ActionKey = "Action";
-
-        [SerializeField]
-        private CameraController _camera;
-
         private PlayerCharacter[] _players;
+        private int _pausingPlayerNum;
 
         /// <summary>
         /// Initializes the object.
@@ -30,15 +22,39 @@ namespace Atlanticide
         /// </summary>
         private void Update()
         {
-            CheckInput();
-            CheckDebugInput();
+            if (!GameManager.Instance.FadeActive)
+            {
+                if (GameManager.Instance.PlayReady)
+                {
+                    CheckPlayerInput();
+                }
+
+                if (GameManager.Instance.GameState != GameManager.State.Play
+                    || World.Instance.GamePaused)
+                {
+                    CheckMenuInput();
+                }
+
+                // Testing
+                CheckDebugInput();
+            }
         }
 
-        private void CheckInput()
+        /// <summary>
+        /// Checks player specific input.
+        /// </summary>
+        private void CheckPlayerInput()
         {
-            for (int i = 0; i < _players.Length; i++)
+            for (int i = 0; i < GameManager.Instance.PlayerCount; i++)
             {
-                if (_players[i] != null && _players[i].gameObject.activeSelf && i <= 1) // TODO: Remove 2-player limit
+                // Pausing and unpausing the game
+                if (_players[i].Input.GetPauseInput() &&
+                    (!World.Instance.GamePaused || IsAllowedToUnpause(i)))
+                {
+                    TogglePause(i);
+                }
+
+                if (!World.Instance.GamePaused && !_players[i].IsDead)
                 {
                     // Moving the player character
                     Vector3 movingDirection = _players[i].Input.GetMoveInput();
@@ -54,18 +70,53 @@ namespace Atlanticide
                         _players[i].LookInput(lookingDirection);
                     }
 
-                    // Spend energy (for what?)
-                    _players[i].SpendEnergy(_players[i].Input.GetActionInput());
+                    // Jumping
+                    if (_players[i].Input.GetJumpInput())
+                    {
+                        _players[i].Jump();
+                    }
+
+                    // Using an ability
+                    _players[i].UseAbility(_players[i].Input.GetActionInput());
+
+                    // Using the energy collector
+                    // OLD: Firing a weapon
+                    if (_players[i].Input.GetAltActionInput())
+                    {
+                        //_players[i].FireWeapon();
+                        _players[i].UseEnergyCollector();
+                    }
                 }
             }
         }
+        
+        /// <summary>
+        /// Checks menu input.
+        /// </summary>
+        private void CheckMenuInput()
+        {
+            // TODO
+        }
 
+        /// <summary>
+        /// Checks debugging input.
+        /// </summary>
         private void CheckDebugInput()
         {
-            // Respawn
-            if (Input.GetKeyDown(KeyCode.R))
+            // Move NPCs
+            if (Input.GetKey(KeyCode.J))
             {
-                _players[0].Respawn();
+                foreach (NonPlayerCharacter npc in GameManager.Instance.GetNPCs())
+                {
+                    npc.transform.position += Vector3.left * 5 * World.Instance.DeltaTime;
+                }
+            }
+            else if (Input.GetKey(KeyCode.L))
+            {
+                foreach (NonPlayerCharacter npc in GameManager.Instance.GetNPCs())
+                {
+                    npc.transform.position += Vector3.right * 5 * World.Instance.DeltaTime;
+                }
             }
 
             // Change player count
@@ -84,6 +135,40 @@ namespace Atlanticide
             else if (Input.GetKeyDown(KeyCode.Alpha4))
             {
                 GameManager.Instance.ActivatePlayers(4);
+            }
+
+            // Change scene
+            if (Input.GetKeyDown(KeyCode.Keypad1))
+            {
+                GameManager.Instance.LoadLevel(1);
+            }
+            if (Input.GetKeyDown(KeyCode.Keypad2))
+            {
+                GameManager.Instance.LoadLevel(2);
+            }
+            if (Input.GetKeyDown(KeyCode.Keypad0))
+            {
+                GameManager.Instance.LoadTestLevel();
+            }
+
+            // Pause play mode
+            if (Input.GetKeyDown(KeyCode.P))
+            {
+                Debug.Break();
+            }
+        }
+
+        public void TogglePause(int pausingPlayer)
+        {
+            if (!World.Instance.GamePaused)
+            {
+                _pausingPlayerNum = pausingPlayer;
+                World.Instance.PauseGame(true, _players[_pausingPlayerNum].name);
+            }
+            else
+            {
+                _pausingPlayerNum = -1;
+                World.Instance.PauseGame(false);
             }
         }
 
@@ -112,6 +197,24 @@ namespace Atlanticide
                 }
 
                 _players[playerNum].Input.InputDevice = inputDevice;
+            }
+        }
+
+        /// <summary>
+        /// Returns whether the given player can unpause the game.
+        /// If the player is unavailable, anyone can unpause.
+        /// </summary>
+        /// <param name="playerNum">A player number</param>
+        /// <returns>Can the player unpause.</returns>
+        private bool IsAllowedToUnpause(int playerNum)
+        {
+            if (_pausingPlayerNum >= GameManager.Instance.PlayerCount)
+            {
+                return true;
+            }
+            else
+            {
+                return _pausingPlayerNum == playerNum;
             }
         }
     }

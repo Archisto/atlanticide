@@ -26,6 +26,7 @@ namespace Atlanticide
         private string _verticalLookKey;
         private string _actionKey;
         private string _altActionKey;
+        private string _jumpKey;
         private string _pauseKey;
 
         private InputDevice _inputDevice;
@@ -65,6 +66,7 @@ namespace Atlanticide
             _verticalLookKey = "VerticalLook" + InputDevice.ToString();
             _actionKey = "Action" + InputDevice.ToString();
             _altActionKey = "AltAction" + InputDevice.ToString();
+            _jumpKey = "Jump" + InputDevice.ToString();
             _pauseKey = "Pause" + InputDevice.ToString();
         }
 
@@ -98,7 +100,34 @@ namespace Atlanticide
         /// <returns>Is the action input pressed</returns>
         public bool GetActionInput()
         {
-            return Input.GetButton(_actionKey);
+            return Input.GetButton(_actionKey) || Input.GetAxis(_actionKey) == 1;
+        }
+
+        /// <summary>
+        /// Gets the player's alternate action input.
+        /// </summary>
+        /// <returns>Is the alt action input pressed</returns>
+        public bool GetAltActionInput()
+        {
+            return Input.GetButton(_altActionKey) || Input.GetAxis(_altActionKey) == 1;
+        }
+
+        /// <summary>
+        /// Gets the player's jump input.
+        /// </summary>
+        /// <returns>Is the jump input pressed</returns>
+        public bool GetJumpInput()
+        {
+            return Input.GetButtonDown(_jumpKey);
+        }
+
+        /// <summary>
+        /// Gets the player's pause input.
+        /// </summary>
+        /// <returns>Is the pause input pressed</returns>
+        public bool GetPauseInput()
+        {
+            return Input.GetButtonDown(_pauseKey);
         }
     }
 }

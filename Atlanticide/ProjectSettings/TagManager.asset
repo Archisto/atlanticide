@@ -3,7 +3,9 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - Invisible
+  - NoCollision
   layers:
   - Default
   - TransparentFX
@@ -14,11 +16,11 @@ TagManager:
   - 
   - 
   - Platform
-  - 
-  - 
-  - 
-  - 
-  - 
+  - Wall
+  - GameCharacter
+  - Projectile
+  - Pickup
+  - Interactable
   - 
   - 
   - 
