@@ -7,6 +7,7 @@ namespace Atlanticide
     /// <summary>
     /// A score pickup that is collected by walking over it.
     /// </summary>
+    [RequireComponent(typeof(Rigidbody))]
     public class Pickup : LevelObject
     {
         [SerializeField]

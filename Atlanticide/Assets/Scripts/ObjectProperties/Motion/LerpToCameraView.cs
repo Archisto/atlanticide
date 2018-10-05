@@ -11,7 +11,7 @@ namespace Atlanticide
         public Vector3 camPosOffset;
         public float lerpTime = 1f;
 
-        private Vector3 _camRotOffset = Vector3.zero;
+        //private Vector3 _camRotOffset = Vector3.zero;
         private bool _targetReached;
         private float _elapsedTime;
         private Vector3 _startPos;

@@ -41,9 +41,12 @@ namespace Atlanticide
 
         private void OnDestroy()
         {
-            _levelObj.ObjectUpdated -= OnObjectUpdated;
-            _levelObj.ObjectDestroyed -= OnObjectDestroyed;
-            _levelObj.ObjectReset -= OnObjectReset;
+            if (_levelObj != null)
+            {
+                _levelObj.ObjectUpdated -= OnObjectUpdated;
+                _levelObj.ObjectDestroyed -= OnObjectDestroyed;
+                _levelObj.ObjectReset -= OnObjectReset;
+            }
         }
     }
 }

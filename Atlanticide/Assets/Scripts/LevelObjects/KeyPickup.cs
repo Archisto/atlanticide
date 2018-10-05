@@ -8,9 +8,12 @@ namespace Atlanticide
     {
         public int keyCode;
 
+        [SerializeField]
+        private bool _allowDuplicateKeyCodes;
+
         public override void Collect(PlayerCharacter character)
         {
-            World.Instance.keyCodes.AddIfNew(keyCode);
+            World.Instance.TryActivateNewKeyCode(keyCode, _allowDuplicateKeyCodes);
             base.Collect(character);
         }
     }

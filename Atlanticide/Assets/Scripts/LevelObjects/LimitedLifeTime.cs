@@ -10,12 +10,22 @@ namespace Atlanticide
     /// </summary>
     public class LimitedLifeTime : LevelObjectExpansion
     {
-        [SerializeField]
+        /// <summary>
+        /// The object's life time
+        /// </summary>
+        [SerializeField, Tooltip("The object's life time")]
         private float _lifeTime = 10f;
 
-        public float _elapsedTime;
-        public float _ratio;
-        public bool _isDestroyed;
+        /// <summary>
+        /// Is the object set inactive when destroyed
+        /// </summary>
+        [SerializeField,
+            Tooltip("Is the object set inactive when destroyed?")]
+        private bool _setObjectInactive = true;
+
+        private float _elapsedTime;
+        private float _ratio;
+        private bool _isDestroyed;
 
         public override void OnObjectUpdated()
         {
@@ -48,7 +58,8 @@ namespace Atlanticide
 
         private void UpdateObjectActiveState()
         {
-            if (gameObject.activeSelf == _isDestroyed)
+            if (_setObjectInactive &&
+                gameObject.activeSelf == _isDestroyed)
             {
                 gameObject.SetActive(!_isDestroyed);
             }
