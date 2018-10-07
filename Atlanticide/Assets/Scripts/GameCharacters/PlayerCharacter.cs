@@ -35,6 +35,7 @@ namespace Atlanticide
         private EnergyCollector _energyCollector;
         private Climbable _climbable;
         //private Pushable _pushable;
+        private LookAt _shieldAim;
         private bool _jumping;
         private bool _abilityActive;
         private bool _outOfEnergy;
@@ -74,6 +75,11 @@ namespace Atlanticide
             {
                 UpdateEnergyBar();
             }
+
+            if (_shield != null)
+            {
+                _shieldAim = _shield.GetComponent<LookAt>();
+            }
         }
 
         /// <summary>
@@ -91,10 +97,11 @@ namespace Atlanticide
             {
                 UpdateJump();
 
-                if (EnergyBar != null)
+                // Commented for testing
+                /*if (EnergyBar != null)
                 {
                     UpdateEnergy();
-                }
+                }*/
             }
         }
 
@@ -125,6 +132,8 @@ namespace Atlanticide
         {
             Vector3 movement = new Vector3(direction.x, 0, direction.y) * _speed * World.Instance.DeltaTime;
             Vector3 newPosition = transform.position + movement * (Pushing ? 0.3f : 1f);
+
+            RotateTowards(direction);
 
             if (_isRising || _jumping)
             {
@@ -182,7 +191,18 @@ namespace Atlanticide
         /// <param name="direction">The looking direction</param>
         public void LookInput(Vector3 direction)
         {
-            RotateTowards(direction);
+            //RotateTowards(direction);
+            AimShield(direction);
+        }
+
+        private void AimShield(Vector3 direction)
+        {
+            if (_shieldAim != null)
+            {
+                direction = new Vector3(direction.x, 0, direction.y);
+                _shieldAim.targetDirection = Vector3.Lerp
+                    (_shieldAim.targetDirection, direction, _turningSpeed);
+            }
         }
 
         protected override bool CheckGroundCollision(Vector3 position, bool currPos)
@@ -500,11 +520,11 @@ namespace Atlanticide
                 Gizmos.color = Color.red;
                 Gizmos.DrawWireSphere(transform.position, 1);
             }
-            else if (_abilityActive)
-            {
-                Gizmos.color = Color.blue;
-                Gizmos.DrawWireSphere(_telegrab.transform.position, World.Instance.telegrabRadius);
-            }
+            //else if (_abilityActive)
+            //{
+            //    Gizmos.color = Color.blue;
+            //    Gizmos.DrawWireSphere(_telegrab.transform.position, World.Instance.telegrabRadius);
+            //}
         }
     }
 }
