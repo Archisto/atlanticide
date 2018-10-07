@@ -46,9 +46,6 @@ namespace Atlanticide
             Vector3 movement = (1f / _weight) * _pushDirection *
                 World.Instance.pushSpeed * World.Instance.DeltaTime;
             movement.y = 0f;
-
-            // TODO: Check for wall collisions
-
             transform.position += movement;
         }
 

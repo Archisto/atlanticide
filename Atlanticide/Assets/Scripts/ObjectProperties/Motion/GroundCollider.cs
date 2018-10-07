@@ -73,7 +73,9 @@ namespace Atlanticide
 
         private void UpdateFallingAndRising()
         {
-            // TODO: Fix shaking up and down
+            // TODO: Fix shaking up and down.
+            // TODO: Fix being lowered into the ground if the character's right side
+            // hangs off a ledge while colliding with a wall in front. 
 
             // Rising if inside the ground
             if (_isRising)

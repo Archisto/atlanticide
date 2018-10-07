@@ -52,9 +52,6 @@ namespace Atlanticide
 
         private void CheckWallCollisions()
         {
-            // TODO: Fix being lowered into the ground if the character's right side
-            // hangs off a ledge while colliding with a wall in front. 
-
             Vector3 movement = GetMovementOffWall(transform.position);
             transform.position += movement;
         }
