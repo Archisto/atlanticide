@@ -144,6 +144,7 @@ GameObject:
   - component: {fileID: 114626275593767968}
   - component: {fileID: 114952992052952158}
   - component: {fileID: 114712899263160512}
+  - component: {fileID: 114731449764415192}
   m_Layer: 10
   m_Name: PlayerCharacter
   m_TagString: Untagged
@@ -563,7 +564,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1465877221674398}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 9.22, y: 1, z: -1.41}
+  m_LocalPosition: {x: -0.03809738, y: 2.058251, z: -4}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4428769935835244}
@@ -1235,6 +1236,23 @@ MonoBehaviour:
   _mask:
     serializedVersion: 2
     m_Bits: 9728
+--- !u!114 &114731449764415192
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1465877221674398}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 81aa2cb748392a44d9f7fb9a8f3ae21c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  onGround: 1
+  _platformMask:
+    serializedVersion: 2
+    m_Bits: 256
+  _maxFallDistance: 20
+  _riseSpeed: 5
 --- !u!114 &114820953975737304
 MonoBehaviour:
   m_ObjectHideFlags: 1
