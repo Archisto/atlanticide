@@ -52,7 +52,7 @@ namespace Atlanticide
         {
             ResetBaseValues();
             RespawnPosition = transform.position;
-            _characterSize = GetComponent<Renderer>().bounds.size;
+            _characterSize = GetComponent<Collider>().bounds.size;
             _groundHitDist = _characterSize.y / 2;
             _minRiseDist = 0.80f * _characterSize.y;
             _maxRiseDist = 0.99f * _characterSize.y;
@@ -99,9 +99,7 @@ namespace Atlanticide
         protected virtual void RotateTowards(Vector3 direction)
         {
             direction = new Vector3(direction.x, 0, direction.y);
-            Quaternion targetRotation = Quaternion.LookRotation(direction, Vector3.up);
-            Quaternion newRotation = Quaternion.Lerp(transform.rotation, targetRotation, _turningSpeed);
-            transform.rotation = newRotation;
+            transform.rotation = Utils.RotateTowards(transform.rotation, direction, _turningSpeed);
         }
 
         protected float GroundHeightDifference(Vector3 position)

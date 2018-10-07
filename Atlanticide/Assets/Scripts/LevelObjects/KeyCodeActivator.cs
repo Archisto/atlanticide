@@ -48,5 +48,10 @@ namespace Atlanticide
                 }
             }
         }
+
+        public override void OnObjectReset()
+        {
+            _keyCodeActive = false;
+        }
     }
 }

@@ -245,6 +245,13 @@ namespace Atlanticide
             return cardinalDirs;
         }
 
+        public static Quaternion RotateTowards(Quaternion currentRotation, Vector3 direction, float turningSpeed)
+        {
+            Quaternion targetRotation = Quaternion.LookRotation(direction, Vector3.up);
+            Quaternion newRotation = Quaternion.Lerp(currentRotation, targetRotation, turningSpeed);
+            return newRotation;
+        }
+
         public static void DrawProgressBarGizmo(Vector3 position, float progress, Color barColor, Color indicatorColor)
         {
             Gizmos.color = barColor;
