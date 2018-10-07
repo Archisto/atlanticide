@@ -29,6 +29,21 @@ ModelImporter:
     100046: R_Upper_Arm
     100048: Spine
     100050: torso
+    100052: Head_END
+    100054: Head_HELPER
+    100056: L_Hand_END
+    100058: L_LowerArm
+    100060: L_Toe_END
+    100062: L_UpperArm
+    100064: Mane_END
+    100066: Mane_HELPER
+    100068: Pelvis
+    100070: Pelvis_END
+    100072: Pelvis_HELPER
+    100074: R_Hand_END
+    100076: R_LowerArm
+    100078: R_Toe_END
+    100080: R_UpperArm
     400000: Head
     400002: head
     400004: helmet
@@ -55,6 +70,21 @@ ModelImporter:
     400046: R_Upper_Arm
     400048: Spine
     400050: torso
+    400052: Head_END
+    400054: Head_HELPER
+    400056: L_Hand_END
+    400058: L_LowerArm
+    400060: L_Toe_END
+    400062: L_UpperArm
+    400064: Mane_END
+    400066: Mane_HELPER
+    400068: Pelvis
+    400070: Pelvis_END
+    400072: Pelvis_HELPER
+    400074: R_Hand_END
+    400076: R_LowerArm
+    400078: R_Toe_END
+    400080: R_UpperArm
     2100000: 07 - Default
     2300000: head
     2300002: helmet
@@ -68,7 +98,12 @@ ModelImporter:
     4300002: torso
     4300004: helmet
     4300006: mane
+    7400000: Idle
     9500000: //RootNode
+    13700000: head
+    13700002: helmet
+    13700004: mane
+    13700006: torso
   externalObjects: {}
   materials:
     importMaterials: 0
@@ -96,7 +131,35 @@ ModelImporter:
     animationWrapMode: 0
     extraExposedTransformPaths: []
     extraUserProperties: []
-    clipAnimations: []
+    clipAnimations:
+    - serializedVersion: 16
+      name: Idle
+      takeName: Take 001
+      firstFrame: 2
+      lastFrame: 160
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 1
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
     isReadable: 1
   meshes:
     lODScreenPercentages: []
