@@ -65,16 +65,6 @@ namespace Atlanticide
         }
 
         /// <summary>
-        /// Makes the character rise.
-        /// </summary>
-        protected virtual void Rise(float speed)
-        {
-            Vector3 newPosition = transform.position;
-            newPosition.y += speed * World.Instance.DeltaTime;
-            transform.position = newPosition;
-        }
-
-        /// <summary>
         /// Makes the character take damage.
         /// </summary>
         /// <param name="damage">The damage amount</param>

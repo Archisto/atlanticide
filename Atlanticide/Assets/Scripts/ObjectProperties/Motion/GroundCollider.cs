@@ -12,10 +12,10 @@ namespace Atlanticide
         private LayerMask _platformMask;
 
         [SerializeField]
-        private float _maxFallDistance = 20f;
+        private float _riseSpeed = 5f;
 
         [SerializeField]
-        private float _riseSpeed = 5f;
+        private float _maxFallDistance = 20f;
 
         private Vector3 _objectSize;
         private bool _usedToBeOnGround;
@@ -73,7 +73,7 @@ namespace Atlanticide
 
         private void UpdateFallingAndRising()
         {
-            // TODO: Fix shaking up and down.
+            // TODO: Fix shaking up and down (Rise, Fall and falsely not being on ground).
             // TODO: Fix being lowered into the ground if the character's right side
             // hangs off a ledge while colliding with a wall in front. 
 
@@ -88,7 +88,7 @@ namespace Atlanticide
             {
                 onGround = CheckIfObjOnGround();
                 StartOrStopRising(true);
-
+                if (!onGround) Debug.Log("onGround: " + onGround);
                 if (!onGround && !_isRising)
                 {
                     Fall();
@@ -100,7 +100,10 @@ namespace Atlanticide
                         DistanceFallen = 0f;
                     }
 
-                    SmoothMove();
+                    if (transform.position != _oldPosition)
+                    {
+                        SmoothMove();
+                    }
                 }
 
                 _usedToBeOnGround = onGround;
@@ -192,13 +195,11 @@ namespace Atlanticide
                 return;
             }
 
-            float fallSpeed =
+            float fallAmount =
                 (World.Instance.gravity + 2 * DistanceFallen) * World.Instance.DeltaTime;
-            Vector3 newPosition = transform.position;
-            newPosition.y -= fallSpeed;
-            DistanceFallen += fallSpeed;
-            transform.position = newPosition;
+            transform.position -= Vector3.up * fallAmount;
 
+            DistanceFallen += fallAmount;
             if (DistanceFallen >= _maxFallDistance)
             {
                 _fallenOffMap = true;
@@ -213,9 +214,8 @@ namespace Atlanticide
 
         public void Rise(float speed)
         {
-            Vector3 newPosition = transform.position;
-            newPosition.y += speed * World.Instance.DeltaTime;
-            transform.position = newPosition;
+            float riseAmount = speed * World.Instance.DeltaTime;
+            transform.position += Vector3.up * riseAmount;
         }
 
         private void StartOrStopRising(bool startRising)

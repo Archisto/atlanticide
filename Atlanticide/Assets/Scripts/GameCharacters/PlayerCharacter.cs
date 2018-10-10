@@ -188,7 +188,7 @@ namespace Atlanticide
             {
                 if (_jumpForce > 0)
                 {
-                    Rise(_jumpForce);
+                    _groundCollider.Rise(_jumpForce);
                     _jumpForce -= 5 * World.Instance.gravity * World.Instance.DeltaTime;
                 }
 
