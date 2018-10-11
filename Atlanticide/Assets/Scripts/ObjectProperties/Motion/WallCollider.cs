@@ -26,7 +26,7 @@ namespace Atlanticide
         {
             // TODO: Fix being able to go inside the wall by moving diagonally into a corner.
 
-            _objectSize = GetComponent<Renderer>().bounds.size;
+            _objectSize = GetComponent<Collider>().bounds.size;
             _wallLayerNum = LayerMask.NameToLayer(WallKey);
             _cardinalDirs = Utils.Get4CardinalDirections();
             _sideMidPoints = new Vector3[]
@@ -52,9 +52,6 @@ namespace Atlanticide
 
         private void CheckWallCollisions()
         {
-            // TODO: Fix being lowered into the ground if the character's right side
-            // hangs off a ledge while colliding with a wall in front. 
-
             Vector3 movement = GetMovementOffWall(transform.position);
             transform.position += movement;
         }

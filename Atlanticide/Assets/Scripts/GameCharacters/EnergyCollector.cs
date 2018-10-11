@@ -64,15 +64,6 @@ namespace Atlanticide
             float targetTime = (_mode == Mode.Draining ? _chargeTime : _emitTime);
             if (_elapsedTime >= targetTime)
             {
-                //if (_mode == Mode.Draining)
-                //{
-                //    Drain();
-                //}
-                //else
-                //{
-                //    Emit();
-                //}
-
                 ReturnToIdle();
             }
         }

@@ -19,14 +19,14 @@ namespace Atlanticide
         [SerializeField, Range(0.1f, 20f)]
         private float _climbSpeed = 1f;
 
-        [SerializeField, Range(0.01f, 2f)]
-        private float _energyDrainSpeed;
+        //[SerializeField, Range(0.01f, 2f)]
+        //private float _energyDrainSpeed;
 
-        [SerializeField, Range(0.01f, 2f)]
-        private float _energyRechargeSpeed;
+        //[SerializeField, Range(0.01f, 2f)]
+        //private float _energyRechargeSpeed;
 
-        [SerializeField, Range(0.01f, 1f)]
-        private float _minRechargedEnergy;
+        //[SerializeField, Range(0.01f, 1f)]
+        //private float _minRechargedEnergy;
 
         [SerializeField]
         private float _respawnTime = 1f;
@@ -34,10 +34,9 @@ namespace Atlanticide
         private Weapon _weapon;
         private EnergyCollector _energyCollector;
         private Climbable _climbable;
-        //private Pushable _pushable;
-        private bool _jumping;
+        private LookAt _shieldAim;
         private bool _abilityActive;
-        private bool _outOfEnergy;
+        //private bool _outOfEnergy;
         private float _energy = 1;
         private float _jumpForce;
         private float _elapsedRespawnTime;
@@ -49,6 +48,8 @@ namespace Atlanticide
         public Slider EnergyBar { get; set; }
 
         public EnergyCollector EnergyCollector { get { return _energyCollector; } }
+
+        public bool Jumping { get; private set; }
 
         public bool Climbing { get; private set; }
 
@@ -74,6 +75,11 @@ namespace Atlanticide
             {
                 UpdateEnergyBar();
             }
+
+            if (_shield != null)
+            {
+                _shieldAim = _shield.GetComponent<LookAt>();
+            }
         }
 
         /// <summary>
@@ -91,10 +97,11 @@ namespace Atlanticide
             {
                 UpdateJump();
 
-                if (EnergyBar != null)
+                // Commented for testing
+                /*if (EnergyBar != null)
                 {
                     UpdateEnergy();
-                }
+                }*/
             }
         }
 
@@ -125,55 +132,8 @@ namespace Atlanticide
         {
             Vector3 movement = new Vector3(direction.x, 0, direction.y) * _speed * World.Instance.DeltaTime;
             Vector3 newPosition = transform.position + movement * (Pushing ? 0.3f : 1f);
-
-            if (_isRising || _jumping)
-            {
-                transform.position = newPosition;
-            }
-            else
-            {
-                float groundHeightDiff = GroundHeightDifference(newPosition);
-
-                // If the slope is too steep upwards, the character doesn't move
-                if (groundHeightDiff < 0.5f * _characterSize.y)
-                {
-                    // If the slope is too steep upwards or downwards, the height difference is ignored.
-                    // Slopes that are too steep upwards are handled with the Rise method.
-                    // Super minimal height differences are also ignored.
-                    if (groundHeightDiff > -0.1f * _characterSize.y &&
-                        groundHeightDiff < 0.2f * _characterSize.y &&
-                        (groundHeightDiff < -0.0001f * _characterSize.y ||
-                        groundHeightDiff > 0.0001f * _characterSize.y))
-                    {
-                        movement.y = groundHeightDiff;
-                        float maxGroundHeiDiff = (groundHeightDiff > 0 ? 0.2f : -0.1f) * _characterSize.y;
-                        float ratio = Utils.ReverseRatio(groundHeightDiff, 0, maxGroundHeiDiff);
-                        ratio = (ratio < 0.4f ? 0.4f : ratio);
-
-                        // Very steep slope: groundHeightDiff = +-0.03
-                        //float slopeSpeedDampening = Utils.Ratio(Mathf.Abs(groundHeightDiff), 0, 1f);
-                        //float slopeSpeedDampening = (Mathf.Abs(groundHeightDiff) > 0.07f ? 0.25f : 0.1f);
-                        //float slopeSpeedDampening = 0f;
-
-                        movement.x = movement.x * ratio;
-                        //movement.x = Utils.WeighValue(movement.x, 0, slopeSpeedDampening);
-                        movement.z = movement.z * ratio;
-                        //movement.z = Utils.WeighValue(movement.z, 0, slopeSpeedDampening);
-
-                        newPosition = transform.position + movement;
-
-                        //newPosition =
-                        //    transform.position +
-                        //    new Vector3(direction.x, groundHeightDiff, direction.y).normalized * _speed * World.Instance.DeltaTime;
-                        //newPosition.y = transform.position.y + groundHeightDiff;
-
-                        _onGround = true;
-                    }
-
-                    //transform.position = GetPositionOffWall(transform.position, newPosition);
-                    transform.position = newPosition;
-                }
-            }
+            transform.position = newPosition;
+            RotateTowards(direction);
         }
 
         /// <summary>
@@ -182,30 +142,17 @@ namespace Atlanticide
         /// <param name="direction">The looking direction</param>
         public void LookInput(Vector3 direction)
         {
-            RotateTowards(direction);
+            //RotateTowards(direction);
+            AimShield(direction);
         }
 
-        protected override bool CheckGroundCollision(Vector3 position, bool currPos)
+        private void AimShield(Vector3 direction)
         {
-            bool result = base.CheckGroundCollision(position, currPos);
-
-            if (result && !_jumping)
+            if (_shieldAim != null)
             {
-                _onGround = true;
-            }
-
-            return result;
-        }
-
-        /// <summary>
-        /// Makes the character fall.
-        /// </summary>
-        protected override void Fall()
-        {
-            if (!_jumping && !Climbing)
-            {
-                base.Fall();
-                _onGround = false;
+                direction = new Vector3(direction.x, 0, direction.y);
+                _shieldAim.targetDirection = Vector3.Lerp
+                    (_shieldAim.targetDirection, direction, _turningSpeed);
             }
         }
 
@@ -214,7 +161,7 @@ namespace Atlanticide
         /// </summary>
         public void Jump()
         {
-            if ((!_jumping && _onGround) || Climbing)
+            if ((!Jumping && _groundCollider.onGround) || Climbing)
             {
                 if (Climbing)
                 {
@@ -225,9 +172,9 @@ namespace Atlanticide
                     EndPush();
                 }
 
-                _jumping = true;
+                Jumping = true;
                 _jumpForce = _jumpHeight * 4;
-                _onGround = false;
+                _groundCollider.onGround = false;
                 SFXPlayer.Instance.Play(Sound.Jump);
             }
         }
@@ -237,18 +184,18 @@ namespace Atlanticide
         /// </summary>
         private void UpdateJump()
         {
-            if (_jumping)
+            if (Jumping)
             {
                 if (_jumpForce > 0)
                 {
-                    Rise(_jumpForce);
+                    _groundCollider.Rise(_jumpForce);
                     _jumpForce -= 5 * World.Instance.gravity * World.Instance.DeltaTime;
                 }
 
                 if (_jumpForce <= 0)
                 {
                     _jumpForce = 0;
-                    _jumping = false;
+                    Jumping = false;
                 }
             }
         }
@@ -258,13 +205,15 @@ namespace Atlanticide
         /// </summary>
         private void UpdateEnergy()
         {
-            _energy = Utils.DrainOrRecharge(_energy, _abilityActive, _energyDrainSpeed,
-                _energyRechargeSpeed, _minRechargedEnergy, _outOfEnergy, out _outOfEnergy);
+            // TODO: If needed, use an AbilityEnergy object
 
-            if (_outOfEnergy)
-            {
-                SetAbilityActive(false);
-            }
+            //_energy = Utils.DrainOrRecharge(_energy, _abilityActive, _energyDrainSpeed,
+            //    _energyRechargeSpeed, _minRechargedEnergy, _outOfEnergy, out _outOfEnergy);
+
+            //if (_outOfEnergy)
+            //{
+            //    SetAbilityActive(false);
+            //}
 
             //UpdateEnergyBar();
         }
@@ -295,16 +244,12 @@ namespace Atlanticide
 
         public void ActionInput(bool active)
         {
-            _abilityActive = active && !_outOfEnergy;
+            _abilityActive = active; // && !_outOfEnergy;
             SetAbilityActive(_abilityActive);
         }
 
         private void SetAbilityActive(bool active)
         {
-            // Telegrab
-            //_telegrab.SetActive(active);
-            //GameManager.Instance.UpdateTelegrab(ID, _telegrab.transform, active);
-
             // Shield
             _shield.SetActive(active);
         }
@@ -341,7 +286,7 @@ namespace Atlanticide
         {
             if (!Climbing)
             {
-                Debug.Log(name + " started climbing " + climbable.name + ".");
+                Debug.Log(name + " started climbing " + climbable.name);
                 Climbing = true;
                 _climbable = climbable;
             }
@@ -351,7 +296,7 @@ namespace Atlanticide
         {
             if (Climbing)
             {
-                Debug.Log(name + " stopped climbing.");
+                Debug.Log(name + " stopped climbing");
                 Climbing = false;
                 _climbable = null;
             }
@@ -394,7 +339,7 @@ namespace Atlanticide
             {
                 // TODO: Use the pushable's weight
 
-                Debug.Log(name + " started pushing " + pushable.name + ".");
+                Debug.Log(name + " started pushing " + pushable.name);
                 Pushing = true;
                 //_pushable = pushable;
             }
@@ -404,7 +349,7 @@ namespace Atlanticide
         {
             if (Pushing)
             {
-                Debug.Log(name + " stopped pushing.");
+                Debug.Log(name + " stopped pushing");
                 Pushing = false;
                 //_pushable.EndPush();
                 //_pushable = null;
@@ -465,9 +410,9 @@ namespace Atlanticide
         protected override void ResetBaseValues()
         {
             base.ResetBaseValues();
-            _jumping = false;
+            Jumping = false;
             _energy = 1f;
-            _outOfEnergy = false;
+            //_outOfEnergy = false;
             _elapsedRespawnTime = 0f;
             SetAbilityActive(false);
             
@@ -485,7 +430,7 @@ namespace Atlanticide
         public override void CancelActions()
         {
             base.CancelActions();
-            _jumping = false;
+            Jumping = false;
             SetAbilityActive(false);
             EndClimb();
             EndPush();
@@ -500,11 +445,11 @@ namespace Atlanticide
                 Gizmos.color = Color.red;
                 Gizmos.DrawWireSphere(transform.position, 1);
             }
-            else if (_abilityActive)
-            {
-                Gizmos.color = Color.blue;
-                Gizmos.DrawWireSphere(_telegrab.transform.position, World.Instance.telegrabRadius);
-            }
+            //else if (_abilityActive)
+            //{
+            //    Gizmos.color = Color.blue;
+            //    Gizmos.DrawWireSphere(_telegrab.transform.position, World.Instance.telegrabRadius);
+            //}
         }
     }
 }

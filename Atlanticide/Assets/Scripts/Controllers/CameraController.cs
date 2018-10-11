@@ -51,6 +51,8 @@ namespace Atlanticide
 
         public Quaternion GetRotationTowardsCamera()
         {
+            // TODO: Quaternion.Inverse?
+
             return Quaternion.Euler(
                 transform.rotation.eulerAngles.x * -1,
                 transform.rotation.eulerAngles.y + 180,

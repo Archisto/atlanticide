@@ -37,7 +37,7 @@ namespace Atlanticide
                 Vector3 newPosition = transform.position + avoidVector;
                 _avoidDist += avoidVector.magnitude;
 
-                if (GroundHeightDifference(newPosition) <= -10 || _avoidDist > _maxAvoidDist)
+                if (_groundCollider.GroundHeightDifference(newPosition) <= -10 || _avoidDist > _maxAvoidDist)
                 {
                     _touchedByOtherChar = false;
                     _avoidDist = 0;
@@ -51,15 +51,15 @@ namespace Atlanticide
 
         public void PromoteToPlayer()
         {
-            Die();
+            Kill();
         }
 
         /// <summary>
         /// Kills the character.
         /// </summary>
-        protected override void Die()
+        public override void Kill()
         {
-            base.Die();
+            base.Kill();
             _touchedByOtherChar = false;
             gameObject.SetActive(false);
         }
@@ -75,11 +75,6 @@ namespace Atlanticide
 
         private void OnCollisionEnter(Collision collision)
         {
-            if (Telegrabbed)
-            {
-                return;
-            }
-
             GameCharacter character = collision.gameObject.GetComponent<GameCharacter>();
             if (character != null)
             {

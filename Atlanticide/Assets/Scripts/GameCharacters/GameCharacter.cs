@@ -17,29 +17,14 @@ namespace Atlanticide
         protected int _maxHitpoints = 3;
 
         protected int _hitpoints;
-        protected bool _isRising;
-        protected bool _onGround;
-        protected float _distFallen;
         protected Vector3 _characterSize;
-        private float _groundHitDist;
-        private float _minRiseDist;
-        private float _maxRiseDist;
-        private LayerMask _platformLayerMask;
-        private Telegrabable _telegrabability;
+        protected GroundCollider _groundCollider;
 
         public bool IsInvulnerable { get; set; }
 
         public bool IsImmobile { get; set; }
 
         public bool IsDead { get; protected set; }
-
-        public bool Telegrabbed
-        {
-            get
-            {
-                return _telegrabability != null && _telegrabability.Telegrabbed;
-            }
-        }
 
         public Vector3 RespawnPosition { get; set; }
 
@@ -52,12 +37,8 @@ namespace Atlanticide
         {
             ResetBaseValues();
             RespawnPosition = transform.position;
-            _characterSize = GetComponent<Renderer>().bounds.size;
-            _groundHitDist = _characterSize.y / 2;
-            _minRiseDist = 0.80f * _characterSize.y;
-            _maxRiseDist = 0.99f * _characterSize.y;
-            _platformLayerMask = LayerMask.GetMask("Platform");
-            _telegrabability = GetComponent<Telegrabable>();
+            _characterSize = GetComponent<Collider>().bounds.size;
+            _groundCollider = GetComponent<GroundCollider>();
         }
 
         /// <summary>
@@ -68,25 +49,6 @@ namespace Atlanticide
             if (IsDead)
             {
                 return;
-            }
-
-            if (!Telegrabbed)
-            {
-                if (_isRising)
-                {
-                    // Rising if inside the ground
-                    Rise(5f);
-
-                    if (!CheckSimpleGroundCollision())
-                    {
-                        _isRising = false;
-                    }
-                }
-                else
-                {
-                    // Ground collisions
-                    CheckGroundCollision(transform.position, true);
-                }
             }
         }
 
@@ -99,118 +61,7 @@ namespace Atlanticide
         protected virtual void RotateTowards(Vector3 direction)
         {
             direction = new Vector3(direction.x, 0, direction.y);
-            Quaternion targetRotation = Quaternion.LookRotation(direction, Vector3.up);
-            Quaternion newRotation = Quaternion.Lerp(transform.rotation, targetRotation, _turningSpeed);
-            transform.rotation = newRotation;
-        }
-
-        protected float GroundHeightDifference(Vector3 position)
-        {
-            position.y = transform.position.y;
-            float groundY = transform.position.y - (_characterSize.y / 2);
-
-            RaycastHit hit;
-            bool touchingPlatform =
-                Physics.Raycast(new Ray(position, Vector3.down), out hit, _characterSize.y, _platformLayerMask);
-
-            if (touchingPlatform)
-            {
-                // Positive value for higher ground,
-                // negative for lower
-                return hit.point.y - groundY;
-            }
-            else
-            {
-                // The height difference is "big"
-                return -10;
-            }
-        }
-
-        protected bool CheckSimpleGroundCollision()
-        {
-            return Physics.Raycast(GetTopOfHeadDownRay(), _maxRiseDist, _platformLayerMask);
-        }
-
-        protected virtual bool CheckGroundCollision(Vector3 position, bool currPos)
-        {
-            // TODO: Fix falling when not supposed to.
-
-            Vector3 p1 = position + new Vector3(-0.5f * _characterSize.x, 0, 0.5f * _characterSize.z);
-            Vector3 p2 = position + new Vector3(-0.5f * _characterSize.x, 0, 0.5f * _characterSize.z);
-            Vector3 p3 = position + new Vector3(0.5f * _characterSize.x, 0, 0.5f * _characterSize.z);
-            Vector3 p4 = position + new Vector3(0.5f * _characterSize.x, 0, -0.5f * _characterSize.z);
-            RaycastHit hit;
-            bool touchingPlatform =
-                Physics.Raycast(new Ray(p1, Vector3.down), out hit, _groundHitDist, _platformLayerMask) ||
-                Physics.Raycast(new Ray(p2, Vector3.down), out hit, _groundHitDist, _platformLayerMask) ||
-                Physics.Raycast(new Ray(p3, Vector3.down), out hit, _groundHitDist, _platformLayerMask) ||
-                Physics.Raycast(new Ray(p4, Vector3.down), out hit, _groundHitDist, _platformLayerMask);
-
-            if (touchingPlatform)
-            {
-                // Rise if currently inside the ground
-                if (currPos)
-                {
-                    _distFallen = 0;
-
-                    if (Physics.Raycast(GetTopOfHeadDownRay(), _minRiseDist, _platformLayerMask))
-                    {
-                        _isRising = true;
-                    }
-                }
-
-                return true;
-            }
-            else
-            {
-                _onGround = false;
-            }
-
-            if (currPos && !_onGround)
-            {
-                //Debug.Log("Fall");
-                Fall();
-            }
-
-            return false;
-        }
-
-        private Ray GetTopOfHeadDownRay()
-        {
-            return new Ray(transform.position + new Vector3(0, 0.5f * _characterSize.y, 0), Vector3.down);
-        }
-
-        /// <summary>
-        /// Makes the character fall.
-        /// </summary>
-        protected virtual void Fall()
-        {
-            if (_isRising)
-            {
-                return;
-            }
-
-            float fallSpeed =
-                (World.Instance.gravity + 2 * _distFallen) * World.Instance.DeltaTime;
-            Vector3 newPosition = transform.position;
-            newPosition.y -= fallSpeed;
-            _distFallen += fallSpeed;
-            transform.position = newPosition;
-
-            if (_distFallen > 20)
-            {
-                Die();
-            }
-        }
-
-        /// <summary>
-        /// Makes the character rise.
-        /// </summary>
-        protected virtual void Rise(float speed)
-        {
-            Vector3 newPosition = transform.position;
-            newPosition.y += speed * World.Instance.DeltaTime;
-            transform.position = newPosition;
+            transform.rotation = Utils.RotateTowards(transform.rotation, direction, _turningSpeed);
         }
 
         /// <summary>
@@ -225,7 +76,7 @@ namespace Atlanticide
             if (_hitpoints <= 0)
             {
                 _hitpoints = 0;
-                Die();
+                Kill();
                 return true;
             }
 
@@ -235,12 +86,11 @@ namespace Atlanticide
         /// <summary>
         /// Kills the character.
         /// </summary>
-        protected virtual void Die()
+        public virtual void Kill()
         {
             IsDead = true;
             CancelActions();
-            _telegrabability.SetActive(false);
-            Debug.Log(name + " died.");
+            Debug.Log(name + " died");
         }
 
         /// <summary>
@@ -251,8 +101,7 @@ namespace Atlanticide
             ResetBaseValues();
             ResetPosition();
             gameObject.SetActive(true);
-            _telegrabability.SetActive(true);
-            Debug.Log(name + " respawned.");
+            Debug.Log(name + " respawned");
         }
 
         /// <summary>
@@ -262,13 +111,21 @@ namespace Atlanticide
         {
             IsDead = false;
             _hitpoints = _maxHitpoints;
-            _isRising = false;
-            _distFallen = 0;
+            ResetGroundCollider();
         }
 
         public void ResetPosition()
         {
             transform.position = RespawnPosition;
+            ResetGroundCollider();
+        }
+
+        private void ResetGroundCollider()
+        {
+            if (_groundCollider != null)
+            {
+                _groundCollider.ResetGroundCollider();
+            }
         }
 
         /// <summary>
