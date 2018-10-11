@@ -29,46 +29,6 @@ namespace Atlanticide
             return string.Format("Component {0} could not be found in the object.", comp);
         }
 
-        public static float DrainOrRecharge(float value,
-                                            bool drain,
-                                            float drainSpeed,
-                                            float rechargeSpeed,
-                                            float minRecharge,
-                                            bool depletedBefore,
-                                            out bool depleted)
-        {
-            depleted = depletedBefore;
-
-            // Drain
-            if (drain)
-            {
-                depleted = false;
-
-                value -= drainSpeed * World.Instance.DeltaTime;
-                if (value <= 0)
-                {
-                    value = 0;
-                    depleted = true;
-                }
-            }
-            // Recharge
-            else if (value < 1)
-            {
-                value += rechargeSpeed * World.Instance.DeltaTime;
-
-                if (depleted && value >= minRecharge)
-                {
-                    depleted = false;
-                }
-                if (value > 1)
-                {
-                    value = 1;
-                }
-            }
-
-            return value;
-        }
-
         public static object GetFirstActiveOrInactiveObject(object[] array, bool active)
         {
             if (array.Length == 0)

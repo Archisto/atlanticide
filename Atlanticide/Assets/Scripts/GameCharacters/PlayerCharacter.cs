@@ -19,14 +19,14 @@ namespace Atlanticide
         [SerializeField, Range(0.1f, 20f)]
         private float _climbSpeed = 1f;
 
-        [SerializeField, Range(0.01f, 2f)]
-        private float _energyDrainSpeed;
+        //[SerializeField, Range(0.01f, 2f)]
+        //private float _energyDrainSpeed;
 
-        [SerializeField, Range(0.01f, 2f)]
-        private float _energyRechargeSpeed;
+        //[SerializeField, Range(0.01f, 2f)]
+        //private float _energyRechargeSpeed;
 
-        [SerializeField, Range(0.01f, 1f)]
-        private float _minRechargedEnergy;
+        //[SerializeField, Range(0.01f, 1f)]
+        //private float _minRechargedEnergy;
 
         [SerializeField]
         private float _respawnTime = 1f;
@@ -36,7 +36,7 @@ namespace Atlanticide
         private Climbable _climbable;
         private LookAt _shieldAim;
         private bool _abilityActive;
-        private bool _outOfEnergy;
+        //private bool _outOfEnergy;
         private float _energy = 1;
         private float _jumpForce;
         private float _elapsedRespawnTime;
@@ -205,13 +205,15 @@ namespace Atlanticide
         /// </summary>
         private void UpdateEnergy()
         {
-            _energy = Utils.DrainOrRecharge(_energy, _abilityActive, _energyDrainSpeed,
-                _energyRechargeSpeed, _minRechargedEnergy, _outOfEnergy, out _outOfEnergy);
+            // TODO: If needed, use an AbilityEnergy object
 
-            if (_outOfEnergy)
-            {
-                SetAbilityActive(false);
-            }
+            //_energy = Utils.DrainOrRecharge(_energy, _abilityActive, _energyDrainSpeed,
+            //    _energyRechargeSpeed, _minRechargedEnergy, _outOfEnergy, out _outOfEnergy);
+
+            //if (_outOfEnergy)
+            //{
+            //    SetAbilityActive(false);
+            //}
 
             //UpdateEnergyBar();
         }
@@ -242,7 +244,7 @@ namespace Atlanticide
 
         public void ActionInput(bool active)
         {
-            _abilityActive = active && !_outOfEnergy;
+            _abilityActive = active; // && !_outOfEnergy;
             SetAbilityActive(_abilityActive);
         }
 
@@ -410,7 +412,7 @@ namespace Atlanticide
             base.ResetBaseValues();
             Jumping = false;
             _energy = 1f;
-            _outOfEnergy = false;
+            //_outOfEnergy = false;
             _elapsedRespawnTime = 0f;
             SetAbilityActive(false);
             
