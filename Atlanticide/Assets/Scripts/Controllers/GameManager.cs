@@ -337,6 +337,30 @@ namespace Atlanticide
         }
 
         /// <summary>
+        /// Returns a list of player characters within range from position
+        /// </summary>
+        /// <param name="position">position of the point players are searched from</param>
+        /// <param name="range">range of the area players are searched from</param>
+        /// <returns></returns>
+        public PlayerCharacter[] GetPlayersWithinRange(Vector3 position, float range)
+        {
+            PlayerCharacter[] result = new PlayerCharacter[2];
+            int playersFound = 0;
+
+            for (int i = 0; i < PlayerCount; i++)
+            {
+
+                if(!_players[i].IsDead && Vector3.Distance(position, _players[i].transform.position) <= range)
+                {
+                    result[playersFound] = _players[i];
+                    playersFound++;
+                }
+            }
+
+            return result;
+        }
+
+        /// <summary>
         /// Checks how many players there are within range.
         /// </summary>
         /// <param name="position">A position</param>
