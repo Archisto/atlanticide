@@ -53,7 +53,7 @@ namespace Atlanticide
             }
 
             _objectSize = GetComponent<Collider>().bounds.size;
-            _groundHitDist = _objectSize.y / 2;
+            _groundHitDist = _objectSize.y / 2 + 0.01f;
             _minRiseDist = 0.80f * _objectSize.y;
             _maxRiseDist = 0.99f * _objectSize.y;
         }
@@ -88,7 +88,7 @@ namespace Atlanticide
             {
                 onGround = CheckIfObjOnGround();
                 StartOrStopRising(true);
-                if (!onGround) Debug.Log("onGround: " + onGround);
+                //if (!onGround) Debug.Log(name + " onGround: " + onGround);
                 if (!onGround && !_isRising)
                 {
                     Fall();
