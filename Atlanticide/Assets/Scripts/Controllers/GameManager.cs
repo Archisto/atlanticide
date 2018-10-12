@@ -344,7 +344,7 @@ namespace Atlanticide
         /// <returns></returns>
         public PlayerCharacter[] GetPlayersWithinRange(Vector3 position, float range)
         {
-            PlayerCharacter[] result = new PlayerCharacter[2];
+            PlayerCharacter[] result = new PlayerCharacter[MaxPlayers];
             int playersFound = 0;
 
             for (int i = 0; i < PlayerCount; i++)
