@@ -8,9 +8,6 @@ namespace Atlanticide
     public class PlayerCharacter : GameCharacter, IInputReceiver
     {
         [SerializeField]
-        private GameObject _telegrab;
-
-        [SerializeField]
         private GameObject _shield;
 
         [SerializeField, Range(0.2f, 20f)]
@@ -37,7 +34,7 @@ namespace Atlanticide
         private LookAt _shieldAim;
         private bool _abilityActive;
         //private bool _outOfEnergy;
-        private float _energy = 1;
+        //private float _energy = 1f;
         private float _jumpForce;
         private float _elapsedRespawnTime;
 
@@ -411,7 +408,7 @@ namespace Atlanticide
         {
             base.ResetBaseValues();
             Jumping = false;
-            _energy = 1f;
+            //_energy = 1f;
             //_outOfEnergy = false;
             _elapsedRespawnTime = 0f;
             SetAbilityActive(false);
