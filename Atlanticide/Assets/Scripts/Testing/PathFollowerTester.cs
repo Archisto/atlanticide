@@ -5,11 +5,9 @@ using Atlanticide.WaypointSystem;
 
 namespace Atlanticide
 {
+    [RequireComponent(typeof(FollowPath))]
     public class PathFollowerTester : MonoBehaviour
     {
-        [SerializeField]
-        FollowPath _pathFollower;
-
         [SerializeField]
         bool forward = true;
 
@@ -22,6 +20,7 @@ namespace Atlanticide
         [SerializeField]
         float rampSpeed = 0;
 
+        FollowPath _pathFollower;
         Path path;
 
         /// <summary>
@@ -29,6 +28,7 @@ namespace Atlanticide
         /// </summary>
         private void Start()
         {
+            _pathFollower = GetComponent<FollowPath>();
             path = _pathFollower.path;
             EnterPath();
         }
@@ -45,11 +45,6 @@ namespace Atlanticide
         /// </summary>
         private void Update()
         {
-            if (_pathFollower == null)
-            {
-                return;
-            }
-
             if (!_pathFollower.IsOnPath)
             {
                 forward = !forward;

@@ -10,7 +10,10 @@ namespace Atlanticide
         private float _openTime = 0.5f;
 
         [SerializeField, Range(0.1f, 5f)]
-        private float _bashTime = 0.5f;
+        private float _bashTime = 0.25f;
+
+        [SerializeField, Range(0.1f, 5f)]
+        private float _bashRecoveryTime = 0.5f;
 
         private Transparency _tp; // testing
         private bool _active;
@@ -25,6 +28,11 @@ namespace Atlanticide
         public bool BlocksDamage
         {
             get { return _active && !_updateOpen && !_updateBash; }
+        }
+
+        public bool BashActive
+        {
+            get { return _bashActive; }
         }
 
         /// <summary>
@@ -69,9 +77,10 @@ namespace Atlanticide
         private void UpdateShieldBash()
         {
             _elapsedTime += World.Instance.DeltaTime;
+            float targetTime = (_bashActive ? _bashTime : _bashRecoveryTime);
             _bashProgress = (_bashActive ?
-                _elapsedTime / _bashTime : (_bashTime - _elapsedTime) / _bashTime);
-            if (_elapsedTime >= _bashTime)
+                _elapsedTime / targetTime : (targetTime - _elapsedTime) / targetTime);
+            if (_elapsedTime >= targetTime)
             {
                 _elapsedTime = 0f;
                 if (_bashActive)

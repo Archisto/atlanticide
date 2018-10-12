@@ -69,16 +69,6 @@ namespace Atlanticide
             }
         }
 
-        /// <summary>
-        /// Decelerates the object until it stops moving.
-        /// If <paramref name="instant"/> is true, the object instantly stops.
-        /// </summary>
-        /// <param name="instant">Should the object instantly stop</param>
-        public override void StopMoving(bool instant)
-        {
-            base.StopMoving(instant);
-        }
-
         public void EnterPath(Path path, Direction direction,
             Waypoint startWaypoint, bool skipFirstWaypoint,
             bool instantTopSpeed, float pathTopSpeed = 0f)
@@ -120,7 +110,7 @@ namespace Atlanticide
             // Did we reach the next waypoint but didn't move as far as we could?
             //    If yes, get the next waypoint and move again using the leftover movement
             //    Repeat until there's no leftover movement
-            // Return whether the object is still on the ramp
+            // Return whether the object is still on the path
 
             bool wpReached = false;
             int repeats = 0;
@@ -228,7 +218,7 @@ namespace Atlanticide
             }
             else
             {
-                movingDistance = CurrentSpeed * Time.deltaTime;
+                movingDistance = CurrentSpeed * World.Instance.DeltaTime;
                 //CurrentSpeed = GetSpeedAffectedByGravity(direction);
             }
 
@@ -262,6 +252,9 @@ namespace Atlanticide
             // Moves the object
             transform.position = Vector3.MoveTowards(
                 startPosition, targetPosition, movingDistance);
+
+            // Updates the total moved distance
+            TotalMovedDistance += movingDistance;
 
             // Updates the leftover distance
             _leftoverDistance = movingDistance -
@@ -298,6 +291,12 @@ namespace Atlanticide
             Waypoint temp = _prevWaypoint;
             _prevWaypoint = CurrentWaypoint;
             CurrentWaypoint = temp;
+        }
+
+        public override void ResetMotion()
+        {
+            ExitPath();
+            base.ResetMotion();
         }
     }
 }

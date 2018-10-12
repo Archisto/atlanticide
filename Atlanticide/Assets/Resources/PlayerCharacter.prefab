@@ -412,7 +412,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _openTime: 0.5
-  _bashTime: 0.5
+  _bashTime: 0.1
+  _bashRecoveryTime: 0.5
   _openProgress: 0
   _bashProgress: 0
 --- !u!114 &114230964683030536
