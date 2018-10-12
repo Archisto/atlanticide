@@ -8,7 +8,7 @@ namespace Atlanticide
     public class PlayerCharacter : GameCharacter, IInputReceiver
     {
         [SerializeField]
-        private GameObject _shield;
+        private Shield _shield;
 
         [SerializeField, Range(0.2f, 20f)]
         private float _jumpHeight = 1f;
@@ -45,6 +45,8 @@ namespace Atlanticide
         public Slider EnergyBar { get; set; }
 
         public EnergyCollector EnergyCollector { get { return _energyCollector; } }
+
+        public Shield Shield { get { return _shield; } }
 
         public bool Jumping { get; private set; }
 
@@ -248,7 +250,8 @@ namespace Atlanticide
         private void SetAbilityActive(bool active)
         {
             // Shield
-            _shield.SetActive(active);
+            //_shield.gameObject.SetActive(active);
+            _shield.Activate(active);
         }
 
         /// <summary>

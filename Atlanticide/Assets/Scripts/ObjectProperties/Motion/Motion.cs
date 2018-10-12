@@ -47,6 +47,11 @@ namespace Atlanticide
         public bool ReachedTargetSpeed { get; protected set; }
 
         /// <summary>
+        /// The total distance the object has moved.
+        /// </summary>
+        public float TotalMovedDistance { get; protected set; }
+
+        /// <summary>
         /// Initializes the object.
         /// </summary>
         protected virtual void Start()
@@ -111,6 +116,12 @@ namespace Atlanticide
 
             ReachedTargetSpeed = instant;
             _active = false;
+        }
+
+        public virtual void ResetMotion()
+        {
+            StopMoving(true);
+            TotalMovedDistance = 0f;
         }
 
         /// <summary>

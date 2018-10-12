@@ -79,12 +79,14 @@ namespace Atlanticide
                     // Using an ability
                     _players[i].ActionInput(_players[i].Input.GetActionInput());
 
-                    // Using the energy collector
+                    // Shield bash
+                    // OLD: Using the energy collector
                     // OLD: Firing a weapon
                     if (_players[i].Input.GetAltActionInput())
                     {
                         //_players[i].FireWeapon();
-                        _players[i].UseEnergyCollector();
+                        //_players[i].UseEnergyCollector();
+                        _players[i].Shield.Bash();
                     }
                 }
             }
