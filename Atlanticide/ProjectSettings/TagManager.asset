@@ -5,6 +5,7 @@ TagManager:
   serializedVersion: 2
   tags:
   - Invisible
+  - NoCollision
   layers:
   - Default
   - TransparentFX

@@ -80,6 +80,48 @@ namespace Atlanticide
         {
         }
 
+        public bool TryActivateNewKeyCode(int keyCode, bool allowDuplicates)
+        {
+            bool added = false;
+
+            if (allowDuplicates)
+            {
+                keyCodes.Add(keyCode);
+                added = true;
+            }
+            else
+            {
+                added = keyCodes.AddIfNew(keyCode);
+            }
+
+            if (added)
+            {
+                Debug.Log("Key code [" + keyCode + "] activated");
+            }
+            else
+            {
+                Debug.Log("Key code [" + keyCode + "] is already active");
+            }
+
+            return added;
+        }
+
+        public bool DeactivateKeyCode(int keyCode)
+        {
+            bool removed = keyCodes.Remove(keyCode);
+
+            if (removed)
+            {
+                Debug.Log("First instance of key code [" + keyCode + "] deactivated");
+            }
+            else
+            {
+                Debug.Log("No key code [" + keyCode + "] to deactivate");
+            }
+
+            return removed;
+        }
+
         /// <summary>
         /// Pauses or unpauses the game.
         /// </summary>
