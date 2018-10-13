@@ -158,6 +158,7 @@ namespace Atlanticide
         /// </summary>
         public void ResetWorld()
         {
+            CurrentEnergyCharges = 0;
             keyCodes.Clear();
         }
     }

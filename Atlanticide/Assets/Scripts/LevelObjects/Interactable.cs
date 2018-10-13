@@ -59,12 +59,18 @@ namespace Atlanticide
                     if (forgetInteractor)
                     {
                         Interactor = null;
-                        _interactorIsValid = false;
                     }
                 }
             }
         }
 
-
+        /// <summary>
+        /// Draws gizmos.
+        /// </summary>
+        protected virtual void OnDrawGizmos()
+        {
+            Gizmos.color = (_interactorIsValid ? Color.yellow : Color.black);
+            Gizmos.DrawWireSphere(transform.position, World.Instance.InteractRange);
+        }
     }
 }

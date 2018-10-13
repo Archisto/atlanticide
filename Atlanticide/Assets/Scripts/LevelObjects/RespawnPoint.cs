@@ -32,7 +32,7 @@ namespace Atlanticide
         /// <summary>
         /// How much time is left until the respawn is complete.
         /// </summary>
-        public float SwapRequestTimeLeft
+        public float RespawnTimeLeft
         {
             get
             {
@@ -113,6 +113,10 @@ namespace Atlanticide
             }
         }
 
+        /// <summary>
+        /// Makes the interactor player interact with this object.
+        /// </summary>
+        /// <returns>Was the interaction successful</returns>
         public override bool Interact()
         {
             if (!RespawnActive)
@@ -162,12 +166,11 @@ namespace Atlanticide
         /// <summary>
         /// Draws gizmos.
         /// </summary>
-        private void OnDrawGizmos()
+        protected override void OnDrawGizmos()
         {
             if (!RespawnActive)
             {
-                Gizmos.color = (_interactorIsValid ? Color.yellow : Color.black);
-                Gizmos.DrawWireSphere(transform.position, World.Instance.InteractRange);
+                base.OnDrawGizmos();
             }
             else
             {
