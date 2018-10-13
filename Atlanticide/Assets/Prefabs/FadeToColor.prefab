@@ -52,5 +52,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _color: {r: 0, g: 0, b: 0, a: 0}
+  _altColor: {r: 1, g: 0, b: 0, a: 0}
   _fadeOutTime: 0.5
   _fadeInTime: 0.5

@@ -74,6 +74,9 @@ namespace Atlanticide
                             _players[i].LookInput(lookingDirection);
                         }
 
+                        // Interacting with certain level objects
+                        _players[i].HandleInteractionInput();
+
                         // Jumping
                         _players[i].HandleJumpInput();
 
@@ -153,6 +156,10 @@ namespace Atlanticide
             }
             if (Input.GetKeyDown(KeyCode.Keypad0))
             {
+                if (World.Instance.GamePaused)
+                {
+                    World.Instance.PauseGame(false);
+                }
                 GameManager.Instance.LoadTestLevel();
             }
 

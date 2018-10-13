@@ -41,6 +41,8 @@ namespace Atlanticide
 
         public Shield Shield { get { return _shield; } }
 
+        public Interactable InteractionTarget { get; set; }
+
         public bool Jumping { get; private set; }
 
         public bool Climbing { get; private set; }
@@ -78,11 +80,7 @@ namespace Atlanticide
         {
             base.Update();
 
-            if (IsDead)
-            {
-                UpdateRespawnTimer();
-            }
-            else
+            if (!IsDead)
             {
                 UpdateJump();
             }
@@ -241,6 +239,36 @@ namespace Atlanticide
             return result;
         }
 
+        /// <summary>
+        /// Handles interacting with various level objects such as respawn points.
+        /// </summary>
+        /// <returns>Is the interaction successful</returns>
+        public bool HandleInteractionInput()
+        {
+            bool input = Input.GetInteractInput();
+            if (input && InteractionTarget != null)
+            {
+                // Checks whether the energy cost is not too high
+                if (World.Instance.CurrentEnergyCharges >=
+                    InteractionTarget.EnergyCost)
+                {
+                    if (InteractionTarget.Interact())
+                    {
+                        // Removes the energy cost from the players
+                        EnergyCollector.SetCharges
+                            (World.Instance.CurrentEnergyCharges - InteractionTarget.EnergyCost, true);
+
+                        // Makes the interaction target forget the player
+                        InteractionTarget.SetInteractorTarget(false, true);
+
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
         public bool CheckToolSwapInput()
         {
             bool input = Input.GetToolSwapInput();
@@ -386,6 +414,20 @@ namespace Atlanticide
         //        EndPush();
         //    }
         //}
+
+        public override void Kill()
+        {
+            base.Kill();
+            GameManager.Instance.DeadPlayerCount++;
+        }
+
+        public override void Respawn()
+        {
+            ResetBaseValues();
+            ResetPosition();
+            GameManager.Instance.DeadPlayerCount--;
+            Debug.Log(name + " respawned");
+        }
 
         public void TryRespawnToNPC()
         {

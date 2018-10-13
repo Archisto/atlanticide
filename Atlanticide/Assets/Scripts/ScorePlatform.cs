@@ -32,7 +32,7 @@ namespace Atlanticide
         {
             if (_active)
             {
-                GameManager.Instance.UpdateScore(_scorePerHit);
+                GameManager.Instance.ChangeScore(_scorePerHit);
 
                 if (_scoreHits > 0)
                 {

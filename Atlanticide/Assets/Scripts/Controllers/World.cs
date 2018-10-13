@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Atlanticide.UI;
 
 namespace Atlanticide
 {
@@ -37,22 +38,28 @@ namespace Atlanticide
         public float energyCollectRadius = 1f;
 
         [SerializeField, Range(1, 20)]
-        public int _maxEnergyCharges = 5;
+        private int _maxEnergyCharges = 5;
+
+        [SerializeField, Range(1f, 10f)]
+        private float _interactRange = 3f;
 
         public List<int> keyCodes = new List<int>();
+
+        private UIController _ui;
         private bool _gamePaused;
 
-        public bool GamePaused
-        {
-            get { return _gamePaused; }
-        }
+        public int MaxEnergyCharges { get { return _maxEnergyCharges; } }
+
+        public int CurrentEnergyCharges { get; set; }
+
+        public float InteractRange { get { return _interactRange; } }
+
+        public bool GamePaused { get { return _gamePaused; } }
 
         public float DeltaTime
         {
             get { return (GamePaused ? 0f : Time.deltaTime); }
         }
-
-        public int MaxEnergyCharges { get { return _maxEnergyCharges; } }
 
         /// <summary>
         /// Initializes the singleton instance.
@@ -74,8 +81,9 @@ namespace Atlanticide
         /// <summary>
         /// Initializes the object.
         /// </summary>
-        private void Start()
+        public void Init()
         {
+            _ui = FindObjectOfType<UIController>();
         }
 
         /// <summary>
@@ -137,6 +145,12 @@ namespace Atlanticide
         {
             _gamePaused = pause;
             GameManager.Instance.ActivatePauseScreen(GamePaused, playerName);
+        }
+
+        public void SetEnergyChargesAndUpdateUI(int charges)
+        {
+            CurrentEnergyCharges = charges;
+            _ui.UpdateEnergyBar((float) CurrentEnergyCharges / MaxEnergyCharges);
         }
 
         /// <summary>

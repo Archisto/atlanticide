@@ -54,7 +54,7 @@ namespace Atlanticide
         /// <param name="character">A player character</param>
         public virtual void Collect(PlayerCharacter character)
         {
-            GameManager.Instance.UpdateScore(_score);
+            GameManager.Instance.ChangeScore(_score);
             IsCollected = true;
 
             if (_expansion != null)
