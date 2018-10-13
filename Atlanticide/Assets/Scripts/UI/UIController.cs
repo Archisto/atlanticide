@@ -8,21 +8,28 @@ namespace Atlanticide.UI
     public class UIController : MonoBehaviour
     {
         [SerializeField]
+        private PlayerStatus _playerStatusPrefab;
+
+        [SerializeField]
+        private Transform _playerStatusHandler;
+
+        [SerializeField]
         private Text _scoreText;
 
         [SerializeField]
-        private Slider _energyBar1;
-
-        [SerializeField]
-        private Slider _energyBar2;
+        private Slider _energyBar;
 
         [SerializeField]
         private Image _fade;
+
+        [SerializeField]
+        private List<Sprite> _toolImages;
 
         private Vector2 _canvasSize;
         private Vector2 _uiOffset;
         private Camera _camera;
         private PauseScreen _pauseScreen;
+        private List<PlayerStatus> _playerStatuses;
 
         /// <summary>
         /// Initializes the object.
@@ -30,7 +37,7 @@ namespace Atlanticide.UI
         private void Start()
         {
             InitUI();
-            UpdateUI();
+            UpdateScoreCounter();
         }
 
         /// <summary>
@@ -42,12 +49,28 @@ namespace Atlanticide.UI
             _uiOffset = new Vector2(-0.5f * _canvasSize.x, -0.5f * _canvasSize.y);
             _camera = FindObjectOfType<CameraController>().GetComponent<Camera>();
             _pauseScreen = GetComponentInChildren<PauseScreen>(true);
+
+            PlayerCharacter[] players = GameManager.Instance.GetPlayers();
+            _playerStatuses = new List<PlayerStatus>();
+
+            if (GameManager.Instance.GameState == GameManager.State.Play)
+            {
+                for (int i = 0; i < GameManager.Instance.PlayerCount; i++)
+                {
+                    PlayerStatus ps = Instantiate(_playerStatusPrefab, _playerStatusHandler);
+                    ps.SetToolImage(_toolImages[(int) players[i].Tool]);
+                    ps.SetPlayerName(players[i].name);
+                    _playerStatuses.Add(ps);
+                }
+
+                _energyBar.value = 0f;
+            }
         }
 
         /// <summary>
-        /// Updates the UI.
+        /// Updates the score counter.
         /// </summary>
-        public void UpdateUI()
+        public void UpdateScoreCounter()
         {
             if (_scoreText != null)
             {
@@ -55,22 +78,17 @@ namespace Atlanticide.UI
             }
         }
 
-        public Slider GetEnergyBar(int playerNum)
+        public void UpdateEnergyBar(float energy)
         {
-            switch (playerNum)
+            energy = Mathf.Clamp01(energy);
+            _energyBar.value = energy;
+        }
+
+        public void UpdatePlayerToolImage(int playerNum, PlayerTool tool)
+        {
+            if (_playerStatuses != null && _playerStatuses[playerNum] != null)
             {
-                case 0:
-                {
-                    return _energyBar1;
-                }
-                case 1:
-                {
-                    return _energyBar2;
-                }
-                default:
-                {
-                    return null;
-                }
+                _playerStatuses[playerNum].SetToolImage(_toolImages[(int) tool]);
             }
         }
 

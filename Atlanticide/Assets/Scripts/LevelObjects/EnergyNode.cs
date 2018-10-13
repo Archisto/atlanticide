@@ -18,7 +18,7 @@ namespace Atlanticide
         private bool _active = true;
 
         protected KeyCodeSwitch _keyCodeSwitch;
-        protected PlayerCharacter _closestPlayer;
+        protected PlayerCharacter _energyCollectorPlayer;
         private bool _activeByDefault;
 
         public bool Active
@@ -66,7 +66,8 @@ namespace Atlanticide
         {
             if (Active)
             {
-                UpdateClosestEnergyCollector();
+                UpdateEnergyCollectorPlayer();
+                UpdateEnergyCollectorTarget();
             }
             else
             {
@@ -84,34 +85,65 @@ namespace Atlanticide
             }
         }
 
-        protected void UpdateClosestEnergyCollector()
+        public void UpdateEnergyCollectorPlayer()
         {
-            PlayerCharacter newClosestPlayer = GameManager.Instance.GetClosestAblePlayer(transform.position);
+            if (_energyCollectorPlayer == null ||
+                _energyCollectorPlayer.Tool != PlayerTool.EnergyCollector)
+            {
+                _energyCollectorPlayer =
+                    GameManager.Instance.GetPlayerWithTool(PlayerTool.EnergyCollector, true);
+            }
+        }
 
-            bool differentPlayer = (newClosestPlayer != _closestPlayer);
-            bool newPlayerOK = (newClosestPlayer != null && newClosestPlayer.EnergyCollector != null);
-
-            if (differentPlayer && newPlayerOK)
+        protected void UpdateEnergyCollectorTarget()
+        {
+            if (EnergyCollectorPlayerIsAvailable() &&
+                _energyCollectorPlayer.EnergyCollector.Target != this)
             {
                 float distance = Vector3.Distance
-                    (transform.position, newClosestPlayer.EnergyCollector.transform.position);
+                    (transform.position, _energyCollectorPlayer.EnergyCollector.transform.position);
                 if (distance <= World.Instance.energyCollectRadius)
                 {
-                    if (_closestPlayer != null)
-                    {
-                        _closestPlayer.UpdateClosestEnergyNode(null);
-                    }
-
-                    _closestPlayer = newClosestPlayer;
-                    _closestPlayer.UpdateClosestEnergyNode(this);
+                    _energyCollectorPlayer.EnergyCollector.Target = this;
                 }
             }
         }
 
-        public void RemoveClosestPlayer()
+        public bool EnergyCollectorPlayerIsAvailable()
         {
-            _closestPlayer = null;
+            return (_energyCollectorPlayer != null && !_energyCollectorPlayer.IsDead);
         }
+
+        private void RemoveEnergyCollectorPlayer()
+        {
+            if (_energyCollectorPlayer.EnergyCollector.Target == this)
+            {
+                _energyCollectorPlayer.EnergyCollector.Target = null;
+            }
+
+            _energyCollectorPlayer = null;
+        }
+
+        //public void SetEnergyCollectorPlayer(PlayerCharacter player)
+        //{
+        //    if (player == null)
+        //    {
+        //        if (_energyCollectorPlayer != null)
+        //        {
+        //            _energyCollectorPlayer.UpdateClosestEnergyNode(null);
+        //            _energyCollectorPlayer = null;
+        //        }
+        //    }
+        //    else if (player.Tool == PlayerTool.EnergyCollector)
+        //    {
+        //        if (_energyCollectorPlayer != null)
+        //        {
+        //            _energyCollectorPlayer.UpdateClosestEnergyNode(null);
+        //        }
+
+        //        _energyCollectorPlayer = player;
+        //    }
+        //}
 
         public virtual bool GainCharge()
         {
@@ -141,7 +173,7 @@ namespace Atlanticide
 
             if (!Active)
             {
-                RemoveClosestPlayer();
+                RemoveEnergyCollectorPlayer();
             }
         }
 
@@ -159,7 +191,13 @@ namespace Atlanticide
         {
             if (Active)
             {
-                Gizmos.color = (_closestPlayer != null ? Color.yellow : Color.black);
+                Gizmos.color = Color.black;
+                if (EnergyCollectorPlayerIsAvailable() &&
+                    _energyCollectorPlayer.EnergyCollector.Target == this)
+                {
+                    Gizmos.color = Color.yellow;
+                }
+
                 Gizmos.DrawWireSphere(transform.position, World.Instance.energyCollectRadius);
 
                 Gizmos.color = (MaxCharge ? Color.green : Color.black);

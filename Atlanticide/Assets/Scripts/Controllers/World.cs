@@ -36,6 +36,9 @@ namespace Atlanticide
         [SerializeField, Range(0.1f, 5f)]
         public float energyCollectRadius = 1f;
 
+        [SerializeField, Range(1, 20)]
+        public int _maxEnergyCharges = 5;
+
         public List<int> keyCodes = new List<int>();
         private bool _gamePaused;
 
@@ -48,6 +51,8 @@ namespace Atlanticide
         {
             get { return (GamePaused ? 0f : Time.deltaTime); }
         }
+
+        public int MaxEnergyCharges { get { return _maxEnergyCharges; } }
 
         /// <summary>
         /// Initializes the singleton instance.
@@ -98,10 +103,10 @@ namespace Atlanticide
             {
                 Debug.Log("Key code [" + keyCode + "] activated");
             }
-            else
-            {
-                Debug.Log("Key code [" + keyCode + "] is already active");
-            }
+            //else
+            //{
+            //    Debug.Log("Key code [" + keyCode + "] is already active");
+            //}
 
             return added;
         }

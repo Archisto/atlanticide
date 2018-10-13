@@ -16,9 +16,6 @@ namespace Atlanticide
         [SerializeField]
         private GameObject _energyObject;
 
-        [SerializeField, Range(1, 20)]
-        private int _maxCharges = 5;
-
         [SerializeField]
         private float _chargeTime = 1f;
 
@@ -27,12 +24,16 @@ namespace Atlanticide
 
         private float _elapsedTime;
         private Mode _mode;
-        private EnergyNode _node;
         private EnergyNode _tempNode;
 
         public int CurrentCharges { get; private set; }
 
-        public int MaxCharges { get { return _maxCharges; } }
+        public EnergyNode Target { get; set; }
+
+        /// <summary>
+        /// Is the energy collector in an idle state.
+        /// </summary>
+        public bool IsIdle { get { return _mode == Mode.Idle; } }
 
         /// <summary>
         /// Initializes the object.
@@ -70,54 +71,49 @@ namespace Atlanticide
 
         public void UpdateTarget()
         {
-            if (_node != null &&
-                Vector3.Distance(transform.position, _node.transform.position)
+            if (Target != null &&
+                Vector3.Distance(transform.position, Target.transform.position)
                     > World.Instance.energyCollectRadius)
             {
-                _node.RemoveClosestPlayer();
-                _node = null;
-                Debug.Log("Node lost, too far");
+                Target = null;
+                //Debug.Log("Node lost, too far");
             }
         }
 
         public void SetTarget(EnergyNode node)
         {
-            if (_node != node)
+            if (Target != node)
             {
-                _node = node;
+                Target = node;
 
-                if (node == null)
-                {
-                    Debug.Log("Node lost, other player closer");
-                }
-                else
-                {
-                    Debug.Log("New node: " + _node);
-                }
+                //if (node != null)
+                //{
+                //    Debug.Log("New node: " + Target);
+                //}
             }
         }
 
-        public void StartChargingOrEmitting()
+        public void TryDrainingOrEmitting()
         {
-            if (_mode == Mode.Idle && _node != null)
+            if (_mode == Mode.Idle && Target != null)
             {
-                if (!_node.Active)
+                if (!Target.Active)
                 {
-                    _node = null;
+                    Target = null;
                     return;
                 }
 
-                _tempNode = _node;
-                if (_node is EnergySource)
+                _tempNode = Target;
+                if (Target is EnergySource)
                 {
-                    if (!_node.ZeroCharge)
+                    if (!Target.ZeroCharge)
                     {
                         StartDraining();
                     }
                 }
                 else
                 {
-                    if (!_node.MaxCharge)
+                    if (!Target.MaxCharge)
                     {
                         StartEmitting();
                     }
@@ -125,9 +121,53 @@ namespace Atlanticide
             }
         }
 
+        private bool CanDrainOrEmit()
+        {
+            if (_mode == Mode.Idle && Target != null)
+            {
+                if (!Target.Active)
+                {
+                    Target = null;
+                    return false;
+                }
+                else
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public bool TryDraining()
+        {
+            if (CanDrainOrEmit() && Target is EnergySource
+                && !Target.ZeroCharge)
+            {
+                _tempNode = Target;
+                StartDraining();
+                return true;
+            }
+
+            return false;
+        }
+
+        public bool TryEmitting()
+        {
+            if (CanDrainOrEmit() && Target is EnergyTarget
+                && !Target.MaxCharge)
+            {
+                _tempNode = Target;
+                StartEmitting();
+                return true;
+            }
+
+            return false;
+        }
+
         protected void StartDraining()
         {
-            if (CurrentCharges < _maxCharges)
+            if (CurrentCharges < World.Instance.MaxEnergyCharges)
             {
                 Debug.Log("Draining energy; charges: " + (CurrentCharges + 1));
                 _elapsedTime = 0f;
@@ -151,14 +191,23 @@ namespace Atlanticide
 
         private void Drain()
         {
-            CurrentCharges++;
+            SetCharges(CurrentCharges + 1, true);
             _tempNode.LoseCharge();
         }
 
         private void Emit()
         {
-            CurrentCharges--;
+            SetCharges(CurrentCharges - 1, true);
             _tempNode.GainCharge();
+        }
+
+        public void SetCharges(int charges, bool global)
+        {
+            CurrentCharges = charges;
+            if (global)
+            {
+                GameManager.Instance.SetEnergyCharges(CurrentCharges);
+            }
         }
 
         public void ReturnToIdle()
@@ -171,7 +220,8 @@ namespace Atlanticide
         public void ResetEnergyCollector()
         {
             ReturnToIdle();
-            CurrentCharges = 0;
+            Target = null;
+            SetCharges(0, false);
             _elapsedTime = 0f;
         }
 

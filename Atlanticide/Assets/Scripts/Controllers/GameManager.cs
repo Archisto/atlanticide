@@ -39,12 +39,16 @@ namespace Atlanticide
         private Level _level;
         private PlayerCharacter _playerPrefab;
         private PlayerCharacter[] _players;
+        private PlayerTool[] _playerTools;
         private NonPlayerCharacter[] _npcs;
-        private UIController _UI;
+        private UIController _ui;
         private LevelObject[] _levelObjects;
         private Transform[] _telegrabs;
+        private InputController _input;
         private SettingsManager _settings;
         private FadeToColor _fade;
+        private bool _updateAtSceneStart = true;
+        private bool _freshGameStart = true;
         private bool _exitingScene;
         private bool _startingScene;
         private string _nextSceneName;
@@ -61,6 +65,8 @@ namespace Atlanticide
         public int PlayerCount { get; private set; }
 
         public int CurrentLevel { get; set; }
+
+        public int CurrentEnergyCharges { get; private set; }
 
         public int CurrentScore { get; private set; }
 
@@ -125,6 +131,8 @@ namespace Atlanticide
 
                 PlayerCount = 2;
                 CurrentLevel = 1;
+                _playerTools = new PlayerTool[MaxPlayers];
+                _updateAtSceneStart = true;
             }
         }
 
@@ -137,6 +145,27 @@ namespace Atlanticide
             {
                 LoadScene(_nextSceneName);
             }
+
+            if (_updateAtSceneStart)
+            {
+                LevelStartInit();
+            }
+        }
+
+        private void LevelStartInit()
+        {
+            if (GameState == State.Play)
+            {
+                Debug.Log("Level starts");
+                SetPlayerTools(_freshGameStart);
+            }
+            else
+            {
+                Debug.Log("Menu starts");
+            }
+
+            _freshGameStart = false;
+            _updateAtSceneStart = false;
         }
 
         private void InitSettings()
@@ -148,6 +177,7 @@ namespace Atlanticide
         {
             InitUI();
             InitFade();
+            InitInput();
 
             if (GameState == State.Play)
             {
@@ -158,6 +188,7 @@ namespace Atlanticide
             }
 
             _startingScene = false;
+            _updateAtSceneStart = true;
         }
 
         /// <summary>
@@ -206,8 +237,8 @@ namespace Atlanticide
                 _players[i].ID = i;
                 _players[i].name = "Player " + (i + 1);
                 _players[i].Input = new PlayerInput(i);
-                _players[i].EnergyBar = _UI.GetEnergyBar(i);
                 _players[i].transform.position = _level.GetSpawnPoint(i);
+                SetPlayerTool(_players[i], i + 1);
             }
         }
 
@@ -245,8 +276,8 @@ namespace Atlanticide
         /// </summary>
         private void InitUI()
         {
-            _UI = FindObjectOfType<UIController>();
-            if (_UI == null)
+            _ui = FindObjectOfType<UIController>();
+            if (_ui == null)
             {
                 Debug.LogError(Utils.GetObjectMissingString("UIController"));
             }
@@ -260,7 +291,7 @@ namespace Atlanticide
             _fade = FindObjectOfType<FadeToColor>();
             if (_fade != null)
             {
-                _fade.Init(_UI.GetFade());
+                _fade.Init(_ui.GetFade());
 
                 if (_startingScene)
                 {
@@ -269,9 +300,21 @@ namespace Atlanticide
             }
         }
 
+        /// <summary>
+        /// Initializes the input controller.
+        /// </summary>
+        private void InitInput()
+        {
+            _input = FindObjectOfType<InputController>();
+            if (_ui == null)
+            {
+                Debug.LogError(Utils.GetObjectMissingString("InputController"));
+            }
+        }
+
         public UIController GetUI()
         {
-            return _UI;
+            return _ui;
         }
 
         public PlayerCharacter[] GetPlayers()
@@ -301,6 +344,12 @@ namespace Atlanticide
             }
         }
 
+        public void SetEnergyCharges(int charges)
+        {
+            CurrentEnergyCharges = charges;
+            _ui.UpdateEnergyBar((float) CurrentEnergyCharges / World.Instance.MaxEnergyCharges);
+        }
+
         public void UpdateScore(int score)
         {
             SetScore(CurrentScore + score);
@@ -309,7 +358,7 @@ namespace Atlanticide
         public void SetScore(int score)
         {
             CurrentScore = score;
-            _UI.UpdateUI();
+            _ui.UpdateScoreCounter();
         }
 
         /// <summary>
@@ -404,18 +453,6 @@ namespace Atlanticide
         }
 
         /// <summary>
-        /// Invokes an action on each active player character.
-        /// </summary>
-        /// <param name="action">An action</param>
-        public void ForEachActivePlayerChar(Action<PlayerCharacter> action)
-        {
-            for (int i = 0; i < PlayerCount; i++)
-            {
-                action(_players[i]);
-            }
-        }
-
-        /// <summary>
         /// Gets the first player within range.
         /// </summary>
         /// <param name="position">A position</param>
@@ -436,19 +473,156 @@ namespace Atlanticide
         }
 
         /// <summary>
+        /// Returns whether the given player characters are within range of each other.
+        /// </summary>
+        /// <param name="player">A player character</param>
+        /// <param name="otherPlayer">Another player character</param>
+        /// <param name="range">The range</param>
+        /// <returns>Are the given player characters within range of each other
+        /// </returns>
+        public bool PlayersAreWithinRangeOfEachOther(
+            PlayerCharacter player, PlayerCharacter otherPlayer, float range)
+        {
+            return Vector3.Distance
+                (player.transform.position, otherPlayer.transform.position)
+                <= range;
+        }
+
+        /// <summary>
+        /// Returns the first player character that isn't the one given.
+        /// Can return only a living character if necessary.
+        /// </summary>
+        /// <param name="invalidPlayer">A player that won't be returned</param>
+        /// <param name="includeDead">Are dead players included</param>
+        /// <returns>A player character other than the one given</returns>
+        public PlayerCharacter GetAnyOtherPlayer(PlayerCharacter invalidPlayer, bool includeDead)
+        {
+            foreach (PlayerCharacter pc in _players)
+            {
+                if (pc != invalidPlayer && (includeDead || !pc.IsDead))
+                {
+                    return pc;
+                }
+            }
+
+            return null;
+        }
+
+        public PlayerCharacter GetPlayerWithTool(PlayerTool tool, bool includeDead)
+        {
+            foreach (PlayerCharacter pc in _players)
+            {
+                if (pc.Tool == tool && (includeDead || !pc.IsDead))
+                {
+                    return pc;
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Invokes an action on each active player character.
+        /// </summary>
+        /// <param name="action">An action</param>
+        public void ForEachActivePlayerChar(Action<PlayerCharacter> action)
+        {
+            for (int i = 0; i < PlayerCount; i++)
+            {
+                action(_players[i]);
+            }
+        }
+
+        /// <summary>
+        /// Saves the tools currently in use or gives each player character a saved tool.
+        /// </summary>
+        /// <param name="saveCurrent">Should the tools currently in use be saved</param>
+        public void SetPlayerTools(bool saveCurrent)
+        {
+            for (int i = 0; i < _players.Length; i++)
+            {
+                if (saveCurrent)
+                {
+                    _playerTools[i] = _players[i].Tool;
+                    //Debug.Log(string.Format("Tool saved: {0} has {1}", _players[i].name, _playerTools[i]));
+                }
+                else
+                {
+                    SetPlayerTool(_players[i], _playerTools[i]);
+                    _ui.UpdatePlayerToolImage(i, _playerTools[i]);
+                    //Debug.Log(string.Format("Tool set: {0} gets {1}", _players[i].name, _playerTools[i]));
+                }
+            }
+        }
+
+        /// <summary>
+        /// Sets the given players tool.
+        /// </summary>
+        /// <param name="player">A player</param>
+        /// <param name="tool">A tool</param>
+        public void SetPlayerTool(PlayerCharacter player, PlayerTool tool)
+        {
+            if (player.Tool == PlayerTool.EnergyCollector)
+            {
+                player.EnergyCollector.ResetEnergyCollector();
+            }
+            else if (player.Tool == PlayerTool.Shield)
+            {
+                player.Shield.CancelBash();
+                player.Shield.ActivateInstantly(false);
+            }
+
+            player.Tool = tool;
+
+            // The UI controller first updates the tool images in its Start method.
+            // This is for subsequent tool swaps.
+            if (!_updateAtSceneStart)
+            {
+                _ui.UpdatePlayerToolImage(player.ID, player.Tool);
+            }
+
+            // Gives the same amount of charges to the new energy
+            // collector player as the previous had before the tool swap
+            if (CurrentEnergyCharges > 0 &&
+                player.Tool == PlayerTool.EnergyCollector)
+            {
+                player.EnergyCollector.SetCharges(CurrentEnergyCharges, false);
+            }
+        }
+
+        /// <summary>
+        /// Sets the given players tool.
+        /// </summary>
+        /// <param name="player">A player</param>
+        /// <param name="toolNum">A tool's enum number</param>
+        public void SetPlayerTool(PlayerCharacter player, int toolNum)
+        {
+            if (Enum.IsDefined(typeof(PlayerTool), toolNum))
+            {
+                SetPlayerTool(player, (PlayerTool) toolNum);
+            }
+            else
+            {
+                Debug.LogWarning("Enum PlayerTool does not have a value at index " + toolNum);
+            }
+        }
+
+        /// <summary>
         /// Resets the current level.
         /// </summary>
         public void ResetLevel()
         {
             Debug.Log("Restarting level");
             World.Instance.ResetWorld();
+            _input.ResetInput();
             _players.ForEach(pc => pc.CancelActions());
             _players.ForEach(pc => pc.RespawnPosition = _level.GetSpawnPoint(pc.ID));
             ForEachActivePlayerChar(pc => pc.Respawn());
             _npcs.ForEach(npc => npc.Respawn());
             _levelObjects.ForEach(obj => obj.ResetObject());
             _level.ResetLevel();
-            _UI.ResetUI();
+            _ui.ResetUI();
+            SetEnergyCharges(0);
             SetScore(0);
         }
 
@@ -509,6 +683,7 @@ namespace Atlanticide
                 if (GameState == State.Play)
                 {
                     _players.ForEach(p => p.CancelActions());
+                    SetEnergyCharges(0);
                 }
 
                 _exitingScene = true;
@@ -542,7 +717,7 @@ namespace Atlanticide
         {
             if (activate || !_exitingScene)
             {
-                _UI.ActivatePauseScreen(activate, playerName);
+                _ui.ActivatePauseScreen(activate, playerName);
             }
         }
 
