@@ -254,9 +254,12 @@ namespace Atlanticide
                 {
                     if (InteractionTarget.Interact())
                     {
-                        // Removes the energy cost from the players
-                        EnergyCollector.SetCharges
-                            (World.Instance.CurrentEnergyCharges - InteractionTarget.EnergyCost, true);
+                        if (InteractionTarget.EnergyCost != 0)
+                        {
+                            // Removes the energy cost from the players
+                            EnergyCollector.SetCharges (World.Instance.CurrentEnergyCharges -
+                                InteractionTarget.EnergyCost, true);
+                        }
 
                         // Makes the interaction target forget the player
                         InteractionTarget.SetInteractorTarget(false, true);
@@ -484,6 +487,7 @@ namespace Atlanticide
             _energyCollector.ResetEnergyCollector();
             EndClimb();
             EndPush();
+            InteractionTarget = null;
         }
 
         protected override void OnDrawGizmos()

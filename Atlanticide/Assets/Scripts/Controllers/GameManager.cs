@@ -748,7 +748,7 @@ namespace Atlanticide
                 if (GameState == State.Play)
                 {
                     _players.ForEach(p => p.CancelActions());
-                    World.Instance.CurrentEnergyCharges = 0;
+                    World.Instance.ResetWorld();
                 }
 
                 Transition = TransitionPhase.ExitingScene;
