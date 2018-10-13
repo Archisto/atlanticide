@@ -5,7 +5,14 @@ using UnityEngine.UI;
 
 namespace Atlanticide
 {
-    public class PlayerCharacter : GameCharacter, IInputReceiver
+    public enum PlayerTool
+    {
+        None = 0,
+        EnergyCollector = 1,
+        Shield = 2
+    }
+
+    public class PlayerCharacter : GameCharacter
     {
         [SerializeField]
         private Shield _shield;
@@ -44,6 +51,8 @@ namespace Atlanticide
 
         public Slider EnergyBar { get; set; }
 
+        public PlayerTool Tool { get; set; }
+
         public EnergyCollector EnergyCollector { get { return _energyCollector; } }
 
         public Shield Shield { get { return _shield; } }
@@ -54,6 +63,13 @@ namespace Atlanticide
 
         public bool Pushing { get; private set; }
 
+        public bool ShieldIsActive
+        {
+            get
+            {
+                return (Tool == PlayerTool.Shield && _shield.Active);
+            }
+        }
 
         public bool IsAvailableForActions()
         {
@@ -116,10 +132,6 @@ namespace Atlanticide
                 {
                     Climb(direction);
                 }
-                //else if (Pushing)
-                //{
-                //    Push(direction);
-                //}
                 else
                 {
                     Move(direction);
@@ -132,7 +144,11 @@ namespace Atlanticide
             Vector3 movement = new Vector3(direction.x, 0, direction.y) * _speed * World.Instance.DeltaTime;
             Vector3 newPosition = transform.position + movement * (Pushing ? 0.3f : 1f);
             transform.position = newPosition;
-            RotateTowards(direction);
+
+            if (!ShieldIsActive)
+            {
+                RotateTowards(direction);
+            }
         }
 
         /// <summary>
@@ -141,8 +157,10 @@ namespace Atlanticide
         /// <param name="direction">The looking direction</param>
         public void LookInput(Vector3 direction)
         {
-            //RotateTowards(direction);
-            AimShield(direction);
+            if (ShieldIsActive)
+            {
+                RotateTowards(direction);
+            }
         }
 
         private void AimShield(Vector3 direction)
@@ -241,28 +259,48 @@ namespace Atlanticide
             }
         }
 
-        public void ActionInput(bool active)
+        public void CheckActionInput()
         {
-            _abilityActive = active; // && !_outOfEnergy;
-            SetAbilityActive(_abilityActive);
+            bool active = Input.GetActionInput();
+
+            if (Tool == PlayerTool.EnergyCollector && active)
+            {
+                // TODO: Drain
+                UseEnergyCollector();
+            }
+            else if (Tool == PlayerTool.Shield)
+            {
+                UseShield(active);
+            }
+
+            _abilityActive = active;
         }
 
-        private void SetAbilityActive(bool active)
+        public void CheckAltActionInput()
         {
-            // Shield
-            //_shield.gameObject.SetActive(active);
-            _shield.Activate(active);
+            bool active = Input.GetAltActionInput();
+
+            if (active)
+            {
+                if (Tool == PlayerTool.EnergyCollector)
+                {
+                    // TODO: Emit
+                    UseEnergyCollector();
+                }
+                else if (Tool == PlayerTool.Shield)
+                {
+                    Shield.Bash();
+                }
+            }
         }
 
         /// <summary>
-        /// Fires the player character's weapon.
+        /// Opens or closes the shield.
         /// </summary>
-        public void FireWeapon()
+        /// <param name="activate">Should the shield be activated</param>
+        private void UseShield(bool activate)
         {
-            if (_weapon != null && !_abilityActive)
-            {
-                _weapon.Fire();
-            }
+            _shield.Activate(activate);
         }
 
         /// <summary>
@@ -270,10 +308,21 @@ namespace Atlanticide
         /// </summary>
         public void UseEnergyCollector()
         {
-            if (_energyCollector != null && !_abilityActive)
+            if (_energyCollector != null)
             {
                 _energyCollector.StartChargingOrEmitting();
                 UpdateEnergyBar();
+            }
+        }
+
+        /// <summary>
+        /// Fires the player character's weapon.
+        /// </summary>
+        public void FireWeapon()
+        {
+            if (_weapon != null)
+            {
+                _weapon.Fire();
             }
         }
 
@@ -414,7 +463,7 @@ namespace Atlanticide
             //_energy = 1f;
             //_outOfEnergy = false;
             _elapsedRespawnTime = 0f;
-            SetAbilityActive(false);
+            UseShield(false);
             
             if (_energyCollector != null)
             {
@@ -431,7 +480,7 @@ namespace Atlanticide
         {
             base.CancelActions();
             Jumping = false;
-            SetAbilityActive(false);
+            UseShield(false);
             EndClimb();
             EndPush();
         }

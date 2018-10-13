@@ -40,9 +40,10 @@ namespace Atlanticide
         private PlayerCharacter _playerPrefab;
         private PlayerCharacter[] _players;
         private NonPlayerCharacter[] _npcs;
-        private UIController _UI;
+        private UIController _ui;
         private LevelObject[] _levelObjects;
         private Transform[] _telegrabs;
+        private InputController _input;
         private SettingsManager _settings;
         private FadeToColor _fade;
         private bool _exitingScene;
@@ -148,6 +149,7 @@ namespace Atlanticide
         {
             InitUI();
             InitFade();
+            InitInput();
 
             if (GameState == State.Play)
             {
@@ -206,8 +208,9 @@ namespace Atlanticide
                 _players[i].ID = i;
                 _players[i].name = "Player " + (i + 1);
                 _players[i].Input = new PlayerInput(i);
-                _players[i].EnergyBar = _UI.GetEnergyBar(i);
+                _players[i].EnergyBar = _ui.GetEnergyBar(i);
                 _players[i].transform.position = _level.GetSpawnPoint(i);
+                SetPlayerTool(_players[i], i + 1);
             }
         }
 
@@ -245,8 +248,8 @@ namespace Atlanticide
         /// </summary>
         private void InitUI()
         {
-            _UI = FindObjectOfType<UIController>();
-            if (_UI == null)
+            _ui = FindObjectOfType<UIController>();
+            if (_ui == null)
             {
                 Debug.LogError(Utils.GetObjectMissingString("UIController"));
             }
@@ -260,7 +263,7 @@ namespace Atlanticide
             _fade = FindObjectOfType<FadeToColor>();
             if (_fade != null)
             {
-                _fade.Init(_UI.GetFade());
+                _fade.Init(_ui.GetFade());
 
                 if (_startingScene)
                 {
@@ -269,9 +272,21 @@ namespace Atlanticide
             }
         }
 
+        /// <summary>
+        /// Initializes the input controller.
+        /// </summary>
+        private void InitInput()
+        {
+            _input = FindObjectOfType<InputController>();
+            if (_ui == null)
+            {
+                Debug.LogError(Utils.GetObjectMissingString("InputController"));
+            }
+        }
+
         public UIController GetUI()
         {
-            return _UI;
+            return _ui;
         }
 
         public PlayerCharacter[] GetPlayers()
@@ -309,7 +324,7 @@ namespace Atlanticide
         public void SetScore(int score)
         {
             CurrentScore = score;
-            _UI.UpdateUI();
+            _ui.UpdateUI();
         }
 
         /// <summary>
@@ -404,18 +419,6 @@ namespace Atlanticide
         }
 
         /// <summary>
-        /// Invokes an action on each active player character.
-        /// </summary>
-        /// <param name="action">An action</param>
-        public void ForEachActivePlayerChar(Action<PlayerCharacter> action)
-        {
-            for (int i = 0; i < PlayerCount; i++)
-            {
-                action(_players[i]);
-            }
-        }
-
-        /// <summary>
         /// Gets the first player within range.
         /// </summary>
         /// <param name="position">A position</param>
@@ -436,19 +439,105 @@ namespace Atlanticide
         }
 
         /// <summary>
+        /// Returns whether the given player characters are within range of each other.
+        /// </summary>
+        /// <param name="player">A player character</param>
+        /// <param name="otherPlayer">Another player character</param>
+        /// <param name="range">The range</param>
+        /// <returns>Are the given player characters within range of each other
+        /// </returns>
+        public bool PlayersAreWithinRangeOfEachOther(
+            PlayerCharacter player, PlayerCharacter otherPlayer, float range)
+        {
+            return Vector3.Distance
+                (player.transform.position, otherPlayer.transform.position)
+                <= range;
+        }
+
+        /// <summary>
+        /// Returns the first player character that isn't the one given.
+        /// Can return only a living character if necessary.
+        /// </summary>
+        /// <param name="invalidPlayer">A player that won't be returned</param>
+        /// <param name="includeDead">Are dead players included</param>
+        /// <returns>A player character other than the one given</returns>
+        public PlayerCharacter GetAnyOtherPlayer(PlayerCharacter invalidPlayer, bool includeDead)
+        {
+            foreach (PlayerCharacter pc in _players)
+            {
+                if (pc != invalidPlayer && (includeDead || !pc.IsDead))
+                {
+                    return pc;
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Invokes an action on each active player character.
+        /// </summary>
+        /// <param name="action">An action</param>
+        public void ForEachActivePlayerChar(Action<PlayerCharacter> action)
+        {
+            for (int i = 0; i < PlayerCount; i++)
+            {
+                action(_players[i]);
+            }
+        }
+
+        /// <summary>
+        /// Sets the given players tool.
+        /// </summary>
+        /// <param name="player">A player</param>
+        /// <param name="tool">A tool</param>
+        public void SetPlayerTool(PlayerCharacter player, PlayerTool tool)
+        {
+            if (player.Tool == PlayerTool.EnergyCollector)
+            {
+                player.EnergyCollector.ResetEnergyCollector();
+            }
+            else if (player.Tool == PlayerTool.Shield)
+            {
+                player.Shield.CancelBash();
+                player.Shield.ActivateInstantly(false);
+            }
+
+            player.Tool = tool;
+        }
+
+        /// <summary>
+        /// Sets the given players tool.
+        /// </summary>
+        /// <param name="player">A player</param>
+        /// <param name="toolNum">A tool's enum number</param>
+        public void SetPlayerTool(PlayerCharacter player, int toolNum)
+        {
+            if (Enum.IsDefined(typeof(PlayerTool), toolNum))
+            {
+                SetPlayerTool(player, (PlayerTool) toolNum);
+            }
+            else
+            {
+                Debug.LogWarning("Enum PlayerTool does not have a value at index " + toolNum);
+            }
+        }
+
+        /// <summary>
         /// Resets the current level.
         /// </summary>
         public void ResetLevel()
         {
             Debug.Log("Restarting level");
             World.Instance.ResetWorld();
+            _input.ResetInput();
             _players.ForEach(pc => pc.CancelActions());
             _players.ForEach(pc => pc.RespawnPosition = _level.GetSpawnPoint(pc.ID));
             ForEachActivePlayerChar(pc => pc.Respawn());
             _npcs.ForEach(npc => npc.Respawn());
             _levelObjects.ForEach(obj => obj.ResetObject());
             _level.ResetLevel();
-            _UI.ResetUI();
+            _ui.ResetUI();
             SetScore(0);
         }
 
@@ -542,7 +631,7 @@ namespace Atlanticide
         {
             if (activate || !_exitingScene)
             {
-                _UI.ActivatePauseScreen(activate, playerName);
+                _ui.ActivatePauseScreen(activate, playerName);
             }
         }
 

@@ -212,6 +212,23 @@ namespace Atlanticide
             return newRotation;
         }
 
+        /// <summary>
+        /// Returns how many values does an enumerator have.
+        /// </summary>
+        /// <param name="enumType">An enum type</param>
+        /// <returns>The length of the enum</returns>
+        public static int GetEnumLength(Type enumType)
+        {
+            if (enumType == typeof(Enum))
+            {
+                return Enum.GetValues(enumType).Length;
+            }
+            else
+            {
+                return -1;
+            }
+        }
+
         public static void DrawProgressBarGizmo(Vector3 position, float progress, Color barColor, Color indicatorColor)
         {
             Gizmos.color = barColor;

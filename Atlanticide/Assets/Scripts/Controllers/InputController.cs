@@ -7,6 +7,7 @@ namespace Atlanticide
     public class InputController : MonoBehaviour
     {
         private PlayerCharacter[] _players;
+        private ToolSwapping _toolSwap;
         private int _pausingPlayerNum;
 
         /// <summary>
@@ -15,6 +16,7 @@ namespace Atlanticide
         private void Start()
         {
             _players = GameManager.Instance.GetPlayers();
+            _toolSwap = FindObjectOfType<ToolSwapping>();
         }
 
         /// <summary>
@@ -76,18 +78,17 @@ namespace Atlanticide
                         _players[i].Jump();
                     }
 
-                    // Using an ability
-                    _players[i].ActionInput(_players[i].Input.GetActionInput());
-
-                    // Shield bash
-                    // OLD: Using the energy collector
-                    // OLD: Firing a weapon
-                    if (_players[i].Input.GetAltActionInput())
+                    // Tool swapping
+                    if (_players[i].Input.GetToolSwapInput())
                     {
-                        //_players[i].FireWeapon();
-                        //_players[i].UseEnergyCollector();
-                        _players[i].Shield.Bash();
+                        _toolSwap.InitiateSwapRequest(_players[i]);
                     }
+
+                    // Using the player's primary action
+                    _players[i].CheckActionInput();
+
+                    // Using the player's alternate action
+                    _players[i].CheckAltActionInput();
                 }
             }
         }
@@ -218,6 +219,14 @@ namespace Atlanticide
             {
                 return _pausingPlayerNum == playerNum;
             }
+        }
+
+        /// <summary>
+        /// Resets the input controller.
+        /// </summary>
+        public void ResetInput()
+        {
+            _toolSwap.EndSwapRequest();
         }
     }
 }
