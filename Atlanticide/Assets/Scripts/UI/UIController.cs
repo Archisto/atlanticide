@@ -63,7 +63,7 @@ namespace Atlanticide.UI
                     _playerStatuses.Add(ps);
                 }
 
-                _energyBar.value = 0f;
+                UpdateEnergyBar(0f);
             }
         }
 

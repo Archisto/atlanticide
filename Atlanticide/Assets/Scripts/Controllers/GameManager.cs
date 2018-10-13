@@ -36,6 +36,21 @@ namespace Atlanticide
         private const string MainMenuKey = "MainMenu";
         private const string LevelKey = "Level";
 
+        public enum State
+        {
+            MainMenu = 0,
+            Play = 1,
+            LevelEnd = 2
+        }
+
+        public enum TransitionPhase
+        {
+            None = 0,
+            ResetingLevel = 1,
+            ExitingScene = 2,
+            StartingScene = 3
+        }
+
         private Level _level;
         private PlayerCharacter _playerPrefab;
         private PlayerCharacter[] _players;
@@ -49,24 +64,32 @@ namespace Atlanticide
         private FadeToColor _fade;
         private bool _updateAtSceneStart = true;
         private bool _freshGameStart = true;
-        private bool _exitingScene;
-        private bool _startingScene;
         private string _nextSceneName;
-
-        public enum State
-        {
-            MainMenu = 0,
-            Play = 1,
-            LevelEnd = 2
-        }
+        private int _deadPlayerCount;
 
         public State GameState { get; set; }
 
+        public TransitionPhase Transition { get; set; }
+
         public int PlayerCount { get; private set; }
 
-        public int CurrentLevel { get; set; }
+        public int DeadPlayerCount
+        {
+            get
+            {
+                return _deadPlayerCount;
+            }
+            set
+            {
+                _deadPlayerCount = value;
+                if (LevelFailed)
+                {
+                    StartLevelReset();
+                }
+            }
+        }
 
-        public int CurrentEnergyCharges { get; private set; }
+        public int CurrentLevel { get; set; }
 
         public int CurrentScore { get; private set; }
 
@@ -79,7 +102,8 @@ namespace Atlanticide
         {
             get
             {
-                return _exitingScene || _startingScene;
+                return Transition == TransitionPhase.ExitingScene ||
+                    Transition == TransitionPhase.StartingScene;
             }
         }
 
@@ -97,6 +121,14 @@ namespace Atlanticide
             {
                 return GameState == State.Play &&
                        !SceneChanging;
+            }
+        }
+
+        public bool LevelFailed
+        {
+            get
+            {
+                return DeadPlayerCount == PlayerCount;
             }
         }
 
@@ -141,9 +173,17 @@ namespace Atlanticide
         /// </summary>
         private void Update()
         {
-            if (_exitingScene && _fade.FadedOut)
+            if (Transition == TransitionPhase.ExitingScene
+                && _fade.FadedOut)
             {
                 LoadScene(_nextSceneName);
+            }
+            else if (Transition == TransitionPhase.ResetingLevel
+                     && _fade.FadedOut)
+            {
+                Transition = TransitionPhase.None;
+                ActivatePauseScreen(false, "");
+                ResetLevel();
             }
 
             if (_updateAtSceneStart)
@@ -175,6 +215,7 @@ namespace Atlanticide
 
         private void InitScene()
         {
+            World.Instance.Init();
             InitUI();
             InitFade();
             InitInput();
@@ -187,7 +228,7 @@ namespace Atlanticide
                 _levelObjects = FindObjectsOfType<LevelObject>();
             }
 
-            _startingScene = false;
+            Transition = TransitionPhase.None;
             _updateAtSceneStart = true;
         }
 
@@ -293,7 +334,7 @@ namespace Atlanticide
             {
                 _fade.Init(_ui.GetFade());
 
-                if (_startingScene)
+                if (Transition == TransitionPhase.StartingScene)
                 {
                     _fade.StartFadeIn();
                 }
@@ -306,7 +347,7 @@ namespace Atlanticide
         private void InitInput()
         {
             _input = FindObjectOfType<InputController>();
-            if (_ui == null)
+            if (_input == null)
             {
                 Debug.LogError(Utils.GetObjectMissingString("InputController"));
             }
@@ -314,6 +355,7 @@ namespace Atlanticide
 
         public UIController GetUI()
         {
+            Debug.Log(_ui);
             return _ui;
         }
 
@@ -344,13 +386,7 @@ namespace Atlanticide
             }
         }
 
-        public void SetEnergyCharges(int charges)
-        {
-            CurrentEnergyCharges = charges;
-            _ui.UpdateEnergyBar((float) CurrentEnergyCharges / World.Instance.MaxEnergyCharges);
-        }
-
-        public void UpdateScore(int score)
+        public void ChangeScore(int score)
         {
             SetScore(CurrentScore + score);
         }
@@ -489,6 +525,24 @@ namespace Atlanticide
         }
 
         /// <summary>
+        /// Returns the first player character in the array.
+        /// </summary>
+        /// <param name="includeDead">Are dead players included</param>
+        /// <returns>A player character</returns>
+        public PlayerCharacter GetAnyPlayer(bool includeDead)
+        {
+            foreach (PlayerCharacter pc in _players)
+            {
+                if (includeDead || !pc.IsDead)
+                {
+                    return pc;
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>
         /// Returns the first player character that isn't the one given.
         /// Can return only a living character if necessary.
         /// </summary>
@@ -583,10 +637,10 @@ namespace Atlanticide
 
             // Gives the same amount of charges to the new energy
             // collector player as the previous had before the tool swap
-            if (CurrentEnergyCharges > 0 &&
+            if (World.Instance.CurrentEnergyCharges > 0 &&
                 player.Tool == PlayerTool.EnergyCollector)
             {
-                player.EnergyCollector.SetCharges(CurrentEnergyCharges, false);
+                player.EnergyCollector.SetCharges(World.Instance.CurrentEnergyCharges, false);
             }
         }
 
@@ -608,11 +662,20 @@ namespace Atlanticide
         }
 
         /// <summary>
+        /// Starts reseting level with a fade-out.
+        /// </summary>
+        public void StartLevelReset()
+        {
+            Transition = TransitionPhase.ResetingLevel;
+            _fade.StartFadeOut(LevelFailed);
+            Debug.Log("Restarting level");
+        }
+
+        /// <summary>
         /// Resets the current level.
         /// </summary>
         public void ResetLevel()
         {
-            Debug.Log("Restarting level");
             World.Instance.ResetWorld();
             _input.ResetInput();
             _players.ForEach(pc => pc.CancelActions());
@@ -622,8 +685,10 @@ namespace Atlanticide
             _levelObjects.ForEach(obj => obj.ResetObject());
             _level.ResetLevel();
             _ui.ResetUI();
-            SetEnergyCharges(0);
+            World.Instance.SetEnergyChargesAndUpdateUI(0);
             SetScore(0);
+            DeadPlayerCount = 0;
+            _fade.StartFadeIn();
         }
 
         /// <summary>
@@ -676,19 +741,19 @@ namespace Atlanticide
         /// <param name="sceneName">The scene's name</param>
         public void StartLoadingScene(string sceneName)
         {
-            if (!_exitingScene)
+            if (Transition != TransitionPhase.ExitingScene)
             {
                 Debug.Log("Loading scene: " + sceneName);
 
                 if (GameState == State.Play)
                 {
                     _players.ForEach(p => p.CancelActions());
-                    SetEnergyCharges(0);
+                    World.Instance.CurrentEnergyCharges = 0;
                 }
 
-                _exitingScene = true;
+                Transition = TransitionPhase.ExitingScene;
                 _nextSceneName = sceneName;
-                _fade.StartFadeOut();
+                _fade.StartFadeOut(false);
             }
         }
 
@@ -698,8 +763,7 @@ namespace Atlanticide
         /// <param name="sceneName">The scene's name</param>
         private void LoadScene(string sceneName)
         {
-            _exitingScene = false;
-            _startingScene = true;
+            Transition = TransitionPhase.StartingScene;
             SceneManager.LoadScene(sceneName);
         }
 
@@ -715,7 +779,7 @@ namespace Atlanticide
 
         public void ActivatePauseScreen(bool activate, string playerName)
         {
-            if (activate || !_exitingScene)
+            if (activate || Transition == TransitionPhase.None)
             {
                 _ui.ActivatePauseScreen(activate, playerName);
             }

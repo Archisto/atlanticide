@@ -12,6 +12,9 @@ namespace Atlanticide
         private Color _color;
 
         [SerializeField]
+        private Color _altColor;
+
+        [SerializeField]
         private float _fadeOutTime = 1;
 
         [SerializeField]
@@ -19,6 +22,7 @@ namespace Atlanticide
 
         private Image _screenCoverImage;
         private bool _fadeOut;
+        private bool _useAltColor;
         private float _fadeProgress;
         private float _elapsedTime;
 
@@ -73,7 +77,7 @@ namespace Atlanticide
 
             if (_fadeOut)
             {
-                StartFadeOut();
+                StartFadeOut(false);
             }
             else
             {
@@ -84,9 +88,10 @@ namespace Atlanticide
         /// <summary>
         /// Starts fading out.
         /// </summary>
-        public void StartFadeOut()
+        public void StartFadeOut(bool useAltColor)
         {
             _fadeOut = true;
+            _useAltColor = useAltColor;
             StartFade();
         }
 
@@ -177,7 +182,7 @@ namespace Atlanticide
         {
             if (_screenCoverImage != null)
             {
-                Color newColor = _color;
+                Color newColor = (_useAltColor ? _altColor : _color);
 
                 if (_fadeOut)
                 {

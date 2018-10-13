@@ -169,7 +169,7 @@ namespace Atlanticide
         {
             if (CurrentCharges < World.Instance.MaxEnergyCharges)
             {
-                Debug.Log("Draining energy; charges: " + (CurrentCharges + 1));
+                //Debug.Log("Draining energy; charges: " + (CurrentCharges + 1));
                 _elapsedTime = 0f;
                 _mode = Mode.Draining;
                 _energyObject.SetActive(true);
@@ -181,7 +181,7 @@ namespace Atlanticide
         {
             if (CurrentCharges > 0)
             {
-                Debug.Log("Emitting energy; charges: " + (CurrentCharges - 1));
+                //Debug.Log("Emitting energy; charges: " + (CurrentCharges - 1));
                 _elapsedTime = 0f;
                 _mode = Mode.Emitting;
                 _energyObject.SetActive(true);
@@ -201,12 +201,18 @@ namespace Atlanticide
             _tempNode.GainCharge();
         }
 
+        public void ChangeCharges(int charges, bool global)
+        {
+            SetCharges(CurrentCharges + charges, global);
+        }
+
         public void SetCharges(int charges, bool global)
         {
             CurrentCharges = charges;
             if (global)
             {
-                GameManager.Instance.SetEnergyCharges(CurrentCharges);
+                World.Instance.SetEnergyChargesAndUpdateUI(CurrentCharges);
+                Debug.Log("Energy charges: " + CurrentCharges);
             }
         }
 

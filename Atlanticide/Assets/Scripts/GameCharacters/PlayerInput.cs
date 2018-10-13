@@ -26,6 +26,7 @@ namespace Atlanticide
         private string _verticalLookKey;
         private string _actionKey;
         private string _altActionKey;
+        private string _interactKey;
         private string _jumpKey;
         private string _toolSwapKey;
         private string _pauseKey;
@@ -67,6 +68,7 @@ namespace Atlanticide
             _verticalLookKey = "VerticalLook" + InputDevice.ToString();
             _actionKey = "Action" + InputDevice.ToString();
             _altActionKey = "AltAction" + InputDevice.ToString();
+            _interactKey = "Interact" + InputDevice.ToString();
             _jumpKey = "Jump" + InputDevice.ToString();
             _toolSwapKey = "ToolSwap" + InputDevice.ToString();
             _pauseKey = "Pause" + InputDevice.ToString();
@@ -112,6 +114,15 @@ namespace Atlanticide
         public bool GetAltActionInput()
         {
             return Input.GetButton(_altActionKey) || Input.GetAxis(_altActionKey) == 1;
+        }
+
+        /// <summary>
+        /// Gets the player's interact input.
+        /// </summary>
+        /// <returns>Is the interact input pressed</returns>
+        public bool GetInteractInput()
+        {
+            return Input.GetButtonDown(_interactKey);
         }
 
         /// <summary>

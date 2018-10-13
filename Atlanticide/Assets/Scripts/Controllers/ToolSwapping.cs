@@ -40,9 +40,27 @@ namespace Atlanticide
         public bool SwapRequestActive { get; private set; }
 
         /// <summary>
-        /// How close is the request to its expiration.
+        /// How close is the swap request to its expiration.
         /// </summary>
-        public float SwapRequestRatio { get; private set; }
+        public float SwapRequestExpirationProgress { get; private set; }
+
+        /// <summary>
+        /// How much time is left until the swap request expires.
+        /// </summary>
+        public float SwapRequestTimeLeft
+        {
+            get
+            {
+                if (SwapRequestActive)
+                {
+                    return _swapRequestDuration - _elapsedTime;
+                }
+                else
+                {
+                    return 0f;
+                }
+            }
+        }
 
         /// <summary>
         /// Initializes the object.
@@ -87,7 +105,7 @@ namespace Atlanticide
         private void UpdateSwapRequest()
         {
             _elapsedTime += World.Instance.DeltaTime;
-            SwapRequestRatio = (_elapsedTime / _swapRequestDuration);
+            SwapRequestExpirationProgress = (_elapsedTime / _swapRequestDuration);
             if (_elapsedTime >= _swapRequestDuration)
             {
                 EndSwapRequest();
