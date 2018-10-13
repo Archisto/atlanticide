@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace Atlanticide
 {
@@ -23,33 +22,18 @@ namespace Atlanticide
         [SerializeField, Range(0.1f, 20f)]
         private float _climbSpeed = 1f;
 
-        //[SerializeField, Range(0.01f, 2f)]
-        //private float _energyDrainSpeed;
-
-        //[SerializeField, Range(0.01f, 2f)]
-        //private float _energyRechargeSpeed;
-
-        //[SerializeField, Range(0.01f, 1f)]
-        //private float _minRechargedEnergy;
-
         [SerializeField]
         private float _respawnTime = 1f;
 
         private Weapon _weapon;
         private EnergyCollector _energyCollector;
         private Climbable _climbable;
-        private LookAt _shieldAim;
-        private bool _abilityActive;
-        //private bool _outOfEnergy;
-        //private float _energy = 1f;
         private float _jumpForce;
         private float _elapsedRespawnTime;
 
         public int ID { get; set; }
 
         public PlayerInput Input { get; set; }
-
-        public Slider EnergyBar { get; set; }
 
         public PlayerTool Tool { get; set; }
 
@@ -85,16 +69,6 @@ namespace Atlanticide
             base.Start();
             _weapon = GetComponentInChildren<Weapon>();
             _energyCollector = GetComponentInChildren<EnergyCollector>();
-
-            if (_energyCollector != null)
-            {
-                UpdateEnergyBar();
-            }
-
-            if (_shield != null)
-            {
-                _shieldAim = _shield.GetComponent<LookAt>();
-            }
         }
 
         /// <summary>
@@ -111,12 +85,6 @@ namespace Atlanticide
             else
             {
                 UpdateJump();
-
-                // Commented for testing
-                /*if (EnergyBar != null)
-                {
-                    UpdateEnergy();
-                }*/
             }
         }
 
@@ -163,20 +131,11 @@ namespace Atlanticide
             }
         }
 
-        private void AimShield(Vector3 direction)
-        {
-            if (_shieldAim != null)
-            {
-                direction = new Vector3(direction.x, 0, direction.y);
-                _shieldAim.targetDirection = Vector3.Lerp
-                    (_shieldAim.targetDirection, direction, _turningSpeed);
-            }
-        }
-
         /// <summary>
         /// Makes the player character jump.
         /// </summary>
-        public void Jump()
+        /// <returns>Does the character jump</returns>
+        public bool Jump()
         {
             if ((!Jumping && _groundCollider.onGround) || Climbing)
             {
@@ -193,7 +152,10 @@ namespace Atlanticide
                 _jumpForce = _jumpHeight * 4;
                 _groundCollider.onGround = false;
                 SFXPlayer.Instance.Play(Sound.Jump);
+                return true;
             }
+
+            return false;
         }
 
         /// <summary>
@@ -218,35 +180,6 @@ namespace Atlanticide
         }
 
         /// <summary>
-        /// Updates the player's energy.
-        /// </summary>
-        private void UpdateEnergy()
-        {
-            // TODO: If needed, use an AbilityEnergy object
-
-            //_energy = Utils.DrainOrRecharge(_energy, _abilityActive, _energyDrainSpeed,
-            //    _energyRechargeSpeed, _minRechargedEnergy, _outOfEnergy, out _outOfEnergy);
-
-            //if (_outOfEnergy)
-            //{
-            //    SetAbilityActive(false);
-            //}
-
-            //UpdateEnergyBar();
-        }
-
-        private void UpdateEnergyBar()
-        {
-            // TODO: Decide how the energy bar is used or even if at all.
-
-            if (EnergyBar != null && _energyCollector != null)
-            {
-                //EnergyBar.value = _energy;
-                EnergyBar.value = ((float) _energyCollector.CurrentCharges / _energyCollector.MaxCharges);
-            }
-        }
-
-        /// <summary>
         /// Updates the respawn timer.
         /// </summary>
         private void UpdateRespawnTimer()
@@ -254,65 +187,98 @@ namespace Atlanticide
             _elapsedRespawnTime += World.Instance.DeltaTime;
             if (_elapsedRespawnTime >= _respawnTime)
             {
-                //TryRespawnToNPC(); // Only if the game has NPCs the player takes control of
                 Respawn();
             }
         }
 
-        public void CheckActionInput()
+        public bool HandleJumpInput()
+        {
+            if (Input.GetJumpInput())
+            {
+                return Jump();
+            }
+
+            return false;
+        }
+
+        public bool HandleActionInput()
         {
             bool active = Input.GetActionInput();
+            bool result = false;
 
             if (Tool == PlayerTool.EnergyCollector && active)
             {
-                // TODO: Drain
-                UseEnergyCollector();
+                // Drain
+                result = UseEnergyCollector(drain: true);
             }
             else if (Tool == PlayerTool.Shield)
             {
                 UseShield(active);
+                result = active;
             }
 
-            _abilityActive = active;
+            return result;
         }
 
-        public void CheckAltActionInput()
+        public bool HandleAltActionInput()
         {
             bool active = Input.GetAltActionInput();
+            bool result = false;
 
             if (active)
             {
                 if (Tool == PlayerTool.EnergyCollector)
                 {
-                    // TODO: Emit
-                    UseEnergyCollector();
+                    // Emit
+                    result = UseEnergyCollector(drain: false);
                 }
                 else if (Tool == PlayerTool.Shield)
                 {
-                    Shield.Bash();
+                    result = Shield.Bash();
                 }
             }
+
+            return result;
+        }
+
+        public bool CheckToolSwapInput()
+        {
+            bool input = Input.GetToolSwapInput();
+            return (input && _energyCollector.IsIdle && _shield.IsIdle);
         }
 
         /// <summary>
         /// Opens or closes the shield.
         /// </summary>
         /// <param name="activate">Should the shield be activated</param>
-        private void UseShield(bool activate)
+        /// <returns></returns>
+        private bool UseShield(bool activate)
         {
-            _shield.Activate(activate);
+            return _shield.Activate(activate);
         }
 
         /// <summary>
-        /// Uses the energy collector.
+        /// Uses the energy collector for draining or emitting energy.
+        /// Returns whether succeeded in draining or emitting energy.
         /// </summary>
-        public void UseEnergyCollector()
+        /// <param name="drain">Should energy be drained</param>
+        /// <returns>Is draining or emitting energy successful</returns>
+        public bool UseEnergyCollector(bool drain)
         {
+            bool result = false;
             if (_energyCollector != null)
             {
-                _energyCollector.StartChargingOrEmitting();
-                UpdateEnergyBar();
+                if (drain)
+                {
+                    result = _energyCollector.TryDraining();
+                }
+                else
+                {
+                    result = _energyCollector.TryEmitting();
+                }
             }
+
+            return result;
         }
 
         /// <summary>
@@ -324,11 +290,6 @@ namespace Atlanticide
             {
                 _weapon.Fire();
             }
-        }
-
-        public void UpdateClosestEnergyNode(EnergyNode node)
-        {
-            _energyCollector.SetTarget(node);
         }
 
         public void StartClimb(Climbable climbable)
@@ -429,7 +390,8 @@ namespace Atlanticide
         public void TryRespawnToNPC()
         {
             NonPlayerCharacter[] npcs = GameManager.Instance.GetNPCs();
-            NonPlayerCharacter npc = Utils.GetFirstActiveOrInactiveObject(npcs, true) as NonPlayerCharacter;
+            NonPlayerCharacter npc =
+                Utils.GetFirstActiveOrInactiveObject(npcs, true) as NonPlayerCharacter;
             if (npc != null)
             {
                 RespawnToNPC(npc);
@@ -460,8 +422,6 @@ namespace Atlanticide
         {
             base.ResetBaseValues();
             Jumping = false;
-            //_energy = 1f;
-            //_outOfEnergy = false;
             _elapsedRespawnTime = 0f;
             UseShield(false);
             
@@ -469,8 +429,6 @@ namespace Atlanticide
             {
                 _energyCollector.ResetEnergyCollector();
             }
-
-            UpdateEnergyBar();
         }
 
         /// <summary>
@@ -480,7 +438,8 @@ namespace Atlanticide
         {
             base.CancelActions();
             Jumping = false;
-            UseShield(false);
+            _shield.ResetShield();
+            _energyCollector.ResetEnergyCollector();
             EndClimb();
             EndPush();
         }
@@ -494,11 +453,6 @@ namespace Atlanticide
                 Gizmos.color = Color.red;
                 Gizmos.DrawWireSphere(transform.position, 1);
             }
-            //else if (_abilityActive)
-            //{
-            //    Gizmos.color = Color.blue;
-            //    Gizmos.DrawWireSphere(_telegrab.transform.position, World.Instance.telegrabRadius);
-            //}
         }
     }
 }

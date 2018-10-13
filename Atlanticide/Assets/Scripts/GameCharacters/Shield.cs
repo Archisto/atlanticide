@@ -24,6 +24,17 @@ namespace Atlanticide
         public float _bashProgress;
         private float _elapsedTime;
 
+        /// <summary>
+        /// Is the shield in an idle state.
+        /// </summary>
+        public bool IsIdle
+        {
+            get { return !_active && !_updateOpen && !_updateBash; }
+        }
+
+        /// <summary>
+        /// Is the shield open and ready to block damage.
+        /// </summary>
         public bool BlocksDamage
         {
             get { return _active && !_updateOpen && !_updateBash; }
@@ -106,24 +117,24 @@ namespace Atlanticide
             _bashActive = false;
         }
 
-        public void Activate(bool activate)
+        public bool Activate(bool activate)
         {
             if (_active != activate)
             {
                 _active = activate;
                 StartOpeningOrClosing();
+                return true;
             }
+
+            return false;
         }
 
         public void ActivateInstantly(bool activate)
         {
-            if (_active != activate)
-            {
-                _active = activate;
-                _updateOpen = false;
-                _openProgress = (_active ? 1f : 0f);
-                _tp.SetAlpha(_openProgress);
-            }
+            _active = activate;
+            _updateOpen = false;
+            _openProgress = (_active ? 1f : 0f);
+            _tp.SetAlpha(_openProgress);
         }
 
         private void StartOpeningOrClosing()
@@ -135,7 +146,7 @@ namespace Atlanticide
             }
         }
 
-        public void Bash()
+        public bool Bash()
         {
             if (!_bashActive &&
                 BlocksDamage)
@@ -143,7 +154,10 @@ namespace Atlanticide
                 _bashActive = true;
                 _updateBash = true;
                 _elapsedTime = 0f;
+                return true;
             }
+
+            return false;
         }
 
         public void BashInstantly()

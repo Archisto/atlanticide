@@ -139,7 +139,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9f6137d7d6cbbe54db752e2784c757d1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _swapRequestDuration: 5
+  _swapRequestDuration: 3
   _swapRange: 3
   _swapIcon: {fileID: 0}
   _iconDistFromPlayerHead: 2

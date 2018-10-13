@@ -32,8 +32,12 @@ namespace Atlanticide
         private PlayerCharacter[] _players;
         private PlayerCharacter _requestingPlayer;
         private UIController _ui;
-        private bool _swapRequestActive;
         private float _elapsedTime;
+
+        /// <summary>
+        /// Is a swap request active.
+        /// </summary>
+        public bool SwapRequestActive { get; private set; }
 
         /// <summary>
         /// How close is the request to its expiration.
@@ -59,7 +63,7 @@ namespace Atlanticide
         /// </summary>
         private void Update()
         {
-            if (_swapRequestActive)
+            if (SwapRequestActive)
             {
                 UpdateSwapRequest();
             }
@@ -70,7 +74,7 @@ namespace Atlanticide
         /// </summary>
         private void LateUpdate()
         {
-            if (_swapRequestActive)
+            if (SwapRequestActive)
             {
                 UpdateSwapRequestIcon();
             }
@@ -140,9 +144,9 @@ namespace Atlanticide
         public bool InitiateSwapRequest(PlayerCharacter player)
         {
             // Initiates a swap request
-            if (!_swapRequestActive)
+            if (!SwapRequestActive)
             {
-                _swapRequestActive = true;
+                SwapRequestActive = true;
                 _requestingPlayer = player;
                 _elapsedTime = 0f;
                 if (_swapIcon != null)
@@ -179,7 +183,7 @@ namespace Atlanticide
         /// </summary>
         public void EndSwapRequest()
         {
-            _swapRequestActive = false;
+            SwapRequestActive = false;
             _requestingPlayer = null;
             if (_swapIcon != null)
             {
@@ -199,6 +203,19 @@ namespace Atlanticide
 
             Debug.Log(string.Format("Swapped tools - {0} gets {2} and {1} gets {3}",
                 _players[0].name, _players[1].name, pt2, pt1));
+
+            GameManager.Instance.SetPlayerTools(saveCurrent: true);
+        }
+
+        /// <summary>
+        /// Returns whether the swap request was initiated by the given player.
+        /// </summary>
+        /// <param name="player">A player</param>
+        /// <returns>Was the swap request initiated by the player</returns>
+        public bool RequestInitiatedBy(PlayerCharacter player)
+        {
+            return (SwapRequestActive && _requestingPlayer != null
+                && _requestingPlayer == player);
         }
     }
 }
