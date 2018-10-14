@@ -11,6 +11,9 @@ namespace Atlanticide
         private Transform _respawnPoint;
 
         [SerializeField]
+        private Vector3 _respawnRotation;
+
+        [SerializeField]
         private float _respawnTime = 1f;
 
         [SerializeField]
@@ -146,6 +149,7 @@ namespace Atlanticide
         {
             _respawningPlayer.RespawnPosition = _respawnPoint.position;
             _respawningPlayer.Respawn();
+            _respawningPlayer.transform.rotation = Quaternion.Euler(_respawnRotation);
             EndPlayerRespawn();
         }
 
