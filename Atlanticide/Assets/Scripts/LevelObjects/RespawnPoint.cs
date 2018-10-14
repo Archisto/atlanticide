@@ -5,6 +5,9 @@ using UnityEngine;
 
 namespace Atlanticide
 {
+    /// <summary>
+    /// A respawn point for reviving dead player characters.
+    /// </summary>
     public class RespawnPoint : Interactable
     {
         [SerializeField]
@@ -114,6 +117,11 @@ namespace Atlanticide
                     SetInteractorTarget(_interactorIsValid);
                 }
             }
+            // If all players are alive, removes the interactor
+            else if (Interactor != null)
+            {
+                SetInteractorTarget(false, true);
+            }
         }
 
         /// <summary>
@@ -124,8 +132,8 @@ namespace Atlanticide
         {
             if (!RespawnActive)
             {
-                PlayerCharacter deadPlayer =
-                    GameManager.Instance.GetAnyOtherPlayer(Interactor, true);
+                PlayerCharacter deadPlayer = GameManager.Instance.GetValidPlayer
+                    ((PlayerCharacter p) => p != Interactor && p.IsDead && !p.Respawning);
                 return TryStartPlayerRespawn(deadPlayer);
             }
 
@@ -134,9 +142,10 @@ namespace Atlanticide
 
         private bool TryStartPlayerRespawn(PlayerCharacter player)
         {
-            if (!RespawnActive && player.IsDead)
+            if (!RespawnActive && player != null)
             {
                 RespawnActive = true;
+                player.Respawning = true;
                 _respawningPlayer = player;
                 _elapsedTime = 0f;
                 return true;
