@@ -61,6 +61,8 @@ namespace Atlanticide
             get { return (GamePaused ? 0f : Time.deltaTime); }
         }
 
+        public bool ShieldBashing { get; set; }
+
         /// <summary>
         /// Initializes the singleton instance.
         /// </summary>

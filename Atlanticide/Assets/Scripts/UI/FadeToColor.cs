@@ -25,6 +25,9 @@ namespace Atlanticide
         private bool _useAltColor;
         private float _fadeProgress;
         private float _elapsedTime;
+        private bool _wait;
+        private short _maxWaitFrames = 2;
+        private short _waitedFrames;
 
         public bool Active { get; private set; }
 
@@ -81,7 +84,7 @@ namespace Atlanticide
             }
             else
             {
-                StartFadeIn();
+                StartFadeIn(false);
             }
         }
 
@@ -92,15 +95,18 @@ namespace Atlanticide
         {
             _fadeOut = true;
             _useAltColor = useAltColor;
+            _wait = false;
             StartFade();
         }
 
         /// <summary>
         /// Starts fading in.
         /// </summary>
-        public void StartFadeIn()
+        public void StartFadeIn(bool wait)
         {
             _fadeOut = false;
+            _wait = wait;
+            _waitedFrames = 0;
             StartFade();
         }
 
@@ -130,6 +136,20 @@ namespace Atlanticide
         {
             if (Active)
             {
+                // If the framerate is very low when faded out, 
+                // wait a few frames to give it time to go back
+                // to normal and only then continue to fade in
+                if (_wait)
+                {
+                    _waitedFrames++;
+                    if (_waitedFrames >= _maxWaitFrames)
+                    {
+                        _wait = false;
+                    }
+
+                    return;
+                }
+
                 // Increases the elapsed time
                 _elapsedTime += Time.deltaTime;
 

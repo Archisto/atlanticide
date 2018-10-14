@@ -51,12 +51,15 @@ namespace Atlanticide
         /// </summary>
         protected override void OnDrawGizmos()
         {
-            base.OnDrawGizmos();
-            Gizmos.DrawWireSphere(transform.position, _range);
-
-            if (_targetTransform != null)
+            if (_drawGizmos)
             {
-                Gizmos.DrawLine(transform.position, _targetTransform.position);
+                base.OnDrawGizmos();
+                Gizmos.DrawWireSphere(transform.position, _range);
+
+                if (_targetTransform != null)
+                {
+                    Gizmos.DrawLine(transform.position, _targetTransform.position);
+                }
             }
         }
     }
