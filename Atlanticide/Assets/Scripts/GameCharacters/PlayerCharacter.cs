@@ -149,7 +149,7 @@ namespace Atlanticide
                 Jumping = true;
                 _jumpForce = _jumpHeight * 4;
                 _groundCollider.onGround = false;
-                SFXPlayer.Instance.Play(Sound.Jump);
+                SFXPlayer.Instance.Play(Sound.Jump_1);
                 return true;
             }
 
@@ -330,6 +330,8 @@ namespace Atlanticide
                 Debug.Log(name + " started climbing " + climbable.name);
                 Climbing = true;
                 _climbable = climbable;
+
+                SFXPlayer.Instance.Play(Sound.Climbing_Slower);
             }
         }
 
@@ -340,6 +342,8 @@ namespace Atlanticide
                 Debug.Log(name + " stopped climbing");
                 Climbing = false;
                 _climbable = null;
+
+                SFXPlayer.Instance.StopAllSFXPlayback();
             }
         }
 

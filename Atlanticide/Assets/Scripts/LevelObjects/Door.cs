@@ -104,6 +104,8 @@ namespace Atlanticide
             {
                 open = true;
                 _changingOpenState = true;
+
+                SFXPlayer.Instance.Play(Sound.Door_Open);
             }
         }
 
@@ -121,6 +123,8 @@ namespace Atlanticide
             if (!unlocked)
             {
                 unlocked = true;
+
+                SFXPlayer.Instance.Play(Sound.Key_Use);
             }
         }
 
