@@ -9,6 +9,12 @@ namespace Atlanticide
         private PlayerCharacter[] _players;
         private ToolSwapping _toolSwap;
         private int _pausingPlayerNum;
+        private float _inputDeadZone = 0.2f;
+
+        private float SqrInputDeadZone
+        {
+            get { return _inputDeadZone * _inputDeadZone; }
+        }
 
         /// <summary>
         /// Initializes the object.
@@ -42,6 +48,33 @@ namespace Atlanticide
             }
         }
 
+        private Vector3 GetFinalMovingInput(Vector3 movingInput)
+        {
+            float moveMagnitude = movingInput.magnitude;
+            if (moveMagnitude > _inputDeadZone)
+            {
+                //Debug.Log("move x: " + movingInput.x + ", y: " + movingInput.y + "; mag: " + moveMagnitude);
+
+                float movementFactor = ((moveMagnitude - _inputDeadZone) / (1 - _inputDeadZone));
+                movementFactor = (movementFactor > 1f ? 1f : movementFactor);
+                movingInput = movingInput.normalized * movementFactor;
+
+                return movingInput;
+            }
+
+            return Vector3.zero;
+        }
+
+        private Vector3 GetFinalLookingInput(Vector3 lookingInput)
+        {
+            if (lookingInput.sqrMagnitude > SqrInputDeadZone)
+            {
+                return lookingInput.normalized;
+            }
+
+            return Vector3.zero;
+        }
+
         /// <summary>
         /// Checks player specific input.
         /// </summary>
@@ -61,17 +94,17 @@ namespace Atlanticide
                     if (!World.Instance.GamePaused)
                     {
                         // Moving the player character
-                        Vector3 movingDirection = _players[i].Input.GetMoveInput();
-                        Vector3 lookingDirection = _players[i].Input.GetLookInput();
+                        Vector3 movingInput = GetFinalMovingInput(_players[i].Input.GetMoveInput());
+                        Vector3 lookingInput = GetFinalLookingInput(_players[i].Input.GetLookInput());
 
-                        if (movingDirection != Vector3.zero)
+                        if (movingInput != Vector3.zero)
                         {
-                            _players[i].MoveInput(movingDirection);
+                            _players[i].MoveInput(movingInput);
                         }
 
-                        if (lookingDirection != Vector3.zero)
+                        if (lookingInput != Vector3.zero)
                         {
-                            _players[i].LookInput(lookingDirection);
+                            _players[i].LookInput(lookingInput);
                         }
 
                         // Interacting with certain level objects

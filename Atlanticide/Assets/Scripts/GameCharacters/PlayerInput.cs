@@ -81,9 +81,8 @@ namespace Atlanticide
         public Vector3 GetMoveInput()
         {
             return new Vector3(
-                Input.GetAxis(_horizontalMoveKey),
-                Input.GetAxis(_verticalMoveKey))
-                .normalized;
+                Input.GetAxisRaw(_horizontalMoveKey),
+                Input.GetAxisRaw(_verticalMoveKey));
         }
 
         /// <summary>
@@ -93,9 +92,8 @@ namespace Atlanticide
         public Vector3 GetLookInput()
         {
             return new Vector3(
-                Input.GetAxis(_horizontalLookKey),
-                Input.GetAxis(_verticalLookKey))
-                .normalized;
+                Input.GetAxisRaw(_horizontalLookKey),
+                Input.GetAxisRaw(_verticalLookKey));
         }
 
         /// <summary>

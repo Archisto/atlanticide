@@ -113,8 +113,8 @@ namespace Atlanticide
 
         private void BashClimax()
         {
-            // TODO
             _bashActive = false;
+            World.Instance.ShieldBashing = false;
         }
 
         public bool Activate(bool activate)
@@ -154,6 +154,7 @@ namespace Atlanticide
                 _bashActive = true;
                 _updateBash = true;
                 _elapsedTime = 0f;
+                World.Instance.ShieldBashing = true;
                 return true;
             }
 
@@ -176,6 +177,7 @@ namespace Atlanticide
             _updateBash = false;
             _bashProgress = 0f;
             _elapsedTime = 0f;
+            World.Instance.ShieldBashing = false;
         }
 
         // called when shield is hit by object (DamageDealer)

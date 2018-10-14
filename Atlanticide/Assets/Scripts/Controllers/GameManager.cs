@@ -336,7 +336,7 @@ namespace Atlanticide
 
                 if (Transition == TransitionPhase.StartingScene)
                 {
-                    _fade.StartFadeIn();
+                    _fade.StartFadeIn(false);
                 }
             }
         }
@@ -688,7 +688,7 @@ namespace Atlanticide
             World.Instance.SetEnergyChargesAndUpdateUI(0);
             SetScore(0);
             DeadPlayerCount = 0;
-            _fade.StartFadeIn();
+            _fade.StartFadeIn(true);
         }
 
         /// <summary>
