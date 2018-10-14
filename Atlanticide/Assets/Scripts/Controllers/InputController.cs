@@ -23,6 +23,8 @@ namespace Atlanticide
         {
             _players = GameManager.Instance.GetPlayers();
             _toolSwap = FindObjectOfType<ToolSwapping>();
+
+            CheckConnectedControllers();
         }
 
         /// <summary>
@@ -277,6 +279,21 @@ namespace Atlanticide
         public void ResetInput()
         {
             _toolSwap.EndSwapRequest();
+        }
+
+        public void CheckConnectedControllers()
+        {
+            for (int i = 0; i < Input.GetJoystickNames().Length; i++)
+            {
+                if (Input.GetJoystickNames()[i] == null)
+                {
+                    Debug.Log("There is no controller attached to this slot!");
+                }
+                else
+                {
+                    Debug.Log(Input.GetJoystickNames()[i]);
+                }
+            }
         }
     }
 }

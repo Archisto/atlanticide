@@ -23,7 +23,34 @@ namespace Atlanticide
         // in this specific order for the right sound
         // to be played at the right time
 
-        Jump = 0
+        Footsteps_Tile_1 = 0,
+        Footsteps_Tile_2 = 1,
+        Footsteps_Tile_3 = 2,
+        Footsteps_Tile_4 = 3,
+        Jump_1 = 4,
+        Jump_2 = 5,
+        Trampoline_Jump = 6,
+        Player_Hurt_1 = 7,
+        Player_Hurt_2 = 8,
+        Player_Landing_Sound_1 = 9,
+        Player_Landing_Sound_2 = 10,
+        Player_Landing_Grunt_1 = 11,
+        Player_Landing_Grunt_2 = 12,
+        Player_Landing_Grunt_3 = 13,
+        Climbing_Slower = 14,
+        Climbing_Faster = 15,
+        Item_Pickup = 16,
+        Key_Use = 17,
+        Door_Open = 18,
+        Door_Close = 19,
+        Pressure_Plate = 20,
+        Lever_Pull = 21,
+        Drawbridge_Lowering = 22,
+        Drawbridge_Wheel_Turning = 23,
+        Shield_Bash = 24,
+        Shield_Deflect_1 = 25,
+        Shield_Deflect_2 = 26,
+        Lifting_Shield = 27
     }
 
     public class SFXPlayer : MonoBehaviour
