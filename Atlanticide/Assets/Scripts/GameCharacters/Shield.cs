@@ -155,6 +155,8 @@ namespace Atlanticide
                 _updateBash = true;
                 _elapsedTime = 0f;
                 World.Instance.ShieldBashing = true;
+
+                SFXPlayer.Instance.Play(Sound.Shield_Bash);
                 return true;
             }
 
@@ -168,6 +170,8 @@ namespace Atlanticide
             {
                 _bashActive = true;
                 BashClimax();
+
+                SFXPlayer.Instance.Play(Sound.Shield_Bash);
             }
         }
 
