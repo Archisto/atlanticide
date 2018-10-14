@@ -5,7 +5,9 @@ namespace Atlanticide
 {
     public class KeyCodeInteractable : Interactable
     {
-        public bool available = true;
+        [SerializeField]
+        private bool _available = true;
+
         public int keyCode;
 
         [SerializeField]
@@ -16,14 +18,35 @@ namespace Atlanticide
 
         private bool _availableByDefault;
 
+        public bool Available
+        {
+            get
+            {
+                return _available;
+            }
+            set
+            {
+                _available = value;
+                if (!_available)
+                {
+                    SetInteractorTarget(false, true);
+                }
+            }
+        }
+
         public bool Activated { get; private set; }
+
+        public override bool ShowTargetIcon
+        {
+            get { return _showTargetIcon && Available; }
+        }
 
         /// <summary>
         /// Initializes the object.
         /// </summary>
         private void Start()
         {
-            _availableByDefault = available;
+            _availableByDefault = Available;
             EnergyCost = _defaultEnergyCost;
         }
 
@@ -32,9 +55,17 @@ namespace Atlanticide
         /// </summary>
         protected override void UpdateObject()
         {
-            if (available)
+            if (Available)
             {
-                CheckForPlayerWithinRange();
+                if (Activated && !_toggle)
+                {
+                    Available = false;
+                }
+                else
+                {
+                    CheckForPlayerWithinRange();
+                }
+
                 base.UpdateObject();
             }
         }
@@ -77,6 +108,7 @@ namespace Atlanticide
             {
                 World.Instance.TryActivateNewKeyCode(keyCode, true);
                 Activated = true;
+
                 return true;
             }
             else if (_toggle)
@@ -94,9 +126,8 @@ namespace Atlanticide
         /// </summary>
         public override void ResetObject()
         {
-            available = _availableByDefault;
+            Available = _availableByDefault;
             Activated = false;
-            SetInteractorTarget(false, true);
             EnergyCost = _defaultEnergyCost;
             base.ResetObject();
         }
@@ -106,7 +137,7 @@ namespace Atlanticide
         /// </summary>
         protected override void OnDrawGizmos()
         {
-            if (available)
+            if (Available)
             {
                 base.OnDrawGizmos();
             }

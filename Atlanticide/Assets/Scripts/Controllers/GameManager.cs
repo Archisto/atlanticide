@@ -545,34 +545,45 @@ namespace Atlanticide
         /// <summary>
         /// Returns the first player character that isn't the one given.
         /// Can return only a living character if necessary.
+        /// Returns null if there is no valid player.
         /// </summary>
         /// <param name="invalidPlayer">A player that won't be returned</param>
         /// <param name="includeDead">Are dead players included</param>
-        /// <returns>A player character other than the one given</returns>
-        public PlayerCharacter GetAnyOtherPlayer(PlayerCharacter invalidPlayer, bool includeDead)
+        /// <returns>A player character or null</returns>
+        public PlayerCharacter GetAnyOtherPlayer(PlayerCharacter invalidPlayer,
+                                                 bool includeDead)
         {
-            foreach (PlayerCharacter pc in _players)
-            {
-                if (pc != invalidPlayer && (includeDead || !pc.IsDead))
-                {
-                    return pc;
-                }
-            }
-
-            return null;
+            return GetValidPlayer((PlayerCharacter p) =>
+                p != invalidPlayer && (!p.IsDead || includeDead));
         }
 
-        public PlayerCharacter GetPlayerWithTool(PlayerTool tool, bool includeDead)
+        /// <summary>
+        /// Returns the first player character which has the given tool.
+        /// Can return only a living character if necessary.
+        /// Returns null if there is no valid player.
+        /// </summary>
+        /// <param name="tool">A player tool</param>
+        /// <param name="includeDead">Are dead players included</param>
+        /// <returns>A player character or null</returns>
+        public PlayerCharacter GetPlayerWithTool(PlayerTool tool,
+                                                 bool includeDead)
         {
-            foreach (PlayerCharacter pc in _players)
-            {
-                if (pc.Tool == tool && (includeDead || !pc.IsDead))
-                {
-                    return pc;
-                }
-            }
+            return GetValidPlayer((PlayerCharacter p) =>
+                p.Tool == tool && (!p.IsDead || includeDead));
+        }
 
-            return null;
+        /// <summary>
+        /// Returns the first player character
+        /// which fulfills all requirements.
+        /// If none does, returns null.
+        /// </summary>
+        /// <param name="requirements">
+        /// [Lambda] The requirements for the player character
+        /// </param>
+        /// <returns>A player character or null</returns>
+        public PlayerCharacter GetValidPlayer(Predicate<PlayerCharacter> requirements)
+        {
+            return Array.Find(_players, requirements);
         }
 
         /// <summary>
@@ -633,14 +644,6 @@ namespace Atlanticide
             if (!_updateAtSceneStart)
             {
                 _ui.UpdatePlayerToolImage(player.ID, player.Tool);
-            }
-
-            // Gives the same amount of charges to the new energy
-            // collector player as the previous had before the tool swap
-            if (World.Instance.CurrentEnergyCharges > 0 &&
-                player.Tool == PlayerTool.EnergyCollector)
-            {
-                player.EnergyCollector.SetCharges(World.Instance.CurrentEnergyCharges, false);
             }
         }
 
@@ -782,6 +785,15 @@ namespace Atlanticide
             if (activate || Transition == TransitionPhase.None)
             {
                 _ui.ActivatePauseScreen(activate, playerName);
+            }
+        }
+
+        public void ActivateTargetIcon(bool activate, int playerID, Interactable interactable)
+        {
+            Vector3 position = (activate ? interactable.transform.position : Vector3.zero);
+            if (!activate || interactable.ShowTargetIcon)
+            {
+                _ui.ActivateTargetIcon(activate, playerID, position);
             }
         }
 

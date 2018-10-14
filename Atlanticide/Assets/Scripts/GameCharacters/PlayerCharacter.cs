@@ -28,6 +28,7 @@ namespace Atlanticide
         private Weapon _weapon;
         private EnergyCollector _energyCollector;
         private Climbable _climbable;
+        private Interactable _interactionTarget;
         private float _jumpForce;
         private float _elapsedRespawnTime;
 
@@ -41,7 +42,19 @@ namespace Atlanticide
 
         public Shield Shield { get { return _shield; } }
 
-        public Interactable InteractionTarget { get; set; }
+        public Interactable InteractionTarget
+        {
+            get
+            {
+                return _interactionTarget;
+            }
+            set
+            {
+                _interactionTarget = value;
+                GameManager.Instance.
+                    ActivateTargetIcon(_interactionTarget != null, ID, _interactionTarget);
+            }
+        }
 
         public bool Jumping { get; private set; }
 
@@ -56,6 +69,8 @@ namespace Atlanticide
                 return (Tool == PlayerTool.Shield && _shield.Active);
             }
         }
+
+        public bool Respawning { get; set; }
 
         public bool IsAvailableForActions()
         {
@@ -257,8 +272,7 @@ namespace Atlanticide
                         if (InteractionTarget.EnergyCost != 0)
                         {
                             // Removes the energy cost from the players
-                            EnergyCollector.SetCharges (World.Instance.CurrentEnergyCharges -
-                                InteractionTarget.EnergyCost, true);
+                            EnergyCollector.ChangeCharges(-1 * InteractionTarget.EnergyCost);
                         }
 
                         // Makes the interaction target forget the player
@@ -471,6 +485,7 @@ namespace Atlanticide
         {
             base.ResetBaseValues();
             Jumping = false;
+            Respawning = false;
             _elapsedRespawnTime = 0f;
             UseShield(false);
             
@@ -487,6 +502,7 @@ namespace Atlanticide
         {
             base.CancelActions();
             Jumping = false;
+            Respawning = false;
             _shield.ResetShield();
             _energyCollector.ResetEnergyCollector();
             EndClimb();

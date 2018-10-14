@@ -119,8 +119,8 @@ namespace Atlanticide
         {
             if (_swapIcon != null)
             {
-                PlayerCharacter otherPlayer =
-                    GameManager.Instance.GetAnyOtherPlayer(_requestingPlayer, false);
+                PlayerCharacter otherPlayer = GameManager.Instance.
+                    GetAnyOtherPlayer(_requestingPlayer, false);
 
                 if (otherPlayer != null)
                 {
@@ -147,7 +147,7 @@ namespace Atlanticide
         {
             Vector3 swapIconPosition = _requestingPlayer.transform.position +
                 Vector3.up * (_requestingPlayer.Size.y / 2 + _iconDistFromPlayerHead);
-            _ui.MoveUIObjToWorldPoint(_swapIcon, swapIconPosition);
+            _ui.MoveUIObjToWorldPoint(_swapIcon, swapIconPosition, Vector2.zero);
         }
 
         /// <summary>

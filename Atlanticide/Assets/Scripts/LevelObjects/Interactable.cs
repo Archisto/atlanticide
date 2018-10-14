@@ -6,6 +6,9 @@ namespace Atlanticide
 {
     public abstract class Interactable : LevelObject
     {
+        [SerializeField]
+        protected bool _showTargetIcon = true;
+
         protected bool _interactorIsValid;
         private PlayerCharacter _interactor;
 
@@ -27,6 +30,8 @@ namespace Atlanticide
         }
 
         public int EnergyCost { get; protected set; }
+
+        public virtual bool ShowTargetIcon { get { return _showTargetIcon; } }
 
         /// <summary>
         /// Makes the interactor player interact with this object.
@@ -62,6 +67,13 @@ namespace Atlanticide
                     }
                 }
             }
+        }
+
+        public override void ResetObject()
+        {
+            SetInteractorTarget(false, true);
+            Interactor = null;
+            base.ResetObject();
         }
 
         /// <summary>

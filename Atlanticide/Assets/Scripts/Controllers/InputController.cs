@@ -156,6 +156,13 @@ namespace Atlanticide
         /// </summary>
         private void CheckDebugInput()
         {
+            // Max energy
+            if (Input.GetKeyDown(KeyCode.Y))
+            {
+                World.Instance.SetEnergyChargesAndUpdateUI
+                    (World.Instance.MaxEnergyCharges);
+            }
+
             // Swap tools
             if (Input.GetKeyDown(KeyCode.T))
             {

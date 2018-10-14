@@ -26,8 +26,6 @@ namespace Atlanticide
         private Mode _mode;
         private EnergyNode _tempNode;
 
-        public int CurrentCharges { get; private set; }
-
         public EnergyNode Target { get; set; }
 
         /// <summary>
@@ -167,9 +165,9 @@ namespace Atlanticide
 
         protected void StartDraining()
         {
-            if (CurrentCharges < World.Instance.MaxEnergyCharges)
+            if (World.Instance.CurrentEnergyCharges < World.Instance.MaxEnergyCharges)
             {
-                //Debug.Log("Draining energy; charges: " + (CurrentCharges + 1));
+                //Debug.Log("Draining energy");
                 _elapsedTime = 0f;
                 _mode = Mode.Draining;
                 _energyObject.SetActive(true);
@@ -179,9 +177,9 @@ namespace Atlanticide
 
         protected void StartEmitting()
         {
-            if (CurrentCharges > 0)
+            if (World.Instance.CurrentEnergyCharges > 0)
             {
-                //Debug.Log("Emitting energy; charges: " + (CurrentCharges - 1));
+                //Debug.Log("Emitting energy");
                 _elapsedTime = 0f;
                 _mode = Mode.Emitting;
                 _energyObject.SetActive(true);
@@ -191,29 +189,20 @@ namespace Atlanticide
 
         private void Drain()
         {
-            SetCharges(CurrentCharges + 1, true);
+            ChangeCharges(1);
             _tempNode.LoseCharge();
         }
 
         private void Emit()
         {
-            SetCharges(CurrentCharges - 1, true);
+            ChangeCharges(-1);
             _tempNode.GainCharge();
         }
 
-        public void ChangeCharges(int charges, bool global)
+        public void ChangeCharges(int charges)
         {
-            SetCharges(CurrentCharges + charges, global);
-        }
-
-        public void SetCharges(int charges, bool global)
-        {
-            CurrentCharges = charges;
-            if (global)
-            {
-                World.Instance.SetEnergyChargesAndUpdateUI(CurrentCharges);
-                Debug.Log("Energy charges: " + CurrentCharges);
-            }
+            World.Instance.SetEnergyChargesAndUpdateUI
+                (World.Instance.CurrentEnergyCharges + charges);
         }
 
         public void ReturnToIdle()
@@ -227,7 +216,6 @@ namespace Atlanticide
         {
             ReturnToIdle();
             Target = null;
-            SetCharges(0, false);
             _elapsedTime = 0f;
         }
 
