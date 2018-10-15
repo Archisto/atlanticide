@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 // README:
@@ -69,7 +68,7 @@ namespace Atlanticide
                 {
                     // NOTE:
                     // There must be a Resources folder under Assets and
-                    // SoundPlayer there for this to work. Not necessary if
+                    // SFXPlayer there for this to work. Not necessary if
                     // a SoundPlayer object is present in a scene from the
                     // get-go.
 

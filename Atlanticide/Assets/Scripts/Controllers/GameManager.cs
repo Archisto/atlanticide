@@ -526,25 +526,20 @@ namespace Atlanticide
 
         /// <summary>
         /// Returns the first player character in the array.
+        /// Can return only a living player if necessary.
+        /// Returns null if there is no valid player.
         /// </summary>
         /// <param name="includeDead">Are dead players included</param>
-        /// <returns>A player character</returns>
+        /// <returns>A player character or null</returns>
         public PlayerCharacter GetAnyPlayer(bool includeDead)
         {
-            foreach (PlayerCharacter pc in _players)
-            {
-                if (includeDead || !pc.IsDead)
-                {
-                    return pc;
-                }
-            }
-
-            return null;
+            return GetValidPlayer((PlayerCharacter p) =>
+                !p.IsDead || includeDead);
         }
 
         /// <summary>
-        /// Returns the first player character that isn't the one given.
-        /// Can return only a living character if necessary.
+        /// Returns the first player character which isn't the one given.
+        /// Can return only a living player if necessary.
         /// Returns null if there is no valid player.
         /// </summary>
         /// <param name="invalidPlayer">A player that won't be returned</param>
@@ -559,7 +554,7 @@ namespace Atlanticide
 
         /// <summary>
         /// Returns the first player character which has the given tool.
-        /// Can return only a living character if necessary.
+        /// Can return only a living player if necessary.
         /// Returns null if there is no valid player.
         /// </summary>
         /// <param name="tool">A player tool</param>
@@ -578,7 +573,8 @@ namespace Atlanticide
         /// If none does, returns null.
         /// </summary>
         /// <param name="requirements">
-        /// [Lambda] The requirements for the player character
+        /// The requirements for the player character
+        /// (tip: use a lambda expression)
         /// </param>
         /// <returns>A player character or null</returns>
         public PlayerCharacter GetValidPlayer(Predicate<PlayerCharacter> requirements)
