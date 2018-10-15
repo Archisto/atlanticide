@@ -64,5 +64,9 @@ namespace Atlanticide
         {
             return _levelCenter.position;
         }
+
+        public void ResetLevel()
+        {
+        }
     }
 }

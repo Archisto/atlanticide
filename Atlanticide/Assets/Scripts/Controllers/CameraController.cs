@@ -29,16 +29,42 @@ namespace Atlanticide
         private void SetPositionInPlay()
         {
             Vector3 newPosition = Vector3.zero;
+            int livingPlayers = 0;
 
             for (int i = 0; i < GameManager.Instance.PlayerCount; i++)
             {
-                newPosition += _players[i].transform.position;
+                if (!_players[i].IsDead)
+                {
+                    newPosition += _players[i].transform.position;
+                    livingPlayers++;
+                }
             }
 
-            newPosition = newPosition / GameManager.Instance.PlayerCount;
-            newPosition.y = _startPosition.y;
-            newPosition.z = _startPosition.z;
-            transform.position = newPosition;
+            if (livingPlayers > 0)
+            {
+                newPosition = newPosition / livingPlayers;
+                newPosition.y = _startPosition.y;
+                newPosition.z = _startPosition.z;
+                transform.position = newPosition;
+            }
+        }
+
+        public Vector3 GetCameraViewPosition(Vector3 camPosOffset)
+        {
+            Vector3 worldOffset = transform.right * camPosOffset.x +
+                                  transform.up * camPosOffset.y +
+                                  transform.forward * camPosOffset.z;
+            return transform.position + worldOffset;
+        }
+
+        public Quaternion GetRotationTowardsCamera()
+        {
+            // TODO: Quaternion.Inverse?
+
+            return Quaternion.Euler(
+                transform.rotation.eulerAngles.x * -1,
+                transform.rotation.eulerAngles.y + 180,
+                transform.rotation.eulerAngles.z * -1);
         }
     }
 }

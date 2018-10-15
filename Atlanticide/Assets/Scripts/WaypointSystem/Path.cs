@@ -28,7 +28,7 @@ namespace Atlanticide.WaypointSystem
         private bool _drawPath = true;
 
         [SerializeField]
-        private float _waypointRadius;
+        private float _waypointRadius = 0.5f;
 
         private List<Waypoint> _waypoints;
 

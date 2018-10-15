@@ -14,7 +14,7 @@ namespace Atlanticide
         /// <summary>
         /// Initializes the object.
         /// </summary>
-        private void Start()
+        private void Awake()
         {
             Renderer renderer = GetComponent<Renderer>();
             _material = new Material(renderer.material);

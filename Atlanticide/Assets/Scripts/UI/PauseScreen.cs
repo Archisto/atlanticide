@@ -28,7 +28,7 @@ namespace Atlanticide.UI
 
         public void RestartLevel()
         {
-            GameManager.Instance.ResetLevel();
+            GameManager.Instance.StartLevelReset();
             ResumeGame();
         }
 

@@ -29,46 +29,6 @@ namespace Atlanticide
             return string.Format("Component {0} could not be found in the object.", comp);
         }
 
-        public static float DrainOrRecharge(float value,
-                                            bool drain,
-                                            float drainSpeed,
-                                            float rechargeSpeed,
-                                            float minRecharge,
-                                            bool depletedBefore,
-                                            out bool depleted)
-        {
-            depleted = depletedBefore;
-
-            // Drain
-            if (drain)
-            {
-                depleted = false;
-
-                value -= drainSpeed * World.Instance.DeltaTime;
-                if (value <= 0)
-                {
-                    value = 0;
-                    depleted = true;
-                }
-            }
-            // Recharge
-            else if (value < 1)
-            {
-                value += rechargeSpeed * World.Instance.DeltaTime;
-
-                if (depleted && value >= minRecharge)
-                {
-                    depleted = false;
-                }
-                if (value > 1)
-                {
-                    value = 1;
-                }
-            }
-
-            return value;
-        }
-
         public static object GetFirstActiveOrInactiveObject(object[] array, bool active)
         {
             if (array.Length == 0)
@@ -243,6 +203,86 @@ namespace Atlanticide
             cardinalDirs[2] = Vector3.left;
             cardinalDirs[3] = Vector3.right;
             return cardinalDirs;
+        }
+
+        public static Quaternion RotateTowards(Quaternion currentRotation, Vector3 direction, float turningSpeed)
+        {
+            Quaternion targetRotation = Quaternion.LookRotation(direction, Vector3.up);
+            Quaternion newRotation = Quaternion.Lerp(currentRotation, targetRotation, turningSpeed);
+            return newRotation;
+        }
+
+        /// <summary>
+        /// Returns how many values does an enumerator have.
+        /// </summary>
+        /// <param name="enumType">An enum type</param>
+        /// <returns>The length of the enum</returns>
+        public static int GetEnumLength(Type enumType)
+        {
+            if (enumType == typeof(Enum))
+            {
+                return Enum.GetValues(enumType).Length;
+            }
+            else
+            {
+                return -1;
+            }
+        }
+
+        public static int Clamp(int value, int min, int max)
+        {
+            if (value < min)
+            {
+                return min;
+            }
+            else if (value > max)
+            {
+                return max;
+            }
+            else
+            {
+                return value;
+            }
+        }
+
+        public static float DistanceTo(this MonoBehaviour obj,
+                                       MonoBehaviour target)
+        {
+            return Vector3.Distance
+                (obj.transform.position, target.transform.position);
+        }
+
+        public static void DrawProgressBarGizmo(Vector3 position, float progress, Color barColor, Color indicatorColor)
+        {
+            Gizmos.color = barColor;
+            float length = 2;
+            float height = 0.5f;
+            Vector3 pos1 = position + Vector3.right * -0.5f * length;
+            Vector3 pos2 = position + Vector3.right * 0.5f * length;
+            Vector3 pos3 = position + new Vector3(length * (progress - 0.5f), 0.5f * height, 0);
+            Vector3 pos4 = position + new Vector3(length * (progress - 0.5f), -0.5f * height, 0);
+            Gizmos.DrawLine(pos1, pos2);
+
+            Gizmos.color = indicatorColor;
+            Gizmos.DrawLine(pos3, pos4);
+        }
+
+        public static void DrawHPGizmo(Vector3 position, int hitpoints, int maxHitpoints, Color color)
+        {
+            Gizmos.color = color;
+            float spacing = 0.8f;
+
+            float lineLength = 2f;
+            Vector3 lineStart = position +
+                new Vector3(-0.5f * lineLength * spacing, -0.4f * spacing, 0); 
+            Gizmos.DrawLine(lineStart, lineStart + Vector3.right * lineLength * spacing);
+        
+            position.x -= 0.5f * (maxHitpoints - 1) * spacing;
+            for (int i = 0; i < hitpoints; i++)
+            {
+                Gizmos.DrawSphere(position, 0.2f);
+                position.x += spacing;
+            }
         }
     }
 }
