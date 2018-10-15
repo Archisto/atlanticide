@@ -11,41 +11,23 @@ namespace Atlanticide
         #region References
 
         /// <summary>
-        /// Reference to the DamageDealer of _hitbox
-        /// </summary>
-        protected DamageDealer DamageDealer { get; private set; }
-
-        /// <summary>
         /// The target EnemyCharacter focuses its actions to
         /// </summary>
-        protected GameObject _target { get; set; }
+        protected GameCharacter Target { get; set; }
 
-        /// <summary>
-        /// Hitbox gameObject
-        /// </summary>
-        [SerializeField] private GameObject _hitbox;
+        [Header("Hit variables")]
 
-        protected GameObject Hitbox
-        {
-            get { return _hitbox; }
-        }
+        // ray is casted from the centre of this object, to the direction of forward of this object
+        [SerializeField]
+        private Transform _hitCentre;
 
-        [Header("hitbox transform")]
+        // range of the hit
+        [SerializeField]
+        private float _hitRange;
 
-        /// <summary>
-        /// Position of the hitbox
-        /// </summary>
-        [SerializeField] private Vector3 _hitboxPosition;
-
-        /// <summary>
-        /// Rotation of the hitbox
-        /// </summary>
-        [SerializeField] private Quaternion _hitboxRotation;
-
-        /// <summary>
-        /// Scale of the hitbox
-        /// </summary>
-        [SerializeField] private Vector3 _hitboxScale;
+        // damage made on hit
+        [SerializeField]
+        private int _hitDamage;
 
         #endregion
 
@@ -65,7 +47,7 @@ namespace Atlanticide
         /// Current EnemyState of EnemyCharacter
         /// </summary>
         protected EnemyState CurrentState { get; private set; }
-        
+
         /// <summary>
         /// Initialize new EnemyState
         /// </summary>
@@ -76,13 +58,13 @@ namespace Atlanticide
             switch (CurrentState)
             {
                 case EnemyState.NO_TARGET:
-                    endNoTarget();
+                    EndNoTarget();
                     break;
                 case EnemyState.TARGET_ON:
-                    endTargetOn();
+                    EndTargetOn();
                     break;
                 case EnemyState.ATTACK:
-                    endAttack();
+                    EndAttack();
                     break;
             }
 
@@ -93,16 +75,39 @@ namespace Atlanticide
             switch (CurrentState)
             {
                 case EnemyState.NO_TARGET:
-                    startNoTarget();
+                    StartNoTarget();
                     break;
                 case EnemyState.TARGET_ON:
-                    startTargetOn();
+                    StartTargetOn();
                     break;
                 case EnemyState.ATTACK:
-                    startAttack();
+                    StartAttack();
                     break;
             }
         }
+
+        #endregion
+
+        #region Hitray
+
+        // ray is casted from the centre of this object, to the direction of forward of this object
+        protected Transform HitCentre { get; private set; }
+
+        // range of the hit
+        protected float HitRange
+        {
+            get { return _hitRange; }
+            set { _hitRange = value; }
+        }
+
+        // damage made on hit
+        protected int HitDamage {
+            get { return _hitDamage; }
+            set { _hitDamage = value; }
+        }
+
+        // when HitRay is being checked
+        protected bool HitCheck { get; set; }
 
         #endregion
 
@@ -110,13 +115,14 @@ namespace Atlanticide
         protected override void Start()
         {
             base.Start();
-            DamageDealer = _hitbox.GetComponent<DamageDealer>();
-            _hitbox.SetActive(false);
+            HitCentre = _hitCentre;
+            HitCheck = false;
             CurrentState = EnemyState.NO_TARGET;
-            startNoTarget();
+
+            StartNoTarget();
         }
 
-        // Update is called once per frame
+        // Update is called once per frame  
         protected override void Update()
         {
             base.Update();
@@ -130,13 +136,13 @@ namespace Atlanticide
             switch (CurrentState)
             {
                 case EnemyState.NO_TARGET:
-                    noTarget();
+                    NoTarget();
                     break;
                 case EnemyState.TARGET_ON:
-                    targetOn();
+                    TargetOn();
                     break;
                 case EnemyState.ATTACK:
-                    attack();
+                    Attack();
                     break;
             }
         }
@@ -147,15 +153,15 @@ namespace Atlanticide
         /// <summary>
         /// Initialize NO_TARGET state
         /// </summary>
-        protected virtual void startNoTarget()
+        protected virtual void StartNoTarget()
         {
-            _target = null;
+            Target = null;
         }
 
         /// <summary>
         /// Initialize TARGET_ON state
         /// </summary>
-        protected virtual void startTargetOn()
+        protected virtual void StartTargetOn()
         {
 
         }
@@ -163,9 +169,9 @@ namespace Atlanticide
         /// <summary>
         /// Initialize ATTACK state
         /// </summary>
-        protected virtual void startAttack()
+        protected virtual void StartAttack()
         {
-            _hitbox.SetActive(true);
+            HitCheck = true;
         }
 
 
@@ -176,14 +182,13 @@ namespace Atlanticide
         /// <summary>
         /// Performs the NO_TARGET state of the enemy
         /// </summary>
-        protected virtual void noTarget()
+        protected virtual void NoTarget()
         {
+            GameCharacter[] players = GameManager.Instance.GetPlayersWithinRange(transform.position, 10 );
 
-            GameCharacter[] players = GameManager.Instance.GetPlayersWithinRange(transform.position, 4);
-
-            if(players[0] != null)
+            if (players[0] != null)
             {
-                _target = players[0].gameObject;
+                Target = players[0];
                 ChangeState(EnemyState.TARGET_ON);
             }
         }
@@ -191,24 +196,25 @@ namespace Atlanticide
         /// <summary>
         /// Performs the TARGET_ON state of the enemy
         /// </summary>
-        protected virtual void targetOn()
+        protected virtual void TargetOn()
         {
             // enemy attacks when he's close enough the target
-            if (Vector3.Distance(_target.transform.position, transform.position) < 1.5f)
+            if (Vector3.Distance(Target.transform.position, transform.position) < HitRange)
             {
                 ChangeState(EnemyState.ATTACK);
                 return;
             }
 
             // approach the target
-            if (_target != null)
+            if (Target != null)
             {
-                Vector3 move = Vector3.MoveTowards(transform.position, _target.transform.position, base._speed * Time.deltaTime);
+                Vector3 move = Vector3.MoveTowards(transform.position, Target.transform.position, base._speed * Time.deltaTime);
                 move.y = transform.position.y;
-                Vector3 targetPostition = new Vector3(_target.transform.position.x, transform.position.y, _target.transform.position.z);
+                Vector3 targetPostition = new Vector3(Target.transform.position.x, transform.position.y, Target.transform.position.z);
                 transform.LookAt(targetPostition);
                 transform.position = move;
-            } else
+            }
+            else
             {
                 ChangeState(EnemyState.NO_TARGET);
             }
@@ -218,14 +224,13 @@ namespace Atlanticide
         /// <summary>
         /// Performs the ATTACK state of the enemy
         /// </summary>
-        protected virtual void attack()
+        protected virtual void Attack()
         {
-            // adjust hitbox
-            _hitbox.transform.localPosition = _hitboxPosition;
-            _hitbox.transform.localRotation = _hitboxRotation;
-            _hitbox.transform.localScale = _hitboxScale;
-
-            ChangeState(EnemyState.NO_TARGET);
+            // check hit
+            if (HitCheck)
+            {
+                CheckHit();
+            }
         }
 
         #endregion
@@ -235,7 +240,7 @@ namespace Atlanticide
         /// <summary>
         /// Finishes the NO_TARGET state
         /// </summary>
-        protected virtual void endNoTarget()
+        protected virtual void EndNoTarget()
         {
 
         }
@@ -243,7 +248,7 @@ namespace Atlanticide
         /// <summary>
         /// Finishes the ON_TARGET state
         /// </summary>
-        protected virtual void endTargetOn()
+        protected virtual void EndTargetOn()
         {
 
         }
@@ -251,11 +256,69 @@ namespace Atlanticide
         /// <summary>
         /// Finishes the ATTACK state
         /// </summary>
-        protected virtual void endAttack()
+        protected virtual void EndAttack()
         {
-            _hitbox.SetActive(false);
+            HitCheck = false;
         }
 
+
+        #endregion
+
+        #region Hitting
+
+        /// <summary>
+        /// Checks whether enemy hits something
+        /// </summary>
+        private void CheckHit()
+        {
+            RaycastHit hit;
+            if(Physics.Raycast(HitCentre.position, HitCentre.TransformDirection(Vector3.forward), out hit, HitRange))
+            {
+                // Check whether shield or character has been hit and react accordingly
+                Shield shield = hit.collider.gameObject.GetComponent<Shield>();
+                GameCharacter character;
+
+                if(shield != null && shield.BlocksDamage)
+                {
+                    shield.Hit();
+                    ChangeState(EnemyState.TARGET_ON);
+                    transform.position += transform.TransformDirection(Vector3.back * 3);
+                    Debug.Log("shield hit");
+                } else
+                {
+                    character = hit.collider.gameObject.GetComponent<GameCharacter>();
+                    if(character != null && !character.IsDead)
+                    {
+                        character.TakeDamage(HitDamage);
+                        ChangeState(EnemyState.NO_TARGET);
+                        Debug.Log("character hit");
+                    }
+                }
+
+                Debug.Log("hit: " + hit.collider.transform.name);
+            }
+        }
+
+        /// <summary>
+        /// Draws the HitRay red if enemy is hitting, yellow otherwise
+        /// </summary>
+        protected override void OnDrawGizmos()
+        {
+            base.OnDrawGizmos();
+            if(HitCheck)
+            {
+                Gizmos.color = Color.red;
+            }
+            else
+            {
+                Gizmos.color = Color.yellow;
+            }
+            if(HitCentre == null)
+            {
+                HitCentre = _hitCentre;
+            }
+            Gizmos.DrawRay(HitCentre.position, HitCentre.TransformDirection(Vector3.forward) * HitRange);
+        }
 
         #endregion
 
