@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -13,6 +14,8 @@ namespace Atlanticide.UI
         [SerializeField]
         public Text pausingPlayerText;
 
+        private Action InputDeviceSwap;
+
         /// <summary>
         /// Initializes the object.
         /// </summary>
@@ -21,9 +24,22 @@ namespace Atlanticide.UI
             title.text = "Game Paused";
         }
 
+        public void SetInputDeviceSwapAction(Action inputDeviceSwap)
+        {
+            InputDeviceSwap = inputDeviceSwap;
+        }
+
         public void ResumeGame()
         {
             World.Instance.PauseGame(false);
+        }
+
+        public void SwapInputDevices()
+        {
+            if (InputDeviceSwap != null)
+            {
+                InputDeviceSwap.Invoke();
+            }
         }
 
         public void RestartLevel()
@@ -41,6 +57,11 @@ namespace Atlanticide.UI
         public void QuitGame()
         {
             Application.Quit();
+        }
+
+        private void OnDestroy()
+        {
+            InputDeviceSwap = null;
         }
     }
 }
