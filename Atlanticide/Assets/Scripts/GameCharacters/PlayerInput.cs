@@ -20,6 +20,8 @@ namespace Atlanticide
     /// </summary>
     public class PlayerInput
     {
+        private const float HoldTime = 0.35f;
+
         private string _horizontalMoveKey;
         private string _verticalMoveKey;
         private string _horizontalLookKey;
@@ -30,6 +32,8 @@ namespace Atlanticide
         private string _jumpKey;
         private string _toolSwapKey;
         private string _pauseKey;
+
+        private HoldInput _holdActionInput;
 
         private InputDevice _inputDevice;
         public InputDevice InputDevice
@@ -55,6 +59,8 @@ namespace Atlanticide
             {
                 InputDevice = (InputDevice) playerNum;
             }
+
+            _holdActionInput = new HoldInput(HoldTime);
         }
 
         /// <summary>
@@ -100,9 +106,12 @@ namespace Atlanticide
         /// Gets the player's action input.
         /// </summary>
         /// <returns>Is the action input pressed</returns>
-        public bool GetActionInput()
+        public bool GetActionInput(out bool inputHeld, out bool inputjustReleased)
         {
-            return Input.GetButton(_actionKey) || Input.GetAxis(_actionKey) == 1;
+            bool input = Input.GetButton(_actionKey) || Input.GetAxis(_actionKey) == 1;
+            inputHeld = _holdActionInput.InputIsHeld(input);
+            inputjustReleased = _holdActionInput.InputJustReleased;
+            return input;
         }
 
         /// <summary>
@@ -148,6 +157,11 @@ namespace Atlanticide
         public bool GetPauseInput()
         {
             return Input.GetButtonDown(_pauseKey);
+        }
+
+        public void ResetInput()
+        {
+            _holdActionInput.ResetHold();
         }
     }
 }

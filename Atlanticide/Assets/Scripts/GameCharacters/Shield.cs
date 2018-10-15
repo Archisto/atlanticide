@@ -123,10 +123,9 @@ namespace Atlanticide
             {
                 _active = activate;
                 StartOpeningOrClosing();
-                return true;
             }
 
-            return false;
+            return _active;
         }
 
         public void ActivateInstantly(bool activate)

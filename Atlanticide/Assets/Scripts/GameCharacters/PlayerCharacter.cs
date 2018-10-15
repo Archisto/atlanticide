@@ -13,9 +13,6 @@ namespace Atlanticide
 
     public class PlayerCharacter : GameCharacter
     {
-        [SerializeField]
-        private Shield _shield;
-
         [SerializeField, Range(0.2f, 20f)]
         private float _jumpHeight = 1f;
 
@@ -26,7 +23,6 @@ namespace Atlanticide
         private float _respawnTime = 1f;
 
         private Weapon _weapon;
-        private EnergyCollector _energyCollector;
         private Climbable _climbable;
         private Interactable _interactionTarget;
         private float _jumpForce;
@@ -38,9 +34,9 @@ namespace Atlanticide
 
         public PlayerTool Tool { get; set; }
 
-        public EnergyCollector EnergyCollector { get { return _energyCollector; } }
+        public EnergyCollector EnergyCollector { get; private set; }
 
-        public Shield Shield { get { return _shield; } }
+        public Shield Shield { get; private set; }
 
         public Interactable InteractionTarget
         {
@@ -66,7 +62,7 @@ namespace Atlanticide
         {
             get
             {
-                return (Tool == PlayerTool.Shield && _shield.Active);
+                return (Tool == PlayerTool.Shield && Shield.Active);
             }
         }
 
@@ -85,7 +81,8 @@ namespace Atlanticide
         {
             base.Start();
             _weapon = GetComponentInChildren<Weapon>();
-            _energyCollector = GetComponentInChildren<EnergyCollector>();
+            EnergyCollector = GetComponentInChildren<EnergyCollector>();
+            Shield = GetComponentInChildren<Shield>();
         }
 
         /// <summary>
@@ -216,7 +213,9 @@ namespace Atlanticide
 
         public bool HandleActionInput()
         {
-            bool active = Input.GetActionInput();
+            bool inputHeld = false;
+            bool inputjustReleased = false;
+            bool active = Input.GetActionInput(out inputHeld, out inputjustReleased);
             bool result = false;
 
             if (Tool == PlayerTool.EnergyCollector && active)
@@ -226,8 +225,19 @@ namespace Atlanticide
             }
             else if (Tool == PlayerTool.Shield)
             {
-                UseShield(active);
-                result = active;
+                // Open the shield if the action button is held down
+                if (inputHeld && !Shield.Active)
+                {
+                    UseShield(true);
+                }
+                // Open or close the shield if pressed once,
+                // close if released after holding
+                else if (inputjustReleased)
+                {
+                    ToggleShield();
+                }
+
+                result = !Shield.IsIdle;
             }
 
             return result;
@@ -289,17 +299,7 @@ namespace Atlanticide
         public bool CheckToolSwapInput()
         {
             bool input = Input.GetToolSwapInput();
-            return (input && _energyCollector.IsIdle && _shield.IsIdle);
-        }
-
-        /// <summary>
-        /// Opens or closes the shield.
-        /// </summary>
-        /// <param name="activate">Should the shield be activated</param>
-        /// <returns></returns>
-        private bool UseShield(bool activate)
-        {
-            return _shield.Activate(activate);
+            return (input && EnergyCollector.IsIdle && Shield.IsIdle);
         }
 
         /// <summary>
@@ -311,19 +311,38 @@ namespace Atlanticide
         public bool UseEnergyCollector(bool drain)
         {
             bool result = false;
-            if (_energyCollector != null)
+            if (EnergyCollector != null)
             {
                 if (drain)
                 {
-                    result = _energyCollector.TryDraining();
+                    result = EnergyCollector.TryDraining();
                 }
                 else
                 {
-                    result = _energyCollector.TryEmitting();
+                    result = EnergyCollector.TryEmitting();
                 }
             }
 
             return result;
+        }
+
+        /// <summary>
+        /// Opens or closes the shield.
+        /// </summary>
+        /// <param name="activate">Should the shield be activated</param>
+        /// <returns>The shield's state</returns>
+        private bool UseShield(bool activate)
+        {
+            return Shield.Activate(activate);
+        }
+
+        /// <summary>
+        /// Opens or closes the shield.
+        /// </summary>
+        /// <returns>The shield's state</returns>
+        private bool ToggleShield()
+        {
+            return UseShield(!Shield.Active);
         }
 
         /// <summary>
@@ -487,11 +506,15 @@ namespace Atlanticide
             Jumping = false;
             Respawning = false;
             _elapsedRespawnTime = 0f;
-            UseShield(false);
             
-            if (_energyCollector != null)
+            if (EnergyCollector != null)
             {
-                _energyCollector.ResetEnergyCollector();
+                EnergyCollector.ResetEnergyCollector();
+            }
+
+            if (Shield != null)
+            {
+                Shield.ResetShield();
             }
         }
 
@@ -501,10 +524,11 @@ namespace Atlanticide
         public override void CancelActions()
         {
             base.CancelActions();
+            Input.ResetInput();
             Jumping = false;
             Respawning = false;
-            _shield.ResetShield();
-            _energyCollector.ResetEnergyCollector();
+            EnergyCollector.ResetEnergyCollector();
+            Shield.ResetShield();
             EndClimb();
             EndPush();
             InteractionTarget = null;

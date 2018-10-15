@@ -104,10 +104,10 @@ namespace Atlanticide
                     Interactor = null;
                 }
             }
-            else
-            {
-                Debug.LogWarning("The interactor is already null.");
-            }
+            //else
+            //{
+            //    Debug.LogWarning("The interactor is already null.");
+            //}
         }
 
         /// <summary>
