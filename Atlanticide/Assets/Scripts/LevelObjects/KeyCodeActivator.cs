@@ -29,9 +29,9 @@ namespace Atlanticide
         }
 
         /// <summary>
-        /// Updates the object once per frame.
+        /// Updates the object.
         /// </summary>
-        private void Update()
+        public override void OnObjectUpdated()
         {
             if (!_keyCodeActive || !_permanent)
             {

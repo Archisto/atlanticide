@@ -27,9 +27,9 @@ namespace Atlanticide
             set
             {
                 _available = value;
-                if (!_available)
+                if (!_available && Interactor != null)
                 {
-                    SetInteractorTarget(false, true);
+                    UnsetInteractorTarget(true);
                 }
             }
         }
@@ -44,8 +44,9 @@ namespace Atlanticide
         /// <summary>
         /// Initializes the object.
         /// </summary>
-        private void Start()
+        protected override void Start()
         {
+            base.Start();
             _availableByDefault = Available;
             EnergyCost = _defaultEnergyCost;
         }
@@ -70,13 +71,21 @@ namespace Atlanticide
             }
         }
 
+        private bool InteractorRequirements(PlayerCharacter p)
+        {
+            return p.IsAvailableForActions() &&
+                   (p.InteractionTarget == null ||
+                       (IsPriorityTarget && !p.InteractionTarget.IsPriorityTarget)) &&
+                   this.DistanceTo(p) <= World.Instance.InteractRange;
+        }
+
         private void CheckForPlayerWithinRange()
         {
             if (Interactor == null)
             {
                 // Gets a living player within range
-                PlayerCharacter pc = GameManager.Instance.GetPlayerWithinRange
-                    (transform.position, World.Instance.InteractRange);
+                PlayerCharacter pc =
+                    GameManager.Instance.GetValidPlayer(InteractorRequirements);
                 if (pc != null)
                 {
                     Interactor = pc;
@@ -94,7 +103,14 @@ namespace Atlanticide
                 float distance = Vector3.Distance
                     (transform.position, Interactor.transform.position);
                 _interactorIsValid = (distance <= World.Instance.InteractRange);
-                SetInteractorTarget(_interactorIsValid, true);
+                if (_interactorIsValid)
+                {
+                    SetInteractorTarget();
+                }
+                else
+                {
+                    UnsetInteractorTarget(true);
+                }
             }
         }
 
@@ -119,6 +135,18 @@ namespace Atlanticide
             }
 
             return false;
+        }
+
+        /// <summary>
+        /// Tries to set the interactor player null after interaction.
+        /// Called in the PlayerCharacter class.
+        /// </summary>
+        public override void TryRemoveInteractorAfterInteraction()
+        {
+            if (_removeInteractorAfterInteraction || !_toggle)
+            {
+                UnsetInteractorTarget(true);
+            }
         }
 
         /// <summary>

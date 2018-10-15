@@ -276,7 +276,7 @@ namespace Atlanticide
                         }
 
                         // Makes the interaction target forget the player
-                        InteractionTarget.SetInteractorTarget(false, true);
+                        InteractionTarget.TryRemoveInteractorAfterInteraction();
 
                         return true;
                     }

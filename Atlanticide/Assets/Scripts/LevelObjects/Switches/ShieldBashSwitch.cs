@@ -4,12 +4,17 @@ namespace Atlanticide
 {
     public class ShieldBashSwitch : Switch
     {
-        private void Update()
+        /// <summary>
+        /// Updates the object.
+        /// </summary>
+        protected override void UpdateObject()
         {
             if (Activated && !_permanent)
             {
                 Activated = false;
             }
+
+            base.UpdateObject();
         }
 
         private void OnCollisionStay(Collision collision)

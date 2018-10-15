@@ -10,6 +10,9 @@ namespace Atlanticide
     [RequireComponent(typeof(ShieldBashSwitch))]
     public class ShieldBashBreakable : LevelObject
     {
+        // NOTE: The ShieldBashSwitch must be
+        // set permanent for this to work properly.
+
         [SerializeField, Range(1, 20)]
         private int _maxHitpoints = 1;
 
@@ -40,9 +43,9 @@ namespace Atlanticide
         }
 
         /// <summary>
-        /// Updates the object once per frame.
+        /// Updates the object.
         /// </summary>
-        private void Update()
+        protected override void UpdateObject()
         {
             if (!_broken)
             {

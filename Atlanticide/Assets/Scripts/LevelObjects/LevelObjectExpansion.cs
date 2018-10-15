@@ -9,7 +9,8 @@ namespace Atlanticide
     /// Adds features to the level object to which this component is attached.
     /// </summary>
     [RequireComponent(typeof(LevelObject))]
-    public abstract class LevelObjectExpansion : MonoBehaviour, ILevelObjectExpansion
+    public abstract class LevelObjectExpansion
+        : MonoBehaviour, ILevelObjectExpansion
     {
         /// <summary>
         /// The expanded level object
@@ -40,6 +41,11 @@ namespace Atlanticide
         }
 
         private void OnDestroy()
+        {
+            UnsubscribeObjectEvents();
+        }
+
+        private void UnsubscribeObjectEvents()
         {
             if (_levelObj != null)
             {

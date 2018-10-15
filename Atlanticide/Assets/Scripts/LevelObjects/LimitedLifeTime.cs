@@ -45,7 +45,7 @@ namespace Atlanticide
         public override void OnObjectDestroyed()
         {
             _isDestroyed = true;
-            UpdateObjectActiveState();
+            SetObjectActive(false);
         }
 
         public override void OnObjectReset()
@@ -53,15 +53,14 @@ namespace Atlanticide
             _isDestroyed = false;
             _ratio = 0f;
             _elapsedTime = 0f;
-            UpdateObjectActiveState();
+            SetObjectActive(true);
         }
 
-        private void UpdateObjectActiveState()
+        private void SetObjectActive(bool activate)
         {
-            if (_setObjectInactive &&
-                gameObject.activeSelf == _isDestroyed)
+            if (_setObjectInactive)
             {
-                gameObject.SetActive(!_isDestroyed);
+                gameObject.SetActive(activate);
             }
         }
 
