@@ -442,7 +442,6 @@ MonoBehaviour:
   _speed: 7
   _turningSpeed: 0.3
   _maxHitpoints: 1
-  _shield: {fileID: 114033507877078324}
   _jumpHeight: 3.5
   _climbSpeed: 4
   _respawnTime: 1
@@ -475,7 +474,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _energyObject: {fileID: 1317634307110344}
-  _maxCharges: 5
   _chargeTime: 1
   _emitTime: 1
 --- !u!114 &114712899263160512

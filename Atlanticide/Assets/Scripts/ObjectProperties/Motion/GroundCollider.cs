@@ -63,6 +63,8 @@ namespace Atlanticide
         /// </summary>
         private void Update()
         {
+            // TODO: If the platform moves, the object moves with it.
+
             if (!World.Instance.GamePaused &&
                 CheckIfObjAvailable())
             {

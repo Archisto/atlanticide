@@ -228,13 +228,13 @@ namespace Atlanticide
                 // Open the shield if the action button is held down
                 if (inputHeld && !Shield.Active)
                 {
-                    UseShield(true);
+                    Shield.Activate(true);
                 }
                 // Open or close the shield if pressed once,
                 // close if released after holding
                 else if (inputjustReleased)
                 {
-                    ToggleShield();
+                    Shield.Activate(!Shield.Active);
                 }
 
                 result = !Shield.IsIdle;
@@ -262,6 +262,28 @@ namespace Atlanticide
             }
 
             return result;
+        }
+
+        /// <summary>
+        /// Handles changing the player character's stance.
+        /// Only the player with shield can change stance
+        /// by raising the shield above his/her head.
+        /// </summary>
+        /// <returns>Does the stance change</returns>
+        public bool HandleStanceInput()
+        {
+            if (Tool == PlayerTool.Shield &&
+                (Shield.BlocksDamage || Shield.Raised))
+            {
+                bool input = Input.GetStanceInput();
+                if (input)
+                {
+                    Shield.RaiseAboveHead(!Shield.Raised);
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         /// <summary>
@@ -324,25 +346,6 @@ namespace Atlanticide
             }
 
             return result;
-        }
-
-        /// <summary>
-        /// Opens or closes the shield.
-        /// </summary>
-        /// <param name="activate">Should the shield be activated</param>
-        /// <returns>The shield's state</returns>
-        private bool UseShield(bool activate)
-        {
-            return Shield.Activate(activate);
-        }
-
-        /// <summary>
-        /// Opens or closes the shield.
-        /// </summary>
-        /// <returns>The shield's state</returns>
-        private bool ToggleShield()
-        {
-            return UseShield(!Shield.Active);
         }
 
         /// <summary>

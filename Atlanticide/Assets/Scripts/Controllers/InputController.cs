@@ -109,6 +109,9 @@ namespace Atlanticide
                             _players[i].LookInput(lookingInput);
                         }
 
+                        // Changing stance
+                        _players[i].HandleStanceInput();
+
                         // Interacting with certain level objects
                         _players[i].HandleInteractionInput();
 
