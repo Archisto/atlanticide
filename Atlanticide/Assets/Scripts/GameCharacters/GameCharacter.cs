@@ -91,6 +91,8 @@ namespace Atlanticide
             IsDead = true;
             CancelActions();
             Debug.Log(name + " died");
+
+            SFXPlayer.Instance.Play(Sound.Player_Hurt_2);
         }
 
         /// <summary>

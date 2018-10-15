@@ -212,6 +212,39 @@ namespace Atlanticide
             return newRotation;
         }
 
+        /// <summary>
+        /// Returns how many values does an enumerator have.
+        /// </summary>
+        /// <param name="enumType">An enum type</param>
+        /// <returns>The length of the enum</returns>
+        public static int GetEnumLength(Type enumType)
+        {
+            if (enumType == typeof(Enum))
+            {
+                return Enum.GetValues(enumType).Length;
+            }
+            else
+            {
+                return -1;
+            }
+        }
+
+        public static int Clamp(int value, int min, int max)
+        {
+            if (value < min)
+            {
+                return min;
+            }
+            else if (value > max)
+            {
+                return max;
+            }
+            else
+            {
+                return value;
+            }
+        }
+
         public static void DrawProgressBarGizmo(Vector3 position, float progress, Color barColor, Color indicatorColor)
         {
             Gizmos.color = barColor;
@@ -225,6 +258,24 @@ namespace Atlanticide
 
             Gizmos.color = indicatorColor;
             Gizmos.DrawLine(pos3, pos4);
+        }
+
+        public static void DrawHPGizmo(Vector3 position, int hitpoints, int maxHitpoints, Color color)
+        {
+            Gizmos.color = color;
+            float spacing = 0.8f;
+
+            float lineLength = 2f;
+            Vector3 lineStart = position +
+                new Vector3(-0.5f * lineLength * spacing, -0.4f * spacing, 0); 
+            Gizmos.DrawLine(lineStart, lineStart + Vector3.right * lineLength * spacing);
+        
+            position.x -= 0.5f * (maxHitpoints - 1) * spacing;
+            for (int i = 0; i < hitpoints; i++)
+            {
+                Gizmos.DrawSphere(position, 0.2f);
+                position.x += spacing;
+            }
         }
     }
 }

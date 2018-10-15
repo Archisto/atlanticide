@@ -12,6 +12,9 @@ namespace Atlanticide
             Tooltip("Does the switch once activated stay active forever.")]
         protected bool _permanent;
 
+        [SerializeField, Tooltip("Are gizmos drawn.")]
+        protected bool _drawGizmos = true;
+
         private bool _permanentByDefault;
 
         public bool Activated { get; protected set; }
@@ -30,10 +33,27 @@ namespace Atlanticide
         /// Please note that the switch's logic may
         /// re(de)activate it right after.
         /// </summary>
-        /// <param name="active">Should the switch be activated</param>
-        public void Activate(bool active)
+        /// <param name="activate">Should the switch be activated</param>
+        public void Activate(bool activate)
         {
-            Activated = active;
+            Activated = activate;
+        }
+
+        /// <summary>
+        /// Tries to activate or deactivate the switch.
+        /// Deactivation doesn't work on permanently activated switches.
+        /// </summary>
+        /// <param name="activate">Should the switch be activated</param>
+        /// <returns>Is the (de)activation successful</returns>
+        public bool TryActivate(bool activate)
+        {
+            if ((activate != Activated) && (activate || !_permanent))
+            {
+                Activated = activate;
+                return true;
+            }
+
+            return false;
         }
 
         /// <summary>

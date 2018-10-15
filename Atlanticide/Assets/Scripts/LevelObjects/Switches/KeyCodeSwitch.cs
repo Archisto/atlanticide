@@ -43,8 +43,11 @@ namespace Atlanticide
         /// </summary>
         protected override void OnDrawGizmos()
         {
-            base.OnDrawGizmos();
-            Gizmos.DrawSphere(transform.position, 0.5f);
+            if (_drawGizmos)
+            {
+                base.OnDrawGizmos();
+                Gizmos.DrawSphere(transform.position, 0.5f);
+            }
         }
     }
 }

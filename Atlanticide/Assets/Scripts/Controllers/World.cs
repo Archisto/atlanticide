@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Atlanticide.UI;
 
 namespace Atlanticide
 {
@@ -36,18 +37,31 @@ namespace Atlanticide
         [SerializeField, Range(0.1f, 5f)]
         public float energyCollectRadius = 1f;
 
+        [SerializeField, Range(1, 20)]
+        private int _maxEnergyCharges = 5;
+
+        [SerializeField, Range(1f, 10f)]
+        private float _interactRange = 3f;
+
         public List<int> keyCodes = new List<int>();
+
+        private UIController _ui;
         private bool _gamePaused;
 
-        public bool GamePaused
-        {
-            get { return _gamePaused; }
-        }
+        public int MaxEnergyCharges { get { return _maxEnergyCharges; } }
+
+        public int CurrentEnergyCharges { get; set; }
+
+        public float InteractRange { get { return _interactRange; } }
+
+        public bool GamePaused { get { return _gamePaused; } }
 
         public float DeltaTime
         {
             get { return (GamePaused ? 0f : Time.deltaTime); }
         }
+
+        public bool ShieldBashing { get; set; }
 
         /// <summary>
         /// Initializes the singleton instance.
@@ -69,8 +83,9 @@ namespace Atlanticide
         /// <summary>
         /// Initializes the object.
         /// </summary>
-        private void Start()
+        public void Init()
         {
+            _ui = FindObjectOfType<UIController>();
         }
 
         /// <summary>
@@ -98,10 +113,10 @@ namespace Atlanticide
             {
                 Debug.Log("Key code [" + keyCode + "] activated");
             }
-            else
-            {
-                Debug.Log("Key code [" + keyCode + "] is already active");
-            }
+            //else
+            //{
+            //    Debug.Log("Key code [" + keyCode + "] is already active");
+            //}
 
             return added;
         }
@@ -134,11 +149,21 @@ namespace Atlanticide
             GameManager.Instance.ActivatePauseScreen(GamePaused, playerName);
         }
 
+        public void SetEnergyChargesAndUpdateUI(int charges)
+        {
+            CurrentEnergyCharges = Utils.Clamp(charges, 0, MaxEnergyCharges);
+            float ratio = (float) CurrentEnergyCharges / MaxEnergyCharges;
+            _ui.UpdateEnergyBar(ratio);
+            Debug.Log(string.Format("Energy charges: {0} ({1} %)",
+                CurrentEnergyCharges, ratio * 100));
+        }
+
         /// <summary>
         /// Resets the world to its default state.
         /// </summary>
         public void ResetWorld()
         {
+            CurrentEnergyCharges = 0;
             keyCodes.Clear();
         }
     }

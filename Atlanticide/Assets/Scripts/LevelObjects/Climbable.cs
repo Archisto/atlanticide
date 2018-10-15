@@ -48,10 +48,14 @@ namespace Atlanticide
         /// <param name="collision">The collision</param>
         protected virtual void OnCollisionEnter(Collision collision)
         {
-            PlayerCharacter pc = collision.gameObject.GetComponent<PlayerCharacter>();
-            if (pc != null && !pc.Climbing)
+            foreach (ContactPoint cp in collision.contacts)
             {
-                pc.StartClimb(this);
+                PlayerCharacter pc = cp.otherCollider.gameObject.GetComponent<PlayerCharacter>();
+                if (pc != null && !pc.Climbing)
+                {
+                    pc.StartClimb(this);
+                    break;
+                }
             }
         }
 

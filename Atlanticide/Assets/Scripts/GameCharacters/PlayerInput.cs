@@ -26,7 +26,9 @@ namespace Atlanticide
         private string _verticalLookKey;
         private string _actionKey;
         private string _altActionKey;
+        private string _interactKey;
         private string _jumpKey;
+        private string _toolSwapKey;
         private string _pauseKey;
 
         private InputDevice _inputDevice;
@@ -66,7 +68,9 @@ namespace Atlanticide
             _verticalLookKey = "VerticalLook" + InputDevice.ToString();
             _actionKey = "Action" + InputDevice.ToString();
             _altActionKey = "AltAction" + InputDevice.ToString();
+            _interactKey = "Interact" + InputDevice.ToString();
             _jumpKey = "Jump" + InputDevice.ToString();
+            _toolSwapKey = "ToolSwap" + InputDevice.ToString();
             _pauseKey = "Pause" + InputDevice.ToString();
         }
 
@@ -77,9 +81,8 @@ namespace Atlanticide
         public Vector3 GetMoveInput()
         {
             return new Vector3(
-                Input.GetAxis(_horizontalMoveKey),
-                Input.GetAxis(_verticalMoveKey))
-                .normalized;
+                Input.GetAxisRaw(_horizontalMoveKey),
+                Input.GetAxisRaw(_verticalMoveKey));
         }
 
         /// <summary>
@@ -89,9 +92,8 @@ namespace Atlanticide
         public Vector3 GetLookInput()
         {
             return new Vector3(
-                Input.GetAxis(_horizontalLookKey),
-                Input.GetAxis(_verticalLookKey))
-                .normalized;
+                Input.GetAxisRaw(_horizontalLookKey),
+                Input.GetAxisRaw(_verticalLookKey));
         }
 
         /// <summary>
@@ -113,12 +115,30 @@ namespace Atlanticide
         }
 
         /// <summary>
+        /// Gets the player's interact input.
+        /// </summary>
+        /// <returns>Is the interact input pressed</returns>
+        public bool GetInteractInput()
+        {
+            return Input.GetButtonDown(_interactKey);
+        }
+
+        /// <summary>
         /// Gets the player's jump input.
         /// </summary>
         /// <returns>Is the jump input pressed</returns>
         public bool GetJumpInput()
         {
             return Input.GetButtonDown(_jumpKey);
+        }
+
+        /// <summary>
+        /// Gets the player's tool swap input.
+        /// </summary>
+        /// <returns>Is the jump input pressed</returns>
+        public bool GetToolSwapInput()
+        {
+            return Input.GetButtonDown(_toolSwapKey);
         }
 
         /// <summary>

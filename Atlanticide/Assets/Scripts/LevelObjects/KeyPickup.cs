@@ -15,6 +15,8 @@ namespace Atlanticide
         {
             World.Instance.TryActivateNewKeyCode(keyCode, _allowDuplicateKeyCodes);
             base.Collect(character);
+
+            SFXPlayer.Instance.Play(Sound.Item_Pickup);
         }
     }
 }

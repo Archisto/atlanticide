@@ -68,8 +68,9 @@ namespace Atlanticide
 
         private void UpdateOpenProgress()
         {
-            _openProgress = (open ? _elapsedTime / _openTime : (_openTime - _elapsedTime) / _openTime);
             _elapsedTime += World.Instance.DeltaTime;
+            _openProgress = (open ?
+                _elapsedTime / _openTime : (_openTime - _elapsedTime) / _openTime);
             if (_elapsedTime >= _openTime)
             {
                 _elapsedTime = 0f;
@@ -77,7 +78,8 @@ namespace Atlanticide
                 _openProgress = Mathf.Clamp01(_openProgress);
             }
 
-            Quaternion newRotation = Quaternion.Lerp(_closedRotation, _openRotationQ, _openProgress);
+            Quaternion newRotation =
+                Quaternion.Lerp(_closedRotation, _openRotationQ, _openProgress);
             transform.rotation = newRotation;
         }
 
@@ -102,6 +104,8 @@ namespace Atlanticide
             {
                 open = true;
                 _changingOpenState = true;
+
+                SFXPlayer.Instance.Play(Sound.Door_Open);
             }
         }
 
@@ -119,6 +123,8 @@ namespace Atlanticide
             if (!unlocked)
             {
                 unlocked = true;
+
+                SFXPlayer.Instance.Play(Sound.Key_Use);
             }
         }
 

@@ -70,14 +70,8 @@ namespace Atlanticide
         {
             if (!Destroyed)
             {
-                Gizmos.color = Color.red;
-
-                for (int i = 0; i < _hitpoints; i++)
-                {
-                    Vector3 position = transform.position + Vector3.up * 3f;
-                    position.x += (i - _maxHitpoints / 2) * 0.8f;
-                    Gizmos.DrawSphere(position, 0.3f);
-                }
+                Utils.DrawHPGizmo(transform.position + Vector3.up * 3f,
+                    _hitpoints, _maxHitpoints, Color.red);
             }
         }
     }

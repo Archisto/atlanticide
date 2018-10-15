@@ -64,9 +64,12 @@ namespace Atlanticide
         /// </summary>
         protected override void OnDrawGizmos()
         {
-            base.OnDrawGizmos();
-            Utils.DrawProgressBarGizmo(transform.position,
-                Progress, Gizmos.color, Color.yellow);
+            if (_drawGizmos)
+            {
+                base.OnDrawGizmos();
+                Utils.DrawProgressBarGizmo(transform.position,
+                    Progress, Gizmos.color, Color.yellow);
+            }
         }
     }
 }

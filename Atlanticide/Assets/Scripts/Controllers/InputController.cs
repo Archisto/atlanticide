@@ -7,7 +7,14 @@ namespace Atlanticide
     public class InputController : MonoBehaviour
     {
         private PlayerCharacter[] _players;
+        private ToolSwapping _toolSwap;
         private int _pausingPlayerNum;
+        private float _inputDeadZone = 0.2f;
+
+        private float SqrInputDeadZone
+        {
+            get { return _inputDeadZone * _inputDeadZone; }
+        }
 
         /// <summary>
         /// Initializes the object.
@@ -15,6 +22,9 @@ namespace Atlanticide
         private void Start()
         {
             _players = GameManager.Instance.GetPlayers();
+            _toolSwap = FindObjectOfType<ToolSwapping>();
+
+            CheckConnectedControllers();
         }
 
         /// <summary>
@@ -40,6 +50,33 @@ namespace Atlanticide
             }
         }
 
+        private Vector3 GetFinalMovingInput(Vector3 movingInput)
+        {
+            float moveMagnitude = movingInput.magnitude;
+            if (moveMagnitude > _inputDeadZone)
+            {
+                //Debug.Log("move x: " + movingInput.x + ", y: " + movingInput.y + "; mag: " + moveMagnitude);
+
+                float movementFactor = ((moveMagnitude - _inputDeadZone) / (1 - _inputDeadZone));
+                movementFactor = (movementFactor > 1f ? 1f : movementFactor);
+                movingInput = movingInput.normalized * movementFactor;
+
+                return movingInput;
+            }
+
+            return Vector3.zero;
+        }
+
+        private Vector3 GetFinalLookingInput(Vector3 lookingInput)
+        {
+            if (lookingInput.sqrMagnitude > SqrInputDeadZone)
+            {
+                return lookingInput.normalized;
+            }
+
+            return Vector3.zero;
+        }
+
         /// <summary>
         /// Checks player specific input.
         /// </summary>
@@ -54,38 +91,54 @@ namespace Atlanticide
                     TogglePause(i);
                 }
 
-                if (!World.Instance.GamePaused && !_players[i].IsDead)
+                if (!_players[i].IsDead)
                 {
-                    // Moving the player character
-                    Vector3 movingDirection = _players[i].Input.GetMoveInput();
-                    Vector3 lookingDirection = _players[i].Input.GetLookInput();
-
-                    if (movingDirection != Vector3.zero)
+                    if (!World.Instance.GamePaused)
                     {
-                        _players[i].MoveInput(movingDirection);
-                    }
+                        // Moving the player character
+                        Vector3 movingInput = GetFinalMovingInput(_players[i].Input.GetMoveInput());
+                        Vector3 lookingInput = GetFinalLookingInput(_players[i].Input.GetLookInput());
 
-                    if (lookingDirection != Vector3.zero)
-                    {
-                        _players[i].LookInput(lookingDirection);
-                    }
+                        if (movingInput != Vector3.zero)
+                        {
+                            _players[i].MoveInput(movingInput);
+                        }
 
-                    // Jumping
-                    if (_players[i].Input.GetJumpInput())
-                    {
-                        _players[i].Jump();
-                    }
+                        if (lookingInput != Vector3.zero)
+                        {
+                            _players[i].LookInput(lookingInput);
+                        }
 
-                    // Using an ability
-                    _players[i].ActionInput(_players[i].Input.GetActionInput());
+                        // Interacting with certain level objects
+                        _players[i].HandleInteractionInput();
 
-                    // Using the energy collector
-                    // OLD: Firing a weapon
-                    if (_players[i].Input.GetAltActionInput())
-                    {
-                        //_players[i].FireWeapon();
-                        _players[i].UseEnergyCollector();
+                        // Jumping
+                        _players[i].HandleJumpInput();
+
+                        // Using the player's primary action
+                        if (_players[i].HandleActionInput())
+                        {
+                            CancelToolSwap(_players[i]);
+                        }
+
+                        // Using the player's alternate action
+                        if (_players[i].HandleAltActionInput())
+                        {
+                            CancelToolSwap(_players[i]);
+                        }
+
+                        // Tool swapping
+                        if (_players[i].CheckToolSwapInput())
+                        {
+                            _toolSwap.InitiateSwapRequest(_players[i]);
+                        }
                     }
+                }
+                // If the player has initiated a tool swap request
+                // but dies, the request is canceled
+                else
+                {
+                    CancelToolSwap(_players[i]);
                 }
             }
         }
@@ -103,20 +156,17 @@ namespace Atlanticide
         /// </summary>
         private void CheckDebugInput()
         {
-            // Move NPCs
-            if (Input.GetKey(KeyCode.J))
+            // Max energy
+            if (Input.GetKeyDown(KeyCode.Y))
             {
-                foreach (NonPlayerCharacter npc in GameManager.Instance.GetNPCs())
-                {
-                    npc.transform.position += Vector3.left * 5 * World.Instance.DeltaTime;
-                }
+                World.Instance.SetEnergyChargesAndUpdateUI
+                    (World.Instance.MaxEnergyCharges);
             }
-            else if (Input.GetKey(KeyCode.L))
+
+            // Swap tools
+            if (Input.GetKeyDown(KeyCode.T))
             {
-                foreach (NonPlayerCharacter npc in GameManager.Instance.GetNPCs())
-                {
-                    npc.transform.position += Vector3.right * 5 * World.Instance.DeltaTime;
-                }
+                _toolSwap.SwapTools();
             }
 
             // Change player count
@@ -148,6 +198,10 @@ namespace Atlanticide
             }
             if (Input.GetKeyDown(KeyCode.Keypad0))
             {
+                if (World.Instance.GamePaused)
+                {
+                    World.Instance.PauseGame(false);
+                }
                 GameManager.Instance.LoadTestLevel();
             }
 
@@ -215,6 +269,37 @@ namespace Atlanticide
             else
             {
                 return _pausingPlayerNum == playerNum;
+            }
+        }
+
+        private void CancelToolSwap(PlayerCharacter player)
+        {
+            if (_toolSwap.RequestInitiatedBy(player))
+            {
+                _toolSwap.EndSwapRequest();
+            }
+        }
+
+        /// <summary>
+        /// Resets the input controller.
+        /// </summary>
+        public void ResetInput()
+        {
+            _toolSwap.EndSwapRequest();
+        }
+
+        public void CheckConnectedControllers()
+        {
+            for (int i = 0; i < Input.GetJoystickNames().Length; i++)
+            {
+                if (Input.GetJoystickNames()[i] == null)
+                {
+                    Debug.Log("There is no controller attached to this slot!");
+                }
+                else
+                {
+                    Debug.Log(Input.GetJoystickNames()[i]);
+                }
             }
         }
     }
