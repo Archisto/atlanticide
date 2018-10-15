@@ -6,6 +6,16 @@ namespace Atlanticide
 {
     public class InputController : MonoBehaviour
     {
+        public enum ControllerType
+        {
+            None = 0,
+            Xbox = 1,
+            PS = 2
+        }
+
+        private const int XboxControllerNameLength = 33;
+        private const int PSControllerNameLength = 19;
+
         private PlayerCharacter[] _players;
         private ToolSwapping _toolSwap;
         private int _pausingPlayerNum;
@@ -314,8 +324,29 @@ namespace Atlanticide
                 }
                 else
                 {
-                    Debug.Log(Input.GetJoystickNames()[i]);
+                    Debug.Log("Controller: " + 
+                        GetConnectedControllerType(Input.GetJoystickNames()[i]));
                 }
+            }
+        }
+
+        public ControllerType GetConnectedControllerType(string joystickName)
+        {
+            if (string.IsNullOrEmpty(joystickName))
+            {
+                return ControllerType.None;
+            }
+            else if (joystickName.Length == XboxControllerNameLength)
+            {
+                return ControllerType.Xbox;
+            }
+            else if (joystickName.Length == PSControllerNameLength)
+            {
+                return ControllerType.PS;
+            }
+            else
+            {
+                return ControllerType.None;
             }
         }
 
