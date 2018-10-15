@@ -10,58 +10,58 @@ namespace Atlanticide
 
         #region start methods overwritten
 
-        protected override void startNoTarget()
+        protected override void StartNoTarget()
         {
-            base.startNoTarget();
+            base.StartNoTarget();
         }
 
-        protected override void startTargetOn()
+        protected override void StartTargetOn()
         {
-            base.startTargetOn();
+            base.StartTargetOn();
         }
 
-        protected override void startAttack()
+        protected override void StartAttack()
         {
-            base.startAttack();
+            base.StartAttack();
         }
 
         #endregion
 
         #region run methods overwritten
 
-        protected override void noTarget()
+        protected override void NoTarget()
         {
-            base.noTarget();
+            base.NoTarget();
         }
 
-        protected override void targetOn()
+        protected override void TargetOn()
         {
-            base.targetOn();
+            base.TargetOn();
         }
 
-        protected override void attack()
+        protected override void Attack()
         {
-            base.attack();
+            base.Attack();
         }
 
         #endregion
 
         #region end methods overwritten
 
-        protected override void endNoTarget()
+        protected override void EndNoTarget()
         {
-            base.endNoTarget();
+            base.EndNoTarget();
             
         }
 
-        protected override void endTargetOn()
+        protected override void EndTargetOn()
         {
-            base.endTargetOn();
+            base.EndTargetOn();
         }
 
-        protected override void endAttack()
+        protected override void EndAttack()
         {
-            base.endAttack();
+            base.EndAttack();
         }
 
         #endregion
