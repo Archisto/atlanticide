@@ -34,7 +34,9 @@ namespace Atlanticide.UI
         private Vector2 _canvasSize;
         private Vector2 _uiOffset;
         private Camera _camera;
+        private InputController _input;
         private PauseScreen _pauseScreen;
+        private PlayerCharacter[] _players;
         private List<PlayerStatus> _playerStatuses;
         private Vector3[] _targetPositions;
 
@@ -43,6 +45,17 @@ namespace Atlanticide.UI
         /// </summary>
         private void Start()
         {
+            _canvasSize = GetComponent<Canvas>().pixelRect.size;
+            _uiOffset = new Vector2(-0.5f * _canvasSize.x, -0.5f * _canvasSize.y);
+            _camera = FindObjectOfType<CameraController>().GetComponent<Camera>();
+            _input = FindObjectOfType<InputController>();
+            _pauseScreen = GetComponentInChildren<PauseScreen>(true);
+            _pauseScreen.SetInputDeviceSwapAction(_input.SwapInputDevices);
+
+            _players = GameManager.Instance.GetPlayers();
+            _playerStatuses = new List<PlayerStatus>();
+            _targetPositions = new Vector3[_targetIcons.Length];
+
             InitUI();
             UpdateScoreCounter();
         }
@@ -61,23 +74,15 @@ namespace Atlanticide.UI
         /// <summary>
         /// Initializes the UI.
         /// </summary>
-        private void InitUI()
+        public void InitUI()
         {
-            _canvasSize = GetComponent<Canvas>().pixelRect.size;
-            _uiOffset = new Vector2(-0.5f * _canvasSize.x, -0.5f * _canvasSize.y);
-            _camera = FindObjectOfType<CameraController>().GetComponent<Camera>();
-            _pauseScreen = GetComponentInChildren<PauseScreen>(true);
-            _targetPositions = new Vector3[_targetIcons.Length];
-            PlayerCharacter[] players = GameManager.Instance.GetPlayers();
-            _playerStatuses = new List<PlayerStatus>();
-
             if (GameManager.Instance.GameState == GameManager.State.Play)
             {
                 for (int i = 0; i < GameManager.Instance.PlayerCount; i++)
                 {
                     PlayerStatus ps = Instantiate(_playerStatusPrefab, _playerStatusHandler);
-                    ps.SetToolImage(_toolImages[(int) players[i].Tool]);
-                    ps.SetPlayerName(players[i].name);
+                    ps.SetToolImage(_toolImages[(int) _players[i].Tool]);
+                    ps.SetPlayerName(_players[i].name);
                     _playerStatuses.Add(ps);
                 }
 

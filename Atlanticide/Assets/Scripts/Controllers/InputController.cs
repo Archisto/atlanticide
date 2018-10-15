@@ -229,34 +229,6 @@ namespace Atlanticide
             }
         }
 
-        private void SetPlayerInputDevice(int playerNum, InputDevice inputDevice)
-        {
-            if (playerNum >= 0 && playerNum < _players.Length &&
-                _players[playerNum] != null)
-            {
-                // The given player already has the input device
-                if (_players[playerNum].Input.InputDevice == inputDevice)
-                {
-                    return;
-                }
-
-                foreach (PlayerCharacter player in _players)
-                {
-                    // The player which has the input device
-                    // swaps it with the given player
-                    if (player.Input.InputDevice == inputDevice)
-                    {
-                        InputDevice temp = _players[playerNum].Input.InputDevice;
-                        _players[playerNum].Input.InputDevice = inputDevice;
-                        player.Input.InputDevice = temp;
-                        return;
-                    }
-                }
-
-                _players[playerNum].Input.InputDevice = inputDevice;
-            }
-        }
-
         /// <summary>
         /// Returns whether the given player can unpause the game.
         /// If the player is unavailable, anyone can unpause.
@@ -284,6 +256,70 @@ namespace Atlanticide
         }
 
         /// <summary>
+        /// Swaps the input devices of players 1 and 2.
+        /// </summary>
+        public void SwapInputDevices()
+        {
+            SetPlayerInputDevice(0, _players[1].Input.InputDevice);
+        }
+
+        /// <summary>
+        /// Sets the input device of the given player.
+        /// If the input device is already used by a player,
+        /// the input devices are swapped.
+        /// </summary>
+        /// <param name="playerNum">A player's index in the array</param>
+        /// <param name="inputDevice">An input device</param>
+        private void SetPlayerInputDevice(int playerNum, InputDevice inputDevice)
+        {
+            if (playerNum >= 0 && playerNum < _players.Length &&
+                _players[playerNum] != null)
+            {
+                // The given player already has the input device
+                if (_players[playerNum].Input.InputDevice == inputDevice)
+                {
+                    Debug.LogWarning("The player already has that input device.");
+                    return;
+                }
+
+                foreach (PlayerCharacter otherPlayer in _players)
+                {
+                    // The other player which has the input device
+                    // swaps it with the given player
+                    if (otherPlayer.Input.InputDevice == inputDevice)
+                    {
+                        InputDevice temp = _players[playerNum].Input.InputDevice;
+                        _players[playerNum].Input.InputDevice = inputDevice;
+                        otherPlayer.Input.InputDevice = temp;
+                        LogController(_players[playerNum]);
+                        LogController(otherPlayer);
+                        return;
+                    }
+                }
+
+                // The input device is currently not used by anyone,
+                // so it is simply set to the player
+                _players[playerNum].Input.InputDevice = inputDevice;
+                LogController(_players[playerNum]);
+            }
+        }
+
+        public void CheckConnectedControllers()
+        {
+            for (int i = 0; i < Input.GetJoystickNames().Length; i++)
+            {
+                if (string.IsNullOrEmpty(Input.GetJoystickNames()[i]))
+                {
+                    Debug.LogWarning("There is no controller attached to this slot!");
+                }
+                else
+                {
+                    Debug.Log(Input.GetJoystickNames()[i]);
+                }
+            }
+        }
+
+        /// <summary>
         /// Resets the input controller.
         /// </summary>
         public void ResetInput()
@@ -291,19 +327,10 @@ namespace Atlanticide
             _toolSwap.EndSwapRequest();
         }
 
-        public void CheckConnectedControllers()
+        private void LogController(PlayerCharacter player)
         {
-            for (int i = 0; i < Input.GetJoystickNames().Length; i++)
-            {
-                if (Input.GetJoystickNames()[i] == null)
-                {
-                    Debug.Log("There is no controller attached to this slot!");
-                }
-                else
-                {
-                    Debug.Log(Input.GetJoystickNames()[i]);
-                }
-            }
+            Debug.Log(player.name + "'s controller: " +
+                player.Input.InputDevice);
         }
     }
 }
