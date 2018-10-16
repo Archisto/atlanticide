@@ -5,17 +5,6 @@ using UnityEngine;
 namespace Atlanticide
 {
     /// <summary>
-    /// The input device: the keyboard or a gamepad.
-    /// </summary>
-    public enum InputDevice
-    {
-        Keyboard = 0,
-        Gamepad1 = 1,
-        Gamepad2 = 2,
-        Gamepad3 = 3
-    }
-
-    /// <summary>
     /// Handles player input.
     /// </summary>
     public class PlayerInput

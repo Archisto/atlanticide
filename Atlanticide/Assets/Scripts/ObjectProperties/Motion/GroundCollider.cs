@@ -190,6 +190,28 @@ namespace Atlanticide
             }
         }
 
+        public float GroundHeightDifference(Vector3 position, float maxDropDist)
+        {
+            position.y = transform.position.y;
+            float groundY = transform.position.y - (_objectSize.y / 2);
+
+            RaycastHit hit;
+            bool touchingPlatform = Physics.Raycast(new Ray(position, Vector3.down),
+                out hit, maxDropDist + (_objectSize.y / 2), _platformMask);
+
+            if (touchingPlatform)
+            {
+                // Positive value for higher ground,
+                // negative for lower
+                return hit.point.y - groundY;
+            }
+            else
+            {
+                // The height difference is "big"
+                return -1 * maxDropDist - 1f;
+            }
+        }
+
         private void Fall()
         {
             if (_isRising)

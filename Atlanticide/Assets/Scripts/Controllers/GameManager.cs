@@ -533,7 +533,7 @@ namespace Atlanticide
         /// <returns>A player character or null</returns>
         public PlayerCharacter GetAnyPlayer(bool includeDead)
         {
-            return GetValidPlayer((PlayerCharacter p) =>
+            return GetValidPlayer(p =>
                 !p.IsDead || includeDead);
         }
 
@@ -548,7 +548,7 @@ namespace Atlanticide
         public PlayerCharacter GetAnyOtherPlayer(PlayerCharacter invalidPlayer,
                                                  bool includeDead)
         {
-            return GetValidPlayer((PlayerCharacter p) =>
+            return GetValidPlayer(p =>
                 p != invalidPlayer && (!p.IsDead || includeDead));
         }
 
@@ -563,7 +563,7 @@ namespace Atlanticide
         public PlayerCharacter GetPlayerWithTool(PlayerTool tool,
                                                  bool includeDead)
         {
-            return GetValidPlayer((PlayerCharacter p) =>
+            return GetValidPlayer(p =>
                 p.Tool == tool && (!p.IsDead || includeDead));
         }
 
