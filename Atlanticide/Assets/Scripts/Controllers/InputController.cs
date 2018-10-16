@@ -4,15 +4,29 @@ using UnityEngine;
 
 namespace Atlanticide
 {
+    /// <summary>
+    /// The input device: the keyboard or a gamepad.
+    /// </summary>
+    public enum InputDevice
+    {
+        Keyboard = 0,
+        Gamepad1 = 1,
+        Gamepad2 = 2,
+        Gamepad3 = 3
+    }
+
+    /// <summary>
+    /// The gamepad type.
+    /// </summary>
+    public enum GamepadType
+    {
+        None = 0,
+        Xbox = 1,
+        PlayStation = 2
+    }
+
     public class InputController : MonoBehaviour
     {
-        public enum ControllerType
-        {
-            None = 0,
-            Xbox = 1,
-            PS = 2
-        }
-
         private const int XboxControllerNameLength = 33;
         private const int PSControllerNameLength = 19;
 
@@ -330,23 +344,23 @@ namespace Atlanticide
             }
         }
 
-        public ControllerType GetConnectedControllerType(string joystickName)
+        public GamepadType GetConnectedControllerType(string joystickName)
         {
             if (string.IsNullOrEmpty(joystickName))
             {
-                return ControllerType.None;
+                return GamepadType.None;
             }
             else if (joystickName.Length == XboxControllerNameLength)
             {
-                return ControllerType.Xbox;
+                return GamepadType.Xbox;
             }
             else if (joystickName.Length == PSControllerNameLength)
             {
-                return ControllerType.PS;
+                return GamepadType.PlayStation;
             }
             else
             {
-                return ControllerType.None;
+                return GamepadType.None;
             }
         }
 
