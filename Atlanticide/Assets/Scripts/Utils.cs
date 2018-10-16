@@ -245,6 +245,13 @@ namespace Atlanticide
             }
         }
 
+        public static float DistanceTo(this MonoBehaviour obj,
+                                       MonoBehaviour target)
+        {
+            return Vector3.Distance
+                (obj.transform.position, target.transform.position);
+        }
+
         public static void DrawProgressBarGizmo(Vector3 position, float progress, Color barColor, Color indicatorColor)
         {
             Gizmos.color = barColor;

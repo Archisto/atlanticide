@@ -20,16 +20,21 @@ namespace Atlanticide
     /// </summary>
     public class PlayerInput
     {
+        private const float HoldTime = 0.35f;
+
         private string _horizontalMoveKey;
         private string _verticalMoveKey;
         private string _horizontalLookKey;
         private string _verticalLookKey;
         private string _actionKey;
         private string _altActionKey;
+        private string _stanceKey;
         private string _interactKey;
         private string _jumpKey;
         private string _toolSwapKey;
         private string _pauseKey;
+
+        private HoldInput _holdActionInput;
 
         private InputDevice _inputDevice;
         public InputDevice InputDevice
@@ -55,6 +60,8 @@ namespace Atlanticide
             {
                 InputDevice = (InputDevice) playerNum;
             }
+
+            _holdActionInput = new HoldInput(HoldTime);
         }
 
         /// <summary>
@@ -68,6 +75,7 @@ namespace Atlanticide
             _verticalLookKey = "VerticalLook" + InputDevice.ToString();
             _actionKey = "Action" + InputDevice.ToString();
             _altActionKey = "AltAction" + InputDevice.ToString();
+            _stanceKey = "Stance" + InputDevice.ToString();
             _interactKey = "Interact" + InputDevice.ToString();
             _jumpKey = "Jump" + InputDevice.ToString();
             _toolSwapKey = "ToolSwap" + InputDevice.ToString();
@@ -100,9 +108,12 @@ namespace Atlanticide
         /// Gets the player's action input.
         /// </summary>
         /// <returns>Is the action input pressed</returns>
-        public bool GetActionInput()
+        public bool GetActionInput(out bool inputHeld, out bool inputjustReleased)
         {
-            return Input.GetButton(_actionKey) || Input.GetAxis(_actionKey) == 1;
+            bool input = Input.GetButton(_actionKey) || Input.GetAxis(_actionKey) == 1;
+            inputHeld = _holdActionInput.InputIsHeld(input);
+            inputjustReleased = _holdActionInput.InputJustReleased;
+            return input;
         }
 
         /// <summary>
@@ -112,6 +123,15 @@ namespace Atlanticide
         public bool GetAltActionInput()
         {
             return Input.GetButton(_altActionKey) || Input.GetAxis(_altActionKey) == 1;
+        }
+
+        /// <summary>
+        /// Gets the player's stance input.
+        /// </summary>
+        /// <returns>Is the stance input pressed</returns>
+        public bool GetStanceInput()
+        {
+            return Input.GetButtonDown(_stanceKey);
         }
 
         /// <summary>
@@ -148,6 +168,11 @@ namespace Atlanticide
         public bool GetPauseInput()
         {
             return Input.GetButtonDown(_pauseKey);
+        }
+
+        public void ResetInput()
+        {
+            _holdActionInput.ResetHold();
         }
     }
 }

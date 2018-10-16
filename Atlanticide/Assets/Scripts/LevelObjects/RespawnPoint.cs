@@ -56,8 +56,9 @@ namespace Atlanticide
         /// <summary>
         /// Initializes the object.
         /// </summary>
-        private void Start()
+        protected override void Start()
         {
+            base.Start();
             EnergyCost = _defaultEnergyCost;
         }
 
@@ -66,16 +67,23 @@ namespace Atlanticide
         /// </summary>
         protected override void UpdateObject()
         {
-            if (RespawnActive)
+            if (GameManager.Instance.DeadPlayerCount > 0)
             {
-                UpdatePlayerRespawn();
-            }
-            else
-            {
-                CheckForPlayerWithinRange();
-            }
+                if (RespawnActive)
+                {
+                    UpdatePlayerRespawn();
+                }
+                else
+                {
+                    CheckForPlayerWithinRange();
+                }
 
-            base.UpdateObject();
+                base.UpdateObject();
+            }
+            else if (Interactor != null)
+            {
+                UnsetInteractorTarget(true);
+            }
         }
 
         private void UpdatePlayerRespawn()
@@ -90,37 +98,36 @@ namespace Atlanticide
 
         private void CheckForPlayerWithinRange()
         {
-            if (GameManager.Instance.DeadPlayerCount > 0)
+            if (Interactor == null &&
+                GameManager.Instance.DeadPlayerCount < GameManager.Instance.PlayerCount)
             {
-                if (Interactor == null &&
-                    GameManager.Instance.DeadPlayerCount < GameManager.Instance.PlayerCount)
+                // Gets a living player
+                PlayerCharacter pc = GameManager.Instance.GetAnyPlayer(false);
+                if (pc != null)
                 {
-                    // Gets a living player
-                    PlayerCharacter pc = GameManager.Instance.GetAnyPlayer(false);
-                    if (pc != null)
-                    {
-                        Interactor = pc;
-                    }
-                }
-
-                if (Interactor != null)
-                {
-                    if (Interactor.IsDead)
-                    {
-                        Interactor = null;
-                        return;
-                    }
-
-                    float distance = Vector3.Distance
-                        (transform.position, Interactor.transform.position);
-                    _interactorIsValid = (distance <= World.Instance.InteractRange);
-                    SetInteractorTarget(_interactorIsValid);
+                    Interactor = pc;
                 }
             }
-            // If all players are alive, removes the interactor
-            else if (Interactor != null)
+
+            if (Interactor != null)
             {
-                SetInteractorTarget(false, true);
+                if (Interactor.IsDead)
+                {
+                    Interactor = null;
+                    return;
+                }
+
+                float distance = Vector3.Distance
+                    (transform.position, Interactor.transform.position);
+                _interactorIsValid = (distance <= World.Instance.InteractRange);
+                if (_interactorIsValid)
+                {
+                    SetInteractorTarget();
+                }
+                else
+                {
+                    UnsetInteractorTarget(false);
+                }
             }
         }
 
@@ -142,6 +149,9 @@ namespace Atlanticide
 
         private bool TryStartPlayerRespawn(PlayerCharacter player)
         {
+            // NOTE: The interactor player cannot be removed here because
+            // it still needs to check the interaction energy cost.
+
             if (!RespawnActive && player != null)
             {
                 RespawnActive = true;
@@ -165,8 +175,16 @@ namespace Atlanticide
         public void EndPlayerRespawn()
         {
             RespawnActive = false;
-            SetInteractorTarget(false, true);
             _respawningPlayer = null;
+        }
+
+        /// <summary>
+        /// Sets the interactor player null after interaction.
+        /// Called in the PlayerCharacter class.
+        /// </summary>
+        public override void TryRemoveInteractorAfterInteraction()
+        {
+            UnsetInteractorTarget(true);
         }
 
         public override void ResetObject()

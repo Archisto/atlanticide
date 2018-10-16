@@ -76,7 +76,7 @@ namespace Atlanticide
         }
 
         /// <summary>
-        /// Draws gizmos.
+        /// Gives the color to the derived switches' gizmos.
         /// </summary>
         protected virtual void OnDrawGizmos()
         {

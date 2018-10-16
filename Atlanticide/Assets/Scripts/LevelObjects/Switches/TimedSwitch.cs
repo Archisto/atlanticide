@@ -54,9 +54,9 @@ namespace Atlanticide
         /// </summary>
         public override void ResetObject()
         {
-            base.ResetObject();
             Progress = 0f;
             _elapsedTime = 0f;
+            base.ResetObject();
         }
 
         /// <summary>
