@@ -39,5 +39,17 @@ namespace Atlanticide
 
             Activated = result;
         }
+
+        /// <summary>
+        /// Draws gizmos.
+        /// </summary>
+        protected override void OnDrawGizmos()
+        {
+            if (_drawGizmos)
+            {
+                base.OnDrawGizmos();
+                Gizmos.DrawSphere(transform.position, 0.5f);
+            }
+        }
     }
 }
