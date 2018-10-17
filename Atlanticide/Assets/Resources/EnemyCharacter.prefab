@@ -40,6 +40,7 @@ GameObject:
   - component: {fileID: 114176640427869518}
   - component: {fileID: 114840287141376854}
   - component: {fileID: 114433333998446934}
+  - component: {fileID: 114335530306781416}
   m_Layer: 10
   m_Name: EnemyCharacter
   m_TagString: Untagged
@@ -206,6 +207,23 @@ MonoBehaviour:
   _hitCentre: {fileID: 4309473786786962}
   _hitRange: 1
   _hitDamage: 1
+--- !u!114 &114335530306781416
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1808887598267606}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 81aa2cb748392a44d9f7fb9a8f3ae21c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  onGround: 1
+  _platformMask:
+    serializedVersion: 2
+    m_Bits: 256
+  _riseSpeed: 5
+  _maxFallDistance: 20
 --- !u!114 &114433333998446934
 MonoBehaviour:
   m_ObjectHideFlags: 1
