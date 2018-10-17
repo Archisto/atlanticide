@@ -40,6 +40,7 @@ GameObject:
   - component: {fileID: 114476421026711808}
   - component: {fileID: 114840287141376854}
   - component: {fileID: 114433333998446934}
+  - component: {fileID: 114986251306922832}
   m_Layer: 10
   m_Name: Insect
   m_TagString: Untagged
@@ -218,8 +219,11 @@ MonoBehaviour:
   _turningSpeed: 1
   _maxHitpoints: 1
   _hitCentre: {fileID: 4544654297837866}
-  _hitRange: 2
+  _hitRange: 1
   _hitDamage: 1
+  IdleRange: 5
+  SearchRange: 10
+  AttackRange: 5
 --- !u!114 &114840287141376854
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -233,6 +237,23 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _baseTelegrabSpeed: 1
   _active: 1
+--- !u!114 &114986251306922832
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1808887598267606}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 81aa2cb748392a44d9f7fb9a8f3ae21c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  onGround: 1
+  _platformMask:
+    serializedVersion: 2
+    m_Bits: 256
+  _riseSpeed: 5
+  _maxFallDistance: 20
 --- !u!135 &135521488679655816
 SphereCollider:
   m_ObjectHideFlags: 1

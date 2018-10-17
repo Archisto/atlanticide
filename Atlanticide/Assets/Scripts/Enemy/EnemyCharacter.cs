@@ -86,6 +86,12 @@ namespace Atlanticide
             }
         }
 
+        // How long Insect is on recovery where it does nothing
+        protected float InRecovery;
+
+        // How long Insect has been in recovery
+        protected float RecoveryTimer;
+
         #endregion
 
         #region Hitray
@@ -117,6 +123,8 @@ namespace Atlanticide
             base.Start();
             HitCentre = _hitCentre;
             HitCheck = false;
+            InRecovery = 0;
+            RecoveryTimer = 0;
             CurrentState = EnemyState.NO_TARGET;
 
             StartNoTarget();
@@ -129,6 +137,13 @@ namespace Atlanticide
 
             if (IsDead)
             {
+                return;
+            }
+
+            // If enemy is in recovery, don't execute state actions
+            if(RecoveryTimer < InRecovery)
+            {
+                RecoveryTimer += Time.deltaTime;
                 return;
             }
 
@@ -199,7 +214,7 @@ namespace Atlanticide
         protected virtual void TargetOn()
         {
             // enemy attacks when he's close enough the target
-            if (Vector3.Distance(Target.transform.position, transform.position) < HitRange)
+            if (Distance(false, Target.transform.position, transform.position, HitRange, true))
             {
                 ChangeState(EnemyState.ATTACK);
                 return;
@@ -208,17 +223,12 @@ namespace Atlanticide
             // approach the target
             if (Target != null)
             {
-                Vector3 move = Vector3.MoveTowards(transform.position, Target.transform.position, base._speed * Time.deltaTime);
-                move.y = transform.position.y;
-                Vector3 targetPostition = new Vector3(Target.transform.position.x, transform.position.y, Target.transform.position.z);
-                transform.LookAt(targetPostition);
-                transform.position = move;
+                MoveToTarget(Target.transform.position, 0, _speed);
             }
             else
             {
                 ChangeState(EnemyState.NO_TARGET);
             }
-
         }
 
         /// <summary>
@@ -280,22 +290,41 @@ namespace Atlanticide
 
                 if(shield != null && shield.BlocksDamage)
                 {
-                    shield.Hit();
-                    ChangeState(EnemyState.TARGET_ON);
-                    transform.position += transform.TransformDirection(Vector3.back * 3);
-                    Debug.Log("shield hit");
+                    HitShield(shield);
                 } else
                 {
                     character = hit.collider.gameObject.GetComponent<GameCharacter>();
                     if(character != null && !character.IsDead)
                     {
-                        character.TakeDamage(HitDamage);
-                        ChangeState(EnemyState.NO_TARGET);
-                        Debug.Log("character hit");
+                        HitCharacter(character);
                     }
                 }
+            }
+        }
 
-                Debug.Log("hit: " + hit.collider.transform.name);
+        /// <summary>
+        /// What happens when enemy hits a shield
+        /// </summary>
+        /// <param name="shield">shield script on the object that is hit</param>
+        protected virtual void HitShield(Shield shield)
+        {
+            shield.Hit();
+            ChangeState(EnemyState.TARGET_ON);
+            transform.position += transform.TransformDirection(Vector3.back * 3);
+            Debug.Log("shield hit");
+        }
+
+        /// <summary>
+        /// What happens when enemy hits a character
+        /// </summary>
+        /// <param name="character">GameCharacter script on the object that is hit</param>
+        protected virtual void HitCharacter(GameCharacter character)
+        {
+            if (character.Equals(Target))
+            {
+                character.TakeDamage(HitDamage);
+                ChangeState(EnemyState.NO_TARGET);
+                Debug.Log("character hit");
             }
         }
 
@@ -322,5 +351,45 @@ namespace Atlanticide
 
         #endregion
 
+        /// <summary>
+        /// Moves object towards the target
+        /// </summary>
+        protected void MoveToTarget(Vector3 target, float rise, float speed)
+        {
+            Vector3 move = Vector3.MoveTowards(transform.position, target, speed * Time.deltaTime);
+            move.y = transform.position.y;
+            Vector3 targetPostition = new Vector3(target.x, transform.position.y, target.z);
+            transform.LookAt(targetPostition);
+            transform.position = move;
+            _groundCollider.onGround = false;
+            _groundCollider.Rise(rise);
+        }
+
+        /// <summary>
+        /// Checks whether distance between given vectors is bigger/smaller than given value.
+        /// Y axis of vectors can be neutralized from the calculation.
+        /// </summary>
+        /// <param name="bigger">is distance compared by bigger or equal to</param>
+        /// <param name="start">start vector</param>
+        /// <param name="end">end vector</param>
+        /// <param name="distance">to what distance the distance between vectors is compared to</param>
+        /// <param name="negateY">Are y axis values neutralized from the calculation</param>
+        /// <returns></returns>
+        protected bool Distance(bool bigger, Vector3 start, Vector3 end, float distance, bool negateY)
+        {
+            if (negateY)
+            {
+                start.Set(start.x, 0, start.z);
+                end.Set(end.x, 0, end.z);
+            }
+
+            if (bigger)
+            {
+                return Vector3.Distance(start, end) >= distance;
+            } else
+            {
+                return Vector3.Distance(start, end) <= distance;
+            }
+        }
     }
 }
