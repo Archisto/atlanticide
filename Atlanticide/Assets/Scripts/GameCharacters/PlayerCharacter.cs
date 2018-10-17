@@ -101,43 +101,43 @@ namespace Atlanticide
         /// <summary>
         /// Moves the player character.
         /// </summary>
-        /// <param name="direction">The moving direction</param>
-        public void MoveInput(Vector3 direction)
+        /// <param name="input">The moving input</param>
+        public void MoveInput(Vector3 input)
         {
             if (!IsImmobile)
             {
                 if (Climbing)
                 {
-                    Climb(direction);
+                    Climb(input);
                 }
                 else
                 {
-                    Move(direction);
+                    Move(input);
                 }
             }
         }
 
-        private void Move(Vector3 direction)
+        private void Move(Vector3 input)
         {
-            Vector3 movement = new Vector3(direction.x, 0, direction.y) * _speed * World.Instance.DeltaTime;
+            Vector3 movement = new Vector3(input.x, 0, input.y) * _speed * World.Instance.DeltaTime;
             Vector3 newPosition = transform.position + movement * (Pushing ? 0.3f : 1f);
             transform.position = newPosition;
 
             if (!ShieldIsActive)
             {
-                RotateTowards(direction);
+                RotateTowards(input);
             }
         }
 
         /// <summary>
         /// Rotates the player character.
         /// </summary>
-        /// <param name="direction">The looking direction</param>
-        public void LookInput(Vector3 direction)
+        /// <param name="input">The looking direction</param>
+        public void LookInput(Vector3 input)
         {
             if (ShieldIsActive)
             {
-                RotateTowards(direction);
+                RotateTowards(input);
             }
         }
 
@@ -383,15 +383,15 @@ namespace Atlanticide
             }
         }
 
-        private void Climb(Vector3 direction)
+        private void Climb(Vector3 input)
         {
             Vector3 movement = Vector3.zero;
-            movement.y = direction.y * _climbSpeed * World.Instance.DeltaTime;
+            movement.y = input.y * _climbSpeed * World.Instance.DeltaTime;
             float climbProgress = _climbable.GetClimbProgress(transform.position + movement);
 
             transform.position = _climbable.GetPositionOnClimbable(climbProgress);
 
-            if ((climbProgress >= 1 && direction.y > 0) || (climbProgress <= 0 && direction.y < 0))
+            if ((climbProgress >= 1 && input.y > 0) || (climbProgress <= 0 && input.y < 0))
             {
                 EndClimb();
             }

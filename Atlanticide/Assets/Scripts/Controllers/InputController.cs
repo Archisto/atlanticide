@@ -32,6 +32,7 @@ namespace Atlanticide
 
         private PlayerCharacter[] _players;
         private ToolSwapping _toolSwap;
+        private CameraController _camera;
         private int _pausingPlayerNum;
         private float _inputDeadZone = 0.2f;
 
@@ -47,6 +48,7 @@ namespace Atlanticide
         {
             _players = GameManager.Instance.GetPlayers();
             _toolSwap = FindObjectOfType<ToolSwapping>();
+            _camera = FindObjectOfType<CameraController>();
 
             CheckConnectedControllers();
         }
@@ -237,10 +239,21 @@ namespace Atlanticide
             {
                 Debug.Break();
             }
+
+            // First-person mode
+            if (Input.GetKeyDown(KeyCode.O))
+            {
+                _camera.SetFirstPersonPlayer(_camera.firstPersonMode ? null : _players[0]);
+            }
         }
 
         public void TogglePause(int pausingPlayer)
         {
+            if (_camera.firstPersonMode)
+            {
+                _camera.SetFirstPersonPlayer(null);
+            }
+
             if (!World.Instance.GamePaused)
             {
                 _pausingPlayerNum = pausingPlayer;
