@@ -14,16 +14,33 @@ namespace Atlanticide
             Z
         }
 
+        /// <summary>
+        /// Returns string "{objectName} is not set."
+        /// </summary>
+        /// <param name="obj">An object</param>
+        /// <returns>A string</returns>
         public static string GetFieldNullString(string obj)
         {
             return string.Format("{0} is not set.", obj);
         }
 
+        /// <summary>
+        /// Returns string
+        /// "An instance of {objectName} could not be found in the scene."
+        /// </summary>
+        /// <param name="obj">An object</param>
+        /// <returns>A string</returns>
         public static string GetObjectMissingString(string obj)
         {
             return string.Format("An instance of {0} could not be found in the scene.", obj);
         }
 
+        /// <summary>
+        /// Returns string
+        /// "Component {componentName} could not be found in the object."
+        /// </summary>
+        /// <param name="comp">A component</param>
+        /// <returns>A string</returns>
         public static string GetComponentMissingString(string comp)
         {
             return string.Format("Component {0} could not be found in the object.", comp);

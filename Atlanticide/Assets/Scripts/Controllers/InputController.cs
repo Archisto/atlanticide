@@ -188,6 +188,15 @@ namespace Atlanticide
         /// </summary>
         private void CheckDebugInput()
         {
+            // Respawn players
+            if (Input.GetKeyDown(KeyCode.U))
+            {
+                foreach (PlayerCharacter player in _players)
+                {
+                    player.Respawn();
+                }
+            }
+
             // Max energy
             if (Input.GetKeyDown(KeyCode.Y))
             {
@@ -199,6 +208,34 @@ namespace Atlanticide
             if (Input.GetKeyDown(KeyCode.T))
             {
                 _toolSwap.SwapTools();
+            }
+
+            // Toggle noclip
+            if (Input.GetKeyDown(KeyCode.I))
+            {
+                bool noclip = false;
+                foreach (PlayerCharacter player in _players)
+                {
+                    WallCollider wc = player.GetComponent<WallCollider>();
+                    noclip = wc.enabled;
+                    wc.enabled = !noclip;
+                }
+                Debug.Log("Noclip: " + noclip);
+            }
+
+            // Toggle god mode
+            if (Input.GetKeyDown(KeyCode.L))
+            {
+                bool godMode = false;
+                foreach (PlayerCharacter player in _players)
+                {
+                    GroundCollider gc = player.GetComponent<GroundCollider>();
+                    godMode = !player.IsInvulnerable;
+                    gc.enabled = !godMode;
+                    player.IsInvulnerable = godMode;
+
+                }
+                Debug.Log("God mode: " + godMode);
             }
 
             // Change player count
@@ -220,22 +257,7 @@ namespace Atlanticide
             }
 
             // Change scene
-            if (Input.GetKeyDown(KeyCode.Keypad1))
-            {
-                GameManager.Instance.LoadLevel(1);
-            }
-            if (Input.GetKeyDown(KeyCode.Keypad2))
-            {
-                GameManager.Instance.LoadLevel(2);
-            }
-            if (Input.GetKeyDown(KeyCode.Keypad0))
-            {
-                if (World.Instance.GamePaused)
-                {
-                    World.Instance.PauseGame(false);
-                }
-                GameManager.Instance.LoadTestLevel();
-            }
+            LoadLevelOrPuzzle();
 
             // Pause play mode
             if (Input.GetKeyDown(KeyCode.P))
@@ -392,6 +414,54 @@ namespace Atlanticide
         {
             Debug.Log(player.name + "'s controller: " +
                 player.Input.InputDevice);
+        }
+
+        // Testing
+        private void LoadLevelOrPuzzle()
+        {
+            bool input = false;
+            int levelOrPuzzle = 1;
+            bool level = true;
+
+            if (Input.GetKeyDown(KeyCode.Keypad0))
+            {
+                if (World.Instance.GamePaused)
+                {
+                    World.Instance.PauseGame(false);
+                }
+                GameManager.Instance.LoadTestLevel();
+                return;
+            }
+            else if (Input.GetKeyDown(KeyCode.Keypad1))
+            {
+                levelOrPuzzle = 1;
+                level = true;
+                input = true;
+            }
+            else if (Input.GetKeyDown(KeyCode.Keypad2))
+            {
+                levelOrPuzzle = 2;
+                level = false;
+                input = true;
+            }
+            else if (Input.GetKeyDown(KeyCode.Keypad3))
+            {
+                levelOrPuzzle = 2;
+                level = true;
+                input = true;
+            }
+
+            if (input)
+            {
+                if (level)
+                {
+                    GameManager.Instance.LoadLevel(levelOrPuzzle);
+                }
+                else
+                {
+                    GameManager.Instance.LoadPuzzle(levelOrPuzzle);
+                }
+            }
         }
     }
 }
