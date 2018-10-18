@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Atlanticide {
+namespace Atlanticide
+{
 
-    public class SimplePlatformPath : MonoBehaviour {
+    public class SimplePlatformPath : MonoBehaviour
+    {
 
         [Header("Objects")]
 
@@ -12,7 +14,10 @@ namespace Atlanticide {
         GameObject Object;
 
         [SerializeField]
-        Transform PointA, PointB;
+        Transform NormalPoint;
+
+        [SerializeField]
+        Transform TargetPoint;
 
         [Header("Settings")]
 
@@ -20,13 +25,19 @@ namespace Atlanticide {
         float Speed;
 
         [SerializeField]
-        bool ToPointA;
-
-        [SerializeField]
         bool LockToPath;
 
         [SerializeField]
         float Accuracy;
+
+        [SerializeField]
+        bool LockToTarget;
+
+        [SerializeField]
+        bool MustFinishTarget;
+
+        [SerializeField]
+        bool MustFinishNormal;
 
         [Header("Activation type")]
 
@@ -39,11 +50,14 @@ namespace Atlanticide {
         [SerializeField]
         EnergyTarget Target;
 
+        private bool TowardsTarget;
 
         private bool OnTarget = true;
 
         // Use this for initialization
-        void Start() {
+        void Start()
+        {
+            TowardsTarget = false;
             if (LockToPath)
             {
                 FinishMovement();
@@ -51,14 +65,22 @@ namespace Atlanticide {
         }
 
         // Update is called once per frame
-        void Update() {
+        void Update()
+        {
+            if(IsAtTarget() && LockToTarget)
+            {
+                return;
+            }
 
-            if (UsingKey)
-            {
-                CheckKey();
-            } else
-            {
-                CheckEnergyTarget();
+            if (IsDone() || (MustFinishTarget && !TowardsTarget) || (MustFinishNormal && TowardsTarget) || (!MustFinishTarget && !MustFinishNormal)) {
+                if (UsingKey)
+                {
+                    CheckKey();
+                }
+                else
+                {
+                    CheckEnergyTarget();
+                }
             }
 
             if (OnTarget)
@@ -80,21 +102,14 @@ namespace Atlanticide {
                 if (KeyCode == ownedKeyCode)
                 {
                     keyMatch = true;
-                    CallForMovement(ToPointA);
+                    CallForMovement(true);
                 }
             }
 
             if (!keyMatch)
             {
-                CallForMovement(ToPointA);
+                CallForMovement(false);
             }
-        }
-
-        // Determines to what direction Object should move
-        private void CallForMovement(bool _ToPointA)
-        {
-            ToPointA = _ToPointA;
-            IsDone();
         }
 
         // Checks if energy target has max level charge
@@ -102,34 +117,43 @@ namespace Atlanticide {
         {
             if (Target.MaxCharge)
             {
-                CallForMovement(ToPointA);
+                CallForMovement(true);
             }
 
-            if(!World.Instance.EmittingEnergy)
+            if (!World.Instance.EmittingEnergy)
             {
-                CallForMovement(!ToPointA);
+                Target.currentCharges = 0;
+                CallForMovement(false);
             }
+        }
+
+        // Determines to what direction Object should move
+        private void CallForMovement(bool toTarget)
+        {
+            TowardsTarget = toTarget;
+            IsDone();
         }
 
         // Snap the object to current target
         private void FinishMovement()
         {
-            Object.transform.position = (ToPointA ? PointA.position : PointB.position);
+            Object.transform.position = (TowardsTarget ? TargetPoint.position : NormalPoint.position);
             OnTarget = true;
         }
 
         // Move the Object towards the current target
         private void Moving()
         {
-            Vector3.MoveTowards(Object.transform.position, (ToPointA ? PointA.position : PointB.position), Speed * Time.deltaTime);
+            Object.transform.position = Vector3.MoveTowards(Object.transform.position, (TowardsTarget ? TargetPoint.position : NormalPoint.position), Speed * Time.deltaTime);
         }
 
         // Check if movement is done
         private bool IsDone()
         {
-            if (Vector3.Distance(Object.transform.position, (ToPointA ? PointA.position : PointB.position)) < Accuracy)
+            if (Vector3.Distance(Object.transform.position, (TowardsTarget ? TargetPoint.position : NormalPoint.position)) <= Accuracy)
             {
                 OnTarget = true;
+
                 if (LockToPath)
                 {
                     FinishMovement();
@@ -138,6 +162,16 @@ namespace Atlanticide {
             }
             OnTarget = false;
             return false;
+        }
+
+        private bool IsAtTarget()
+        {
+            return TowardsTarget && IsDone();
+        }
+
+        private bool IsAtNormal()
+        {
+            return !TowardsTarget && IsDone();
         }
 
     }
