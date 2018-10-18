@@ -403,7 +403,7 @@ InputManager:
     snap: 1
     invert: 0
     type: 2
-    axis: 3
+    axis: 7
     joyNum: 1
   - serializedVersion: 3
     m_Name: VerticalLookGamepad2
@@ -419,7 +419,7 @@ InputManager:
     snap: 1
     invert: 1
     type: 2
-    axis: 4
+    axis: 5
     joyNum: 1
   - serializedVersion: 3
     m_Name: ActionGamepad2
@@ -435,7 +435,7 @@ InputManager:
     snap: 0
     invert: 0
     type: 2
-    axis: 5
+    axis: 3
     joyNum: 1
   - serializedVersion: 3
     m_Name: AltActionGamepad2
@@ -451,7 +451,7 @@ InputManager:
     snap: 0
     invert: 0
     type: 2
-    axis: 6
+    axis: 4
     joyNum: 1
   - serializedVersion: 3
     m_Name: StanceGamepad2
