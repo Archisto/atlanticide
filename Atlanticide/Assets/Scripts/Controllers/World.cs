@@ -63,6 +63,11 @@ namespace Atlanticide
 
         public bool ShieldBashing { get; set; }
 
+        public bool EmittingEnergy { get; set; }
+
+        public bool DrainingEnergy { get; set; }
+
+
         /// <summary>
         /// Initializes the singleton instance.
         /// </summary>
@@ -152,7 +157,7 @@ namespace Atlanticide
         public void SetEnergyChargesAndUpdateUI(int charges)
         {
             CurrentEnergyCharges = Utils.Clamp(charges, 0, MaxEnergyCharges);
-            float ratio = (float) CurrentEnergyCharges / MaxEnergyCharges;
+            float ratio = (float)CurrentEnergyCharges / MaxEnergyCharges;
             _ui.UpdateEnergyBar(ratio);
             Debug.Log(string.Format("Energy charges: {0} ({1} %)",
                 CurrentEnergyCharges, ratio * 100));
@@ -165,6 +170,9 @@ namespace Atlanticide
         {
             CurrentEnergyCharges = 0;
             keyCodes.Clear();
+            EmittingEnergy = false;
+            ShieldBashing = false;
+            DrainingEnergy = false;
         }
     }
 }

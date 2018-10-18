@@ -15,7 +15,7 @@ namespace Atlanticide
         /// </summary>
         protected GameCharacter Target { get; set; }
 
-        [Header("Hit variables")]
+        [Header("HIT VARIABLES")]
 
         // ray is casted from the centre of this object, to the direction of forward of this object
         [SerializeField]
@@ -86,10 +86,10 @@ namespace Atlanticide
             }
         }
 
-        // How long Insect is on recovery where it does nothing
+        // How long enemy is on recovery where it does nothing
         protected float InRecovery;
 
-        // How long Insect has been in recovery
+        // How long enemy has been in recovery
         protected float RecoveryTimer;
 
         #endregion
