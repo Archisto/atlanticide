@@ -118,6 +118,7 @@ namespace Atlanticide
             _fadeProgress = 0;
             _elapsedTime = 0;
             Active = true;
+            UpdateTransparency();
         }
 
         /// <summary>
@@ -215,6 +216,14 @@ namespace Atlanticide
 
                 _screenCoverImage.color = newColor;
             }
+        }
+
+        private void InstantFadeOut()
+        {
+            Color newColor = _color;
+            newColor.a = 1f;
+            _screenCoverImage.color = newColor;
+            Debug.Log("Instant fade-out");
         }
     }
 }

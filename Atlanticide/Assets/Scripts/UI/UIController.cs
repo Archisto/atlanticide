@@ -23,6 +23,9 @@ namespace Atlanticide.UI
         private Image _fade;
 
         [SerializeField]
+        private Image _swapIcon;
+
+        [SerializeField]
         private Image[] _targetIcons;
 
         [SerializeField]
@@ -118,6 +121,11 @@ namespace Atlanticide.UI
         public Image GetFade()
         {
             return _fade;
+        }
+
+        public Image GetSwapIcon()
+        {
+            return _swapIcon;
         }
 
         public void ActivatePauseScreen(bool activate, string playerName)
