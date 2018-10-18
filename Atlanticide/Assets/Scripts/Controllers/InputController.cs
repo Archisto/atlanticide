@@ -27,7 +27,10 @@ namespace Atlanticide
 
     public class InputController : MonoBehaviour
     {
+        // "Controller (XBOX 360 For Windows)"
         private const int XboxControllerNameLength = 33;
+
+        // "Wireless Controller"
         private const int PSControllerNameLength = 19;
 
         private PlayerCharacter[] _players;
