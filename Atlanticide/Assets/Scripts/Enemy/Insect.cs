@@ -138,7 +138,6 @@ namespace Atlanticide
             }
             else
             {
-
                 // Charge towards the target
                 MoveToTarget(AttackTarget, 15, _speed * 5f);
                 //_groundCollider.GroundHeightDifference

@@ -47,6 +47,10 @@ namespace Atlanticide
         {
             if (playerNum >= 0 && playerNum <= 3)
             {
+                if(playerNum != 0)
+                {
+                    playerNum = 2;
+                }
                 InputDevice = (InputDevice) playerNum;
             }
 

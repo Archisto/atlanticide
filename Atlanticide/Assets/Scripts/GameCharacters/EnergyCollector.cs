@@ -17,7 +17,7 @@ namespace Atlanticide
         private GameObject _energyObject;
 
         [SerializeField]
-        private float _chargeTime = 1f;
+        private float _drainTime = 1f;
 
         [SerializeField]
         private float _emitTime = 1f;
@@ -60,7 +60,7 @@ namespace Atlanticide
         private void UpdateChargingOrEmitting()
         {
             _elapsedTime += World.Instance.DeltaTime;
-            float targetTime = (_mode == Mode.Draining ? _chargeTime : _emitTime);
+            float targetTime = (_mode == Mode.Draining ? _drainTime : _emitTime);
             if (_elapsedTime >= targetTime)
             {
                 ReturnToIdle();
@@ -191,10 +191,12 @@ namespace Atlanticide
         {
             ChangeCharges(1);
             _tempNode.LoseCharge();
+            World.Instance.DrainingEnergy = true;
         }
 
         private void Emit()
         {
+            World.Instance.EmittingEnergy = true;
             ChangeCharges(-1);
             _tempNode.GainCharge();
         }
@@ -207,6 +209,8 @@ namespace Atlanticide
 
         public void ReturnToIdle()
         {
+            World.Instance.EmittingEnergy = false;
+            World.Instance.DrainingEnergy = false;
             _mode = Mode.Idle;
             _energyObject.SetActive(false);
             _tempNode = null;
