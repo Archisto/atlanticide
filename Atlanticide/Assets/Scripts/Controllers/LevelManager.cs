@@ -4,33 +4,26 @@ using UnityEngine;
 
 namespace Atlanticide
 {
-    public class Level : MonoBehaviour
+    public class LevelManager : MonoBehaviour
     {
         [SerializeField]
-        private Transform _player1SpawnPoint;
+        private Transform _energyCollPlayerSpawnPoint;
 
         [SerializeField]
-        private Transform _player2SpawnPoint;
-
-        [SerializeField]
-        private Transform _levelCenter;
+        private Transform _shieldPlayerSpawnPoint;
 
         /// <summary>
         /// Initializes the object.
         /// </summary>
         private void Start()
         {
-            if (_player1SpawnPoint == null)
+            if (_energyCollPlayerSpawnPoint == null)
             {
                 Debug.LogError(Utils.GetFieldNullString("Player 1 spawn point"));
             }
-            if (_player2SpawnPoint == null)
+            if (_shieldPlayerSpawnPoint == null)
             {
                 Debug.LogError(Utils.GetFieldNullString("Player 2 spawn point"));
-            }
-            if (_levelCenter == null)
-            {
-                Debug.LogError(Utils.GetFieldNullString("Level center"));
             }
         }
 
@@ -41,28 +34,23 @@ namespace Atlanticide
         {
         }
 
-        public Vector3 GetSpawnPoint(int playerNum)
+        public Vector3 GetSpawnPoint(PlayerTool tool)
         {
-            switch (playerNum)
+            switch (tool)
             {
-                case 0:
+                case PlayerTool.EnergyCollector:
                 {
-                    return _player1SpawnPoint.position;
+                    return _energyCollPlayerSpawnPoint.position;
                 }
-                case 1:
+                case PlayerTool.Shield:
                 {
-                    return _player2SpawnPoint.position;
+                    return _shieldPlayerSpawnPoint.position;
                 }
                 default:
                 {
                     return Vector3.zero;
                 }
             }
-        }
-
-        public Vector3 GetLevelCenter()
-        {
-            return _levelCenter.position;
         }
 
         public void ResetLevel()

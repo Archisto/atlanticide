@@ -168,7 +168,7 @@ namespace Atlanticide
         /// </summary>
         public void ResetWorld()
         {
-            CurrentEnergyCharges = 0;
+            SetEnergyChargesAndUpdateUI(0);
             keyCodes.Clear();
             EmittingEnergy = false;
             ShieldBashing = false;

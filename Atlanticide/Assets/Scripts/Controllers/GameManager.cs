@@ -31,7 +31,7 @@ namespace Atlanticide
         #endregion Statics
 
         public const int MaxPlayers = 2;
-        public const int LastLevel = 1;
+        public const int LevelCount = 2;
 
         private const string MainMenuKey = "MainMenu";
         private const string LevelKey = "Level";
@@ -46,17 +46,18 @@ namespace Atlanticide
         public enum TransitionPhase
         {
             None = 0,
-            ResetingLevel = 1,
+            ResetingScene = 1,
             ExitingScene = 2,
             StartingScene = 3
         }
 
-        private Level _level;
+        private LevelManager _level;
         private PlayerCharacter _playerPrefab;
         private PlayerCharacter[] _players;
         private PlayerTool[] _playerTools;
         private NonPlayerCharacter[] _npcs;
         private UIController _ui;
+        private List<Level> _levels;
         private LevelObject[] _levelObjects;
         private Transform[] _telegrabs;
         private InputController _input;
@@ -81,15 +82,20 @@ namespace Atlanticide
             }
             set
             {
-                _deadPlayerCount = value;
-                if (LevelFailed)
+                if (value >= 0)
                 {
-                    StartLevelReset();
+                    _deadPlayerCount = value;
+                    if (LevelFailed)
+                    {
+                        StartSceneReset();
+                    }
+
+                    SetScore(_deadPlayerCount);
                 }
             }
         }
 
-        public int CurrentLevel { get; set; }
+        public Level CurrentLevel { get; set; }
 
         public int CurrentScore { get; private set; }
 
@@ -161,8 +167,8 @@ namespace Atlanticide
                     GameState = State.Play;
                 }
 
+                InitLevels();
                 PlayerCount = 2;
-                CurrentLevel = 1;
                 _playerTools = new PlayerTool[MaxPlayers];
                 _updateAtSceneStart = true;
             }
@@ -178,12 +184,12 @@ namespace Atlanticide
             {
                 LoadScene(_nextSceneName);
             }
-            else if (Transition == TransitionPhase.ResetingLevel
+            else if (Transition == TransitionPhase.ResetingScene
                      && _fade.FadedOut)
             {
                 Transition = TransitionPhase.None;
                 ActivatePauseScreen(false, "");
-                ResetLevel();
+                ResetScene();
             }
 
             if (_updateAtSceneStart)
@@ -197,7 +203,6 @@ namespace Atlanticide
             if (GameState == State.Play)
             {
                 Debug.Log("Level starts");
-                SetPlayerTools(_freshGameStart);
             }
             else
             {
@@ -222,7 +227,7 @@ namespace Atlanticide
 
             if (GameState == State.Play)
             {
-                InitLevel();
+                InitLevelManager();
                 InitPlayers();
                 InitNPCs();
                 _levelObjects = FindObjectsOfType<LevelObject>();
@@ -230,86 +235,6 @@ namespace Atlanticide
 
             Transition = TransitionPhase.None;
             _updateAtSceneStart = true;
-        }
-
-        /// <summary>
-        /// Initializes the level controller.
-        /// </summary>
-        private void InitLevel()
-        {
-            _level = FindObjectOfType<Level>();
-            if (_level == null)
-            {
-                Debug.LogError(Utils.GetFieldNullString("Level controller"));
-            }
-        }
-
-        /// <summary>
-        /// Initializes the player characters.
-        /// </summary>
-        private void InitPlayers()
-        {
-            _players = new PlayerCharacter[MaxPlayers];
-            _playerPrefab = Resources.Load<PlayerCharacter>("PlayerCharacter");
-            CreatePlayers();
-            ActivatePlayers(PlayerCount);
-
-            // Test
-            _telegrabs = new Transform[MaxPlayers];
-        }
-
-        /// <summary>
-        /// Initializes the non-player characters.
-        /// </summary>
-        private void InitNPCs()
-        {
-            _npcs = FindObjectsOfType<NonPlayerCharacter>();
-        }
-
-        /// <summary>
-        /// Creates the player characters.
-        /// </summary>
-        /// <param name="playerCount">The player count</param>
-        private void CreatePlayers()
-        {
-            for (int i = 0; i < MaxPlayers; i++)
-            {
-                _players[i] = Instantiate(_playerPrefab);
-                _players[i].ID = i;
-                _players[i].name = "Player " + (i + 1);
-                _players[i].Input = new PlayerInput(i);
-                _players[i].transform.position = _level.GetSpawnPoint(i);
-                SetPlayerTool(_players[i], i + 1);
-            }
-        }
-
-        /// <summary>
-        /// Activates a player character for each player and deactives the rest.
-        /// </summary>
-        /// <param name="newPlayerCount">The player count</param>
-        public void ActivatePlayers(int newPlayerCount)
-        {
-            // TODO: Are player characters set inactive when they die?
-            // Do they die? Can player count be changed at any point?
-            // Setting a dead PC inactive and then active again
-            // should not make them respawn.
-
-            PlayerCount = (newPlayerCount < MaxPlayers ? newPlayerCount : MaxPlayers);
-            Debug.Log("New player count: " + PlayerCount);
-
-            for (int i = 0; i < MaxPlayers; i++)
-            {
-                bool activate = (i < PlayerCount);
-                bool alreadyActive = _players[i].gameObject.activeSelf;
-
-                if (!activate && alreadyActive)
-                {
-                    _players[i].CancelActions();
-                    _players[i].Respawn();
-                }
-
-                _players[i].gameObject.SetActive(activate);
-            }
         }
 
         /// <summary>
@@ -336,7 +261,7 @@ namespace Atlanticide
 
                 if (Transition == TransitionPhase.StartingScene)
                 {
-                    _fade.StartFadeIn(false);
+                    _fade.StartFadeIn(true);
                 }
             }
         }
@@ -351,6 +276,99 @@ namespace Atlanticide
             {
                 Debug.LogError(Utils.GetObjectMissingString("InputController"));
             }
+        }
+
+        /// <summary>
+        /// Initializes the level manager.
+        /// </summary>
+        private void InitLevelManager()
+        {
+            _level = FindObjectOfType<LevelManager>();
+            if (_level == null)
+            {
+                Debug.LogError(Utils.GetFieldNullString("LevelManager"));
+            }
+        }
+
+        private void InitLevels()
+        {
+            _levels = new List<Level>();
+            _levels.Add(new Level(1, "Level1", 3));
+            _levels.Add(new Level(2, "Level2", 3));
+
+            _levels[0].SetPuzzleNames(
+                "First Tutorial", "Second Tutorial", "Third Tutorial");
+            _levels[1].SetPuzzleNames(
+                "Iosefka's Clinic", "Central Yharnam", "Cathedral Ward");
+
+            CurrentLevel = _levels[0];
+        }
+
+        /// <summary>
+        /// Initializes the player characters.
+        /// </summary>
+        private void InitPlayers()
+        {
+            _players = new PlayerCharacter[MaxPlayers];
+            _playerPrefab = Resources.Load<PlayerCharacter>("PlayerCharacter");
+            CreatePlayers();
+            ActivatePlayers(PlayerCount);
+
+            // Test
+            _telegrabs = new Transform[MaxPlayers];
+        }
+
+        /// <summary>
+        /// Creates the player characters.
+        /// </summary>
+        /// <param name="playerCount">The player count</param>
+        private void CreatePlayers()
+        {
+            for (int i = 0; i < MaxPlayers; i++)
+            {
+                _players[i] = Instantiate(_playerPrefab);
+                _players[i].ID = i;
+                _players[i].name = "Player " + (i + 1);
+                _players[i].Input = new PlayerInput(i);
+                PlayerTool tool = GetPlayerTool(i);
+                _players[i].Tool = tool;
+                _players[i].transform.position = _level.GetSpawnPoint(tool);
+                Debug.Log("Player " + (i + 1) + " input device: " + _players[i].Input.InputDevice);
+            }
+
+            SavePlayerTools();
+        }
+
+        /// <summary>
+        /// Activates a player character for each player and deactives the rest.
+        /// </summary>
+        /// <param name="newPlayerCount">The player count</param>
+        public void ActivatePlayers(int newPlayerCount)
+        {
+            PlayerCount = (newPlayerCount < MaxPlayers ? newPlayerCount : MaxPlayers);
+            //Debug.Log("New player count: " + PlayerCount);
+
+            for (int i = 0; i < MaxPlayers; i++)
+            {
+                bool activate = (i < PlayerCount);
+                bool alreadyActive = _players[i].gameObject.activeSelf;
+
+                if (!activate && alreadyActive)
+                {
+                    _players[i].CancelActions();
+                    _players[i].Respawn();
+                }
+
+                _players[i].gameObject.SetActive(activate);
+            }
+        }
+
+        /// <summary>
+        /// Initializes the non-player characters.
+        /// </summary>
+        private void InitNPCs()
+        {
+            _npcs = FindObjectsOfType<NonPlayerCharacter>();
         }
 
         public UIController GetUI()
@@ -595,24 +613,37 @@ namespace Atlanticide
         }
 
         /// <summary>
-        /// Saves the tools currently in use or gives each player character a saved tool.
+        /// Returns the tool the given player currently uses or should use.
+        /// This is determined by whether there player's tool has been saved.
         /// </summary>
-        /// <param name="saveCurrent">Should the tools currently in use be saved</param>
-        public void SetPlayerTools(bool saveCurrent)
+        /// <param name="playerID">A player's ID</param>
+        /// <returns>A player tool</returns>
+        public PlayerTool GetPlayerTool(int playerID)
+        {
+            PlayerTool result = PlayerTool.None;
+
+            if (_playerTools[playerID] == PlayerTool.None)
+            {
+                result = (PlayerTool) (playerID + 1);
+            }
+            else
+            {
+                result = _playerTools[playerID];
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Saves which player is using which tool.
+        /// </summary>
+        public void SavePlayerTools()
         {
             for (int i = 0; i < _players.Length; i++)
             {
-                if (saveCurrent)
-                {
-                    _playerTools[i] = _players[i].Tool;
-                    //Debug.Log(string.Format("Tool saved: {0} has {1}", _players[i].name, _playerTools[i]));
-                }
-                else
-                {
-                    SetPlayerTool(_players[i], _playerTools[i]);
-                    _ui.UpdatePlayerToolImage(i, _playerTools[i]);
-                    //Debug.Log(string.Format("Tool set: {0} gets {1}", _players[i].name, _playerTools[i]));
-                }
+                _playerTools[i] = _players[i].Tool;
+                //Debug.Log(string.Format("Tool saved: {0} has {1}",
+                //    _players[i].name, _playerTools[i]));
             }
         }
 
@@ -621,8 +652,9 @@ namespace Atlanticide
         /// </summary>
         /// <param name="player">A player</param>
         /// <param name="tool">A tool</param>
-        public void SetPlayerTool(PlayerCharacter player, PlayerTool tool)
+        public PlayerTool SetPlayerTool(PlayerCharacter player, PlayerTool tool)
         {
+            // Cancels actions performed with the current tool
             if (player.Tool == PlayerTool.EnergyCollector)
             {
                 player.EnergyCollector.ResetEnergyCollector();
@@ -633,6 +665,7 @@ namespace Atlanticide
                 player.Shield.ActivateInstantly(false);
             }
 
+            // Sets the new tool
             player.Tool = tool;
 
             // The UI controller first updates the tool images in its Start method.
@@ -641,51 +674,35 @@ namespace Atlanticide
             {
                 _ui.UpdatePlayerToolImage(player.ID, player.Tool);
             }
-        }
 
-        /// <summary>
-        /// Sets the given players tool.
-        /// </summary>
-        /// <param name="player">A player</param>
-        /// <param name="toolNum">A tool's enum number</param>
-        public void SetPlayerTool(PlayerCharacter player, int toolNum)
-        {
-            if (Enum.IsDefined(typeof(PlayerTool), toolNum))
-            {
-                SetPlayerTool(player, (PlayerTool) toolNum);
-            }
-            else
-            {
-                Debug.LogWarning("Enum PlayerTool does not have a value at index " + toolNum);
-            }
+            return player.Tool;
         }
 
         /// <summary>
         /// Starts reseting level with a fade-out.
         /// </summary>
-        public void StartLevelReset()
+        public void StartSceneReset()
         {
-            Transition = TransitionPhase.ResetingLevel;
+            Transition = TransitionPhase.ResetingScene;
             _fade.StartFadeOut(LevelFailed);
             Debug.Log("Restarting level");
         }
 
         /// <summary>
-        /// Resets the current level.
+        /// Resets the current scene.
         /// </summary>
-        public void ResetLevel()
+        public void ResetScene()
         {
+            SetScore(0);
             World.Instance.ResetWorld();
+            _level.ResetLevel();
             _input.ResetInput();
             _players.ForEach(pc => pc.CancelActions());
-            _players.ForEach(pc => pc.RespawnPosition = _level.GetSpawnPoint(pc.ID));
+            _players.ForEach(pc => pc.RespawnPosition = _level.GetSpawnPoint(pc.Tool));
             ForEachActivePlayerChar(pc => pc.Respawn());
             _npcs.ForEach(npc => npc.Respawn());
             _levelObjects.ForEach(obj => obj.ResetObject());
-            _level.ResetLevel();
             _ui.ResetUI();
-            World.Instance.SetEnergyChargesAndUpdateUI(0);
-            SetScore(0);
             DeadPlayerCount = 0;
             _fade.StartFadeIn(true);
         }
@@ -702,25 +719,47 @@ namespace Atlanticide
         /// <summary>
         /// Loads a level.
         /// </summary>
-        /// <param name="levelNum">The level number</param>
+        /// <param name="levelNum">A level number</param>
         public void LoadLevel(int levelNum)
         {
             if (!SceneChanging)
             {
-                if (levelNum >= 1 && levelNum <= LastLevel)
+                if (levelNum >= 1 && levelNum <= _levels.Count)
                 {
-                    CurrentLevel = levelNum;
-                    StartLoadingScene(LevelKey + levelNum);
-                    GameState = State.Play;
+                    CurrentLevel = _levels[levelNum - 1];
+                    LoadPuzzle(1);
                 }
                 else
                 {
-                    Debug.LogWarning(string.Format("Invalid level number ({0}).", levelNum));
+                    Debug.LogError(string.Format("Invalid level number ({0}).", levelNum));
                 }
             }
             else
             {
                 Debug.LogWarning("Scene is already changing.");
+            }
+        }
+
+        /// <summary>
+        /// Loads a puzzle.
+        /// </summary>
+        /// <param name="puzzleNum">A puzzle number</param>
+        /// <returns>Could the puzzle be loaded</returns>
+        public bool LoadPuzzle(int puzzleNum)
+        {
+            string puzzleName = CurrentLevel.GetPuzzleName(puzzleNum);
+            if (puzzleName != null)
+            {
+                Debug.Log(string.Format("Going to level {0} puzzle {1}: {2}",
+                    CurrentLevel.Number, puzzleNum, puzzleName));
+                StartLoadingScene(CurrentLevel.GetPuzzleSceneName(puzzleNum));
+                GameState = State.Play;
+                return true;
+            }
+            else
+            {
+                Debug.LogError("Invalid puzzle number.");
+                return false;
             }
         }
 

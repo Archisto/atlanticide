@@ -71,13 +71,16 @@ namespace Atlanticide
         /// <returns>Does the character die.</returns>
         public virtual bool TakeDamage(int damage)
         {
-            _hitpoints -= damage;
-
-            if (_hitpoints <= 0)
+            if (!IsInvulnerable)
             {
-                _hitpoints = 0;
-                Kill();
-                return true;
+                _hitpoints -= damage;
+
+                if (_hitpoints <= 0)
+                {
+                    _hitpoints = 0;
+                    Kill();
+                    return true;
+                }
             }
 
             return false;
