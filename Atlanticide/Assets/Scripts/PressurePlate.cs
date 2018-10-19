@@ -7,9 +7,6 @@ namespace Atlanticide
     public class PressurePlate : Switch
     {
         [SerializeField]
-        private int _keyCode;
-
-        [SerializeField]
         private GameObject _plate;
 
         [SerializeField]
@@ -77,15 +74,12 @@ namespace Atlanticide
         private void Activate()
         {
             Activated = true;
-            World.Instance.
-                TryActivateNewKeyCode(_keyCode, true);
             _runningRoutine = StartCoroutine(MovePlateRoutine());
         }
 
         private void Deactivate()
         {
             Activated = false;
-            World.Instance.DeactivateKeyCode(_keyCode);
             _runningRoutine = StartCoroutine(MovePlateRoutine());
         }
 
