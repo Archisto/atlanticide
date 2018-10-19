@@ -188,74 +188,6 @@ namespace Atlanticide
         /// </summary>
         private void CheckDebugInput()
         {
-            // Respawn players
-            if (Input.GetKeyDown(KeyCode.U))
-            {
-                foreach (PlayerCharacter player in _players)
-                {
-                    player.Respawn();
-                }
-            }
-
-            // Max energy
-            if (Input.GetKeyDown(KeyCode.Y))
-            {
-                World.Instance.SetEnergyChargesAndUpdateUI
-                    (World.Instance.MaxEnergyCharges);
-            }
-
-            // Swap tools
-            if (Input.GetKeyDown(KeyCode.T))
-            {
-                _toolSwap.SwapTools();
-            }
-
-            // Toggle noclip
-            if (Input.GetKeyDown(KeyCode.I))
-            {
-                bool noclip = false;
-                foreach (PlayerCharacter player in _players)
-                {
-                    WallCollider wc = player.GetComponent<WallCollider>();
-                    noclip = wc.enabled;
-                    wc.enabled = !noclip;
-                }
-                Debug.Log("Noclip: " + noclip);
-            }
-
-            // Toggle god mode
-            if (Input.GetKeyDown(KeyCode.L))
-            {
-                bool godMode = false;
-                foreach (PlayerCharacter player in _players)
-                {
-                    GroundCollider gc = player.GetComponent<GroundCollider>();
-                    godMode = !player.IsInvulnerable;
-                    gc.enabled = !godMode;
-                    player.IsInvulnerable = godMode;
-
-                }
-                Debug.Log("God mode: " + godMode);
-            }
-
-            // Change player count
-            if (Input.GetKeyDown(KeyCode.Alpha1))
-            {
-                GameManager.Instance.ActivatePlayers(1);
-            }
-            else if (Input.GetKeyDown(KeyCode.Alpha2))
-            {
-                GameManager.Instance.ActivatePlayers(2);
-            }
-            else if (Input.GetKeyDown(KeyCode.Alpha3))
-            {
-                GameManager.Instance.ActivatePlayers(3);
-            }
-            else if (Input.GetKeyDown(KeyCode.Alpha4))
-            {
-                GameManager.Instance.ActivatePlayers(4);
-            }
-
             // Change scene
             LoadLevelOrPuzzle();
 
@@ -265,10 +197,81 @@ namespace Atlanticide
                 Debug.Break();
             }
 
-            // First-person mode
-            if (Input.GetKeyDown(KeyCode.O))
+            if (_players != null)
             {
-                _camera.SetFirstPersonPlayer(_camera.firstPersonMode ? null : _players[0]);
+                // Respawn players
+                if (Input.GetKeyDown(KeyCode.U))
+                {
+                    foreach (PlayerCharacter player in _players)
+                    {
+                        player.Respawn();
+                    }
+                }
+
+                // Max energy
+                if (Input.GetKeyDown(KeyCode.Y))
+                {
+                    World.Instance.SetEnergyChargesAndUpdateUI
+                        (World.Instance.MaxEnergyCharges);
+                }
+
+                // Swap tools
+                if (Input.GetKeyDown(KeyCode.T))
+                {
+                    _toolSwap.SwapTools();
+                }
+
+                // Toggle noclip
+                if (Input.GetKeyDown(KeyCode.I))
+                {
+                    bool noclip = false;
+                    foreach (PlayerCharacter player in _players)
+                    {
+                        WallCollider wc = player.GetComponent<WallCollider>();
+                        GroundCollider gc = player.GetComponent<GroundCollider>();
+                        noclip = wc.enabled;
+                        wc.enabled = !noclip;
+                        gc.enabled = !noclip;
+                    }
+                    Debug.Log("Noclip: " + noclip);
+                }
+
+                // Toggle god mode
+                if (Input.GetKeyDown(KeyCode.L))
+                {
+                    bool godMode = false;
+                    foreach (PlayerCharacter player in _players)
+                    {
+                        godMode = !player.IsInvulnerable;
+                        player.IsInvulnerable = godMode;
+
+                    }
+                    Debug.Log("God mode: " + godMode);
+                }
+
+                // Change player count
+                if (Input.GetKeyDown(KeyCode.Alpha1))
+                {
+                    GameManager.Instance.ActivatePlayers(1);
+                }
+                else if (Input.GetKeyDown(KeyCode.Alpha2))
+                {
+                    GameManager.Instance.ActivatePlayers(2);
+                }
+                else if (Input.GetKeyDown(KeyCode.Alpha3))
+                {
+                    GameManager.Instance.ActivatePlayers(3);
+                }
+                else if (Input.GetKeyDown(KeyCode.Alpha4))
+                {
+                    GameManager.Instance.ActivatePlayers(4);
+                }
+
+                // First-person mode
+                if (Input.GetKeyDown(KeyCode.O))
+                {
+                    _camera.SetFirstPersonPlayer(_camera.firstPersonMode ? null : _players[0]);
+                }
             }
         }
 
