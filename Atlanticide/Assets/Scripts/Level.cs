@@ -6,12 +6,30 @@ namespace Atlanticide
 {
     public class Level
     {
+        /// <summary>
+        /// The level number.
+        /// </summary>
         public int Number { get; private set; }
 
+        /// <summary>
+        /// The current puzzle number.
+        /// </summary>
+        public int CurrentPuzzleNumber { get; set; }
+
+        /// <summary>
+        /// The level's scene name. Each puzzle scene has
+        /// this in its name along with the puzzle number.
+        /// </summary>
         public string LevelSceneName { get; private set; }
 
+        /// <summary>
+        /// The number of puzzles the level contains.
+        /// </summary>
         public int PuzzleCount { get; private set; }
 
+        /// <summary>
+        /// The names of the puzzles
+        /// </summary>
         private string[] _puzzleNames;
 
         /// <summary>
@@ -54,6 +72,18 @@ namespace Atlanticide
             }
         }
 
+        public string GetCurrentPuzzleName()
+        {
+            if (ValidPuzzleNumber(CurrentPuzzleNumber))
+            {
+                return _puzzleNames[CurrentPuzzleNumber - 1];
+            }
+            else
+            {
+                return null;
+            }
+        }
+
         public void SetPuzzleNames(params string[] names)
         {
             if (names == null || names.Length == 0)
@@ -82,6 +112,11 @@ namespace Atlanticide
             }
         }
 
+        /// <summary>
+        /// Returns whether the given number is a valid puzzle number.
+        /// </summary>
+        /// <param name="puzzleNum">A puzzle number</param>
+        /// <returns></returns>
         public bool ValidPuzzleNumber(int puzzleNum)
         {
             return (puzzleNum >= 1 && puzzleNum <= PuzzleCount);

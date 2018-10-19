@@ -14,7 +14,7 @@ namespace Atlanticide.UI
         [SerializeField]
         public Text pausingPlayerText;
 
-        private Action InputDeviceSwap;
+        private InputController _input;
 
         /// <summary>
         /// Initializes the object.
@@ -24,9 +24,9 @@ namespace Atlanticide.UI
             title.text = "Game Paused";
         }
 
-        public void SetInputDeviceSwapAction(Action inputDeviceSwap)
+        public void SetInput(InputController input)
         {
-            InputDeviceSwap = inputDeviceSwap;
+            _input = input;
         }
 
         public void ResumeGame()
@@ -36,10 +36,7 @@ namespace Atlanticide.UI
 
         public void SwapInputDevices()
         {
-            if (InputDeviceSwap != null)
-            {
-                InputDeviceSwap.Invoke();
-            }
+            _input.SwapInputDevices();
         }
 
         public void RestartPuzzle()
@@ -63,11 +60,6 @@ namespace Atlanticide.UI
         public void QuitGame()
         {
             Application.Quit();
-        }
-
-        private void OnDestroy()
-        {
-            InputDeviceSwap = null;
         }
     }
 }

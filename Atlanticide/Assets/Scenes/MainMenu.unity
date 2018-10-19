@@ -453,10 +453,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d4aeb825b3e556e4f9bd6c0920f357a8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _playerStatusPrefab: {fileID: 0}
+  _playerStatusHandler: {fileID: 0}
   _scoreText: {fileID: 0}
-  _energyBar1: {fileID: 0}
-  _energyBar2: {fileID: 0}
-  _fade: {fileID: 1784452018}
+  _energyBar: {fileID: 0}
+  fadeScreen: {fileID: 1784452018}
+  swapIcon: {fileID: 0}
+  levelName: {fileID: 0}
+  _targetIcons: []
+  _targetIconOffset: {x: 0, y: 50}
+  _toolImages: []
 --- !u!114 &318695251
 MonoBehaviour:
   m_ObjectHideFlags: 0

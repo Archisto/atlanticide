@@ -58,6 +58,50 @@ namespace Atlanticide
 
         public bool Pushing { get; private set; }
 
+        public bool Respawning { get; set; }
+
+        #region Tool States
+
+        public bool ToolIsIdle
+        {
+            get
+            {
+                return EnergyCollectorIsIdle || ShieldIsIdle; 
+            }
+        }
+
+        public bool EnergyCollectorIsIdle
+        {
+            get
+            {
+                return (Tool == PlayerTool.EnergyCollector && EnergyCollector.IsIdle);
+            }
+        }
+
+        public bool EnergyCollectorIsEmitting
+        {
+            get
+            {
+                return (Tool == PlayerTool.EnergyCollector && EnergyCollector.IsEmitting);
+            }
+        }
+
+        public bool EnergyCollectorIsDraining
+        {
+            get
+            {
+                return (Tool == PlayerTool.EnergyCollector && EnergyCollector.IsDraining);
+            }
+        }
+
+        public bool ShieldIsIdle
+        {
+            get
+            {
+                return (Tool == PlayerTool.Shield && Shield.IsIdle);
+            }
+        }
+
         public bool ShieldIsActive
         {
             get
@@ -66,12 +110,20 @@ namespace Atlanticide
             }
         }
 
-        public bool Respawning { get; set; }
+        public bool ShieldBlocksDamage
+        {
+            get
+            {
+                return (Tool == PlayerTool.Shield && Shield.BlocksDamage);
+            }
+        }
+
+        #endregion Tool States
 
         public bool IsAvailableForActions()
         {
             return (!IsDead && !IsImmobile && 
-                    !Climbing && !Pushing);
+                    !Climbing && !Pushing && ToolIsIdle);
         }
 
         /// <summary>
@@ -101,22 +153,7 @@ namespace Atlanticide
         /// <summary>
         /// Moves the player character.
         /// </summary>
-        /// <param name="input">The moving input</param>
-        public void MoveInput(Vector3 input)
-        {
-            if (!IsImmobile)
-            {
-                if (Climbing)
-                {
-                    Climb(input);
-                }
-                else
-                {
-                    Move(input);
-                }
-            }
-        }
-
+        /// <param name="input">Movement input</param>
         private void Move(Vector3 input)
         {
             Vector3 movement = new Vector3(input.x, 0, input.y) * _speed * World.Instance.DeltaTime;
@@ -124,18 +161,6 @@ namespace Atlanticide
             transform.position = newPosition;
 
             if (!ShieldIsActive)
-            {
-                RotateTowards(input);
-            }
-        }
-
-        /// <summary>
-        /// Rotates the player character.
-        /// </summary>
-        /// <param name="input">The looking direction</param>
-        public void LookInput(Vector3 input)
-        {
-            if (ShieldIsActive)
             {
                 RotateTowards(input);
             }
@@ -198,6 +223,39 @@ namespace Atlanticide
             if (_elapsedRespawnTime >= _respawnTime)
             {
                 Respawn();
+            }
+        }
+
+        #region Input
+
+        /// <summary>
+        /// Moves the player character.
+        /// </summary>
+        /// <param name="input">The moving input</param>
+        public void MoveInput(Vector3 input)
+        {
+            if (!IsImmobile)
+            {
+                if (Climbing)
+                {
+                    Climb(input);
+                }
+                else
+                {
+                    Move(input);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Rotates the player character.
+        /// </summary>
+        /// <param name="input">The looking direction</param>
+        public void LookInput(Vector3 input)
+        {
+            if (!ShieldIsIdle)
+            {
+                RotateTowards(input);
             }
         }
 
@@ -321,8 +379,10 @@ namespace Atlanticide
         public bool CheckToolSwapInput()
         {
             bool input = Input.GetToolSwapInput();
-            return (input && EnergyCollector.IsIdle && Shield.IsIdle);
+            return (input && ToolIsIdle);
         }
+
+        #endregion Input
 
         /// <summary>
         /// Uses the energy collector for draining or emitting energy.
