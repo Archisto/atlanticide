@@ -166,6 +166,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 18d842ae44222c345ae8fb7488594da0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _replaceOtherInteractionTarget: 0
+  _removeInteractorAfterInteraction: 1
+  _showTargetIcon: 1
   _respawnPoint: {fileID: 4144233575383934}
   _respawnRotation: {x: 0, y: 180, z: 0}
   _respawnTime: 1

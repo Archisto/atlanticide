@@ -262,11 +262,25 @@ namespace Atlanticide
             }
         }
 
+        public static bool Between(float value, float min, float max)
+        {
+            return value >= min && value <= max;
+        }
+
         public static float DistanceTo(this MonoBehaviour obj,
                                        MonoBehaviour target)
         {
             return Vector3.Distance
                 (obj.transform.position, target.transform.position);
+        }
+
+        public static bool WithinRangeBox(Vector3 position,
+                                          Vector3 boxCorner1,
+                                          Vector3 boxCorner2)
+        {
+            return Between(position.x, boxCorner1.x, boxCorner2.x) &&
+                   Between(position.y, boxCorner1.y, boxCorner2.y) &&
+                   Between(position.z, boxCorner1.z, boxCorner2.z);
         }
 
         public static void DrawProgressBarGizmo(Vector3 position, float progress, Color barColor, Color indicatorColor)

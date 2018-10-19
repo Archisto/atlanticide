@@ -11,7 +11,7 @@ namespace Atlanticide
         /// </summary>
         protected override void Start()
         {
-            _startCharges = _maxCharges;
+            _defaultCharges = _maxCharges;
             base.Start();
         }
 

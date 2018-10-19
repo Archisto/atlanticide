@@ -6,6 +6,7 @@ namespace Atlanticide
 {
     public class Shield : MonoBehaviour
     {
+        private const string DefaultKey = "Default";
         private const string InteractableKey = "Interactable";
         private const string PlatformKey = "Platform";
 
@@ -62,6 +63,7 @@ namespace Atlanticide
             _raisedPosition = Vector3.up * _defaultPosition.z;
             _defaultRotation = transform.localRotation;
             _raisedRotation = Quaternion.Euler(Vector3.zero);
+            gameObject.layer = LayerMask.NameToLayer(DefaultKey);
 
             // Testing shield opening with transparency
             _tp = GetComponent<Transparency>();
@@ -136,6 +138,9 @@ namespace Atlanticide
                 {
                     RaiseAboveHead(false);
                 }
+
+                gameObject.layer = LayerMask.NameToLayer
+                    (activate ? InteractableKey : DefaultKey);
             }
 
             return Active;
@@ -147,6 +152,8 @@ namespace Atlanticide
             _updateOpen = false;
             _openProgress = (Active ? 1f : 0f);
             _tp.SetAlpha(_openProgress);
+            gameObject.layer = LayerMask.NameToLayer
+                (activate ? InteractableKey : DefaultKey);
         }
 
         private void StartOpeningOrClosing()
@@ -239,9 +246,9 @@ namespace Atlanticide
         /// </summary>
         public void ResetShield()
         {
+            RaiseAboveHead(false);
             ActivateInstantly(false);
             CancelBash();
-            RaiseAboveHead(false);
             _elapsedTime = 0f;
         }
 
