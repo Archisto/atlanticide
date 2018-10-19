@@ -29,7 +29,7 @@ namespace Atlanticide
         }
 
         /// <summary>
-        /// initializes the timer.
+        /// Initializes the timer.
         /// </summary>
         /// <param name="targetTime">The target time</param>
         /// <param name="pausable">Is the timer paused when
@@ -78,6 +78,11 @@ namespace Atlanticide
             return false;
         }
 
+        /// <summary>
+        /// Returns the elapsed time ratio.
+        /// If the timer is not active, returns 0.
+        /// </summary>
+        /// <returns>A float from 0 to 1</returns>
         public float GetRatio()
         {
             if (!Active)

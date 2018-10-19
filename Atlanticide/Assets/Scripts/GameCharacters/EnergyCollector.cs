@@ -61,14 +61,14 @@ namespace Atlanticide
             {
                 if (Mode != ECMode.Idle)
                 {
-                    UpdateChargingOrEmitting();
+                    UpdateDrainingOrEmitting();
                 }
 
                 UpdateTarget();
             }
         }
 
-        private void UpdateChargingOrEmitting()
+        private void UpdateDrainingOrEmitting()
         {
             _elapsedTime += World.Instance.DeltaTime;
             float targetTime = (Mode == ECMode.Draining ? _drainTime : _emitTime);
@@ -81,8 +81,7 @@ namespace Atlanticide
         public void UpdateTarget()
         {
             if (Target != null &&
-                Vector3.Distance(transform.position, Target.transform.position)
-                    > World.Instance.energyCollectRadius)
+                !Target.PositionWithinRange(transform.position))
             {
                 Target = null;
                 //Debug.Log("Node lost, too far");

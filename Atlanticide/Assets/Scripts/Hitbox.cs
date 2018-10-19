@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Atlanticide
 {
-    public class HitBox : MonoBehaviour
+    public class Hitbox : MonoBehaviour
     {
         public enum CollisionType
         {

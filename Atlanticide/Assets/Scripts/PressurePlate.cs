@@ -10,7 +10,7 @@ namespace Atlanticide
         private GameObject _plate;
 
         [SerializeField]
-        private HitBox _hitBox;
+        private Hitbox _hitbox;
 
         [SerializeField, Range(0.01f, 5f)]
         private float _pressTime = 0.15f;
@@ -33,7 +33,7 @@ namespace Atlanticide
         protected override void Start()
         {
             base.Start();
-            _hitBox.mask = _mask;
+            _hitbox.mask = _mask;
             _pushDownTimer = new Timer(_pressTime, true, true);
             _plateDefaultPosition = _plate.transform.localPosition;
             _platePushedPosition = _plateDefaultPosition
@@ -57,7 +57,7 @@ namespace Atlanticide
         {
             if (!Activated || !_permanent)
             {
-                if (_hitBox.Collision != null)
+                if (_hitbox.Collision != null)
                 {
                     if (!Activated && !_plateMoving)
                     {
@@ -116,9 +116,14 @@ namespace Atlanticide
         public override void ResetObject()
         {
             _plate.transform.localPosition =_plateDefaultPosition;
-            StopCoroutine(_runningRoutine);
             _pushDownTimer.Reset();
             _plateMoving = false;
+
+            if (_runningRoutine != null)
+            {
+                StopCoroutine(_runningRoutine);
+            }
+
             base.ResetObject();
         }
 

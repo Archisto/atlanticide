@@ -299,7 +299,7 @@ MonoBehaviour:
   _permanent: 0
   _drawGizmos: 1
   _plate: {fileID: 1615034327181290}
-  _hitBox: {fileID: 114532227480972128}
+  _hitbox: {fileID: 114532227480972128}
   _pressTime: 0.15
   _pressYMovement: -0.1
   _mask:
