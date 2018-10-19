@@ -544,6 +544,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _score: 0
   keyCode: 0
+  _allowDuplicateKeyCodes: 0
 --- !u!114 &114703094262781088
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -572,5 +573,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _permanent: 0
+  _drawGizmos: 1
   _range: 3
   _allPlayersNeeded: 0
