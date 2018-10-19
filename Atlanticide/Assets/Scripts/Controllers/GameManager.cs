@@ -70,6 +70,7 @@ namespace Atlanticide
         private bool _freshGameStart = true;
         private string _nextSceneName;
         private int _deadPlayerCount;
+        private AudioSource _levelResultAudioSrc;
 
         public State GameState { get; set; }
 
@@ -88,10 +89,7 @@ namespace Atlanticide
                 if (value >= 0)
                 {
                     _deadPlayerCount = value;
-                    if (LevelFailed)
-                    {
-                        StartSceneReset();
-                    }
+                    CheckLevelFailure();
 
                     SetScore(_deadPlayerCount);
                 }
@@ -133,13 +131,15 @@ namespace Atlanticide
             }
         }
 
-        public bool LevelFailed
+        public bool AllPlayersDied
         {
             get
             {
                 return DeadPlayerCount == PlayerCount;
             }
         }
+
+        public bool LevelFailed { get; private set; }
 
         #endregion Fields
 
@@ -750,6 +750,7 @@ namespace Atlanticide
             _npcs.ForEach(npc => npc.Respawn());
             _levelObjects.ForEach(obj => obj.ResetObject());
             _ui.ResetUI();
+            LevelFailed = false;
             DeadPlayerCount = 0;
             _fade.StartFadeIn(true);
         }
@@ -874,6 +875,8 @@ namespace Atlanticide
         public void CompletePuzzle()
         {
             Debug.Log("Level completed");
+            ResetLevelResultAudioSource();
+            _levelResultAudioSrc = SFXPlayer.Instance.Play(Sound.Success);
 
             bool loadNextPuzzle =
                 LoadPuzzle(CurrentLevel.CurrentPuzzleNumber + 1);
@@ -883,6 +886,29 @@ namespace Atlanticide
             if (!loadNextPuzzle)
             {
                 LoadLevel(CurrentLevel.Number + 1);
+            }
+        }
+
+        /// <summary>
+        /// Restarts the level if the players failed.
+        /// </summary>
+        public void CheckLevelFailure()
+        {
+            if (AllPlayersDied)
+            {
+                Debug.Log("Level failed");
+                LevelFailed = true;
+                ResetLevelResultAudioSource();
+                _levelResultAudioSrc = SFXPlayer.Instance.Play(Sound.Failure);
+                StartSceneReset();
+            }
+        }
+
+        private void ResetLevelResultAudioSource()
+        {
+            if (_levelResultAudioSrc != null && _levelResultAudioSrc.isPlaying)
+            {
+                _levelResultAudioSrc.Stop();
             }
         }
 
