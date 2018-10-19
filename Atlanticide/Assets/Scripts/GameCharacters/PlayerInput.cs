@@ -59,6 +59,16 @@ namespace Atlanticide
         }
 
         /// <summary>
+        /// Creates the player input.
+        /// </summary>
+        /// <param name="inputDevice">An input device</param>
+        public PlayerInput(InputDevice inputDevice)
+        {
+            InputDevice = inputDevice;
+            _holdActionInput = new HoldInput(HoldTime);
+        }
+
+        /// <summary>
         /// Updates the input key strings.
         /// </summary>
         private void UpdateInputKeys()

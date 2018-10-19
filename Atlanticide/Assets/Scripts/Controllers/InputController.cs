@@ -350,19 +350,16 @@ namespace Atlanticide
                     // swaps it with the given player
                     if (otherPlayer.Input.InputDevice == inputDevice)
                     {
-                        InputDevice temp = _players[playerNum].Input.InputDevice;
-                        _players[playerNum].Input.InputDevice = inputDevice;
-                        otherPlayer.Input.InputDevice = temp;
-                        LogController(_players[playerNum]);
+                        otherPlayer.Input.InputDevice =
+                            _players[playerNum].Input.InputDevice;
                         LogController(otherPlayer);
-                        return;
+                        break;
                     }
                 }
 
-                // The input device is currently not used by anyone,
-                // so it is simply set to the player
                 _players[playerNum].Input.InputDevice = inputDevice;
                 LogController(_players[playerNum]);
+                GameManager.Instance.SaveInputDevices();
             }
         }
 

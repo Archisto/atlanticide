@@ -19,11 +19,11 @@ namespace Atlanticide.UI
         [SerializeField]
         private Slider _energyBar;
 
-        [SerializeField]
-        private Image _fade;
+        public Image fadeScreen;
 
-        [SerializeField]
-        private Image _swapIcon;
+        public Image swapIcon;
+
+        public Text levelName;
 
         [SerializeField]
         private Image[] _targetIcons;
@@ -53,7 +53,11 @@ namespace Atlanticide.UI
             _camera = FindObjectOfType<CameraController>().GetComponent<Camera>();
             _input = FindObjectOfType<InputController>();
             _pauseScreen = GetComponentInChildren<PauseScreen>(true);
-            _pauseScreen.SetInputDeviceSwapAction(_input.SwapInputDevices);
+
+            if (_pauseScreen != null)
+            {
+                _pauseScreen.SetInput(_input);
+            }
 
             _players = GameManager.Instance.GetPlayers();
             _playerStatuses = new List<PlayerStatus>();
@@ -116,16 +120,6 @@ namespace Atlanticide.UI
             {
                 _playerStatuses[playerNum].SetToolImage(_toolImages[(int) tool]);
             }
-        }
-
-        public Image GetFade()
-        {
-            return _fade;
-        }
-
-        public Image GetSwapIcon()
-        {
-            return _swapIcon;
         }
 
         public void ActivatePauseScreen(bool activate, string playerName)
