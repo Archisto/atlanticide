@@ -5,7 +5,7 @@ using UnityEngine;
 namespace Atlanticide
 {
 
-    public class SimplePlatformPath : MonoBehaviour
+    public class SimplePlatformPath : LevelObject
     {
 
         [Header("Objects")]
@@ -22,13 +22,13 @@ namespace Atlanticide
         [Header("Settings")]
 
         [SerializeField]
-        float Speed;
+        float Speed = 1;
 
         [SerializeField]
-        bool LockToPath;
+        bool LockToPath = true;
 
         [SerializeField]
-        float Accuracy;
+        float Accuracy = 0.1f;
 
         [SerializeField]
         bool LockToTarget;
@@ -57,6 +57,7 @@ namespace Atlanticide
         // Use this for initialization
         void Start()
         {
+            _defaultPosition = transform.position;
             TowardsTarget = false;
             if (LockToPath)
             {
@@ -64,32 +65,33 @@ namespace Atlanticide
             }
         }
 
-        // Update is called once per frame
-        void Update()
+        /// <summary>
+        /// Checks some preferences to see if CheckKey/CheckEnergyTarget should be called
+        /// </summary>
+        /// <returns></returns>
+        private bool AllowCheck()
         {
-            if(IsAtTarget() && LockToTarget)
+            if(MustFinishTarget && MustFinishNormal)
             {
-                return;
+                return false;
             }
 
-            if (IsDone() || (MustFinishTarget && !TowardsTarget) || (MustFinishNormal && TowardsTarget) || (!MustFinishTarget && !MustFinishNormal)) {
-                if (UsingKey)
-                {
-                    CheckKey();
-                }
-                else
-                {
-                    CheckEnergyTarget();
-                }
-            }
-
-            if (OnTarget)
+            if(!MustFinishTarget && !MustFinishNormal)
             {
-                return;
+                return true;
             }
 
-            Moving();
-            IsDone();
+            if(TowardsTarget && !MustFinishTarget)
+            {
+                return true;
+            }
+
+            if(!TowardsTarget && !MustFinishNormal)
+            {
+                return true;
+            }
+
+            return false;
         }
 
         // Checks if corresponding key is activated
@@ -172,6 +174,45 @@ namespace Atlanticide
         private bool IsAtNormal()
         {
             return !TowardsTarget && IsDone();
+        }
+
+        public override void ResetObject()
+        {
+            base.ResetObject();
+            TowardsTarget = false;
+            SetToDefaultPosition();
+        }
+
+        protected override void UpdateObject()
+        {
+            // Do nothing if object is on target and lock is ON
+            if (IsAtTarget() && LockToTarget)
+            {
+                return;
+            }
+
+            // Check whether key/energytarget should be checked
+            if (IsDone() || AllowCheck())
+            {
+                if (UsingKey)
+                {
+                    CheckKey();
+                }
+                else
+                {
+                    CheckEnergyTarget();
+                }
+            }
+
+            // If object is on target, do not move
+            if (OnTarget)
+            {
+                return;
+            }
+
+            // move and check if is done
+            Moving();
+            IsDone();
         }
 
     }
