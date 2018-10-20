@@ -157,10 +157,15 @@ namespace Atlanticide
         public void SetEnergyChargesAndUpdateUI(int charges)
         {
             CurrentEnergyCharges = Utils.Clamp(charges, 0, MaxEnergyCharges);
-            float ratio = (float)CurrentEnergyCharges / MaxEnergyCharges;
+            float ratio = GetEnergyRatio();
             _ui.UpdateEnergyBar(ratio);
-            Debug.Log(string.Format("Energy charges: {0} ({1} %)",
-                CurrentEnergyCharges, ratio * 100));
+            //Debug.Log(string.Format("Energy charges: {0} ({1} %)",
+            //    CurrentEnergyCharges, ratio * 100));
+        }
+
+        public float GetEnergyRatio()
+        {
+            return (float) CurrentEnergyCharges / MaxEnergyCharges;
         }
 
         /// <summary>
