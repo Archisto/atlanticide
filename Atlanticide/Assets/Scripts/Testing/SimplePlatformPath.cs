@@ -22,13 +22,13 @@ namespace Atlanticide
         [Header("Settings")]
 
         [SerializeField]
-        float Speed;
+        float Speed = 1;
 
         [SerializeField]
-        bool LockToPath;
+        bool LockToPath = true;
 
         [SerializeField]
-        float Accuracy;
+        float Accuracy = 0.1f;
 
         [SerializeField]
         bool LockToTarget;
@@ -67,12 +67,14 @@ namespace Atlanticide
         // Update is called once per frame
         void Update()
         {
+            // Do nothing if object is on target and lock is ON
             if(IsAtTarget() && LockToTarget)
             {
                 return;
             }
 
-            if (IsDone() || (MustFinishTarget && !TowardsTarget) || (MustFinishNormal && TowardsTarget) || (!MustFinishTarget && !MustFinishNormal)) {
+            // Check whether key/energytarget should be checked
+            if (IsDone() || AllowCheck()) {
                 if (UsingKey)
                 {
                     CheckKey();
@@ -83,13 +85,44 @@ namespace Atlanticide
                 }
             }
 
+            // If object is on target, do not move
             if (OnTarget)
             {
                 return;
             }
 
+            // move and check if is done
             Moving();
             IsDone();
+        }
+
+        /// <summary>
+        /// Checks some preferences to see if CheckKey/CheckEnergyTarget should be called
+        /// </summary>
+        /// <returns></returns>
+        private bool AllowCheck()
+        {
+            if(MustFinishTarget && MustFinishNormal)
+            {
+                return false;
+            }
+
+            if(!MustFinishTarget && !MustFinishNormal)
+            {
+                return true;
+            }
+
+            if(TowardsTarget && !MustFinishTarget)
+            {
+                return true;
+            }
+
+            if(!TowardsTarget && !MustFinishNormal)
+            {
+                return true;
+            }
+
+            return false;
         }
 
         // Checks if corresponding key is activated
