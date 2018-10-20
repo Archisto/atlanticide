@@ -449,7 +449,7 @@ Transform:
   - {fileID: 1901111600}
   - {fileID: 705141124}
   m_Father: {fileID: 2042424003}
-  m_RootOrder: 6
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &651705550
 GameObject:
@@ -564,7 +564,7 @@ Transform:
   - {fileID: 1404587308}
   - {fileID: 996676019}
   m_Father: {fileID: 2042424003}
-  m_RootOrder: 12
+  m_RootOrder: 11
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &705141123
 GameObject:
@@ -984,7 +984,7 @@ Transform:
   - {fileID: 2020055656}
   - {fileID: 1547431311}
   m_Father: {fileID: 2042424003}
-  m_RootOrder: 8
+  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1089278275
 GameObject:
@@ -1069,7 +1069,7 @@ Transform:
   - {fileID: 1896377230}
   - {fileID: 797086641}
   m_Father: {fileID: 2042424003}
-  m_RootOrder: 5
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1241990559
 GameObject:
@@ -1168,7 +1168,7 @@ GameObject:
   - component: {fileID: 1381081030}
   - component: {fileID: 1381081031}
   m_Layer: 0
-  m_Name: Waypoint001
+  m_Name: Normal
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1186,7 +1186,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1680032183}
-  m_RootOrder: 0
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1381081031
 MonoBehaviour:
@@ -1943,7 +1943,7 @@ MonoBehaviour:
   TargetPoint: {fileID: 797086641}
   Speed: 3
   LockToPath: 1
-  Accuracy: 0.5
+  Accuracy: 0.1
   LockToTarget: 0
   MustFinishTarget: 0
   MustFinishNormal: 0
@@ -2071,7 +2071,7 @@ GameObject:
   - component: {fileID: 1680032183}
   - component: {fileID: 1680032182}
   m_Layer: 0
-  m_Name: Path 3
+  m_Name: Gate
   m_TagString: Untagged
   m_Icon: {fileID: -5442936267250999957, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
@@ -2104,10 +2104,11 @@ Transform:
   m_LocalPosition: {x: 41.79, y: 10.38, z: 3.2}
   m_LocalScale: {x: 0.7162314, y: 7.4225583, z: 4.741783}
   m_Children:
+  - {fileID: 1698172256}
   - {fileID: 1381081030}
   - {fileID: 2032330634}
   m_Father: {fileID: 2042424003}
-  m_RootOrder: 4
+  m_RootOrder: 10
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1698172255
 GameObject:
@@ -2120,10 +2121,9 @@ GameObject:
   - component: {fileID: 1698172259}
   - component: {fileID: 1698172258}
   - component: {fileID: 1698172257}
-  - component: {fileID: 1698172261}
   - component: {fileID: 1698172260}
   m_Layer: 9
-  m_Name: Gate
+  m_Name: Object
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2136,11 +2136,11 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1698172255}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 41.79, y: 10.38, z: 3.2}
-  m_LocalScale: {x: 0.7162314, y: 7.4225583, z: 4.741783}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 2042424003}
-  m_RootOrder: 11
+  m_Father: {fileID: 1680032183}
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!65 &1698172257
 BoxCollider:
@@ -2204,32 +2204,21 @@ MonoBehaviour:
   m_GameObject: {fileID: 1698172255}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8e8e0ffa224ab6a46a700914a1fe2979, type: 3}
+  m_Script: {fileID: 11500000, guid: 4f7839accfed67f48967dc74d4a1e588, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  forwardOnDefault: 0
-  permanent: 1
-  skipFirstWP: 0
-  instantTopSpeed: 1
-  rampSpeed: 0
-  _target: {fileID: 412026847}
---- !u!114 &1698172261
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1698172255}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bafcbfe7578e99045a4fe99fd2e5b907, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _acceleration: 1
-  _deceleration: -1
-  _active: 1
-  _hasInstantTopSpeedByDefault: 1
-  path: {fileID: 1680032182}
-  _topSpeed: 1
+  Object: {fileID: 1698172255}
+  NormalPoint: {fileID: 1381081030}
+  TargetPoint: {fileID: 2032330634}
+  Speed: 1
+  LockToPath: 1
+  Accuracy: 0.1
+  LockToTarget: 1
+  MustFinishTarget: 1
+  MustFinishNormal: 0
+  UsingKey: 0
+  KeyCode: 0
+  Target: {fileID: 412026847}
 --- !u!1 &1738928896
 GameObject:
   m_ObjectHideFlags: 0
@@ -2529,7 +2518,7 @@ Transform:
   m_LocalScale: {x: 4.105892, y: 7, z: 8.618762}
   m_Children: []
   m_Father: {fileID: 2042424003}
-  m_RootOrder: 9
+  m_RootOrder: 8
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!65 &1871129453
 BoxCollider:
@@ -2674,7 +2663,7 @@ Transform:
   m_LocalScale: {x: 4.10589, y: 7, z: 4.2756805}
   m_Children: []
   m_Father: {fileID: 2042424003}
-  m_RootOrder: 10
+  m_RootOrder: 9
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!65 &2001843542
 BoxCollider:
@@ -2826,7 +2815,7 @@ GameObject:
   - component: {fileID: 2032330634}
   - component: {fileID: 2032330635}
   m_Layer: 0
-  m_Name: Waypoint002
+  m_Name: Target
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2844,7 +2833,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1680032183}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &2032330635
 MonoBehaviour:
@@ -2889,14 +2878,13 @@ Transform:
   - {fileID: 256806886}
   - {fileID: 317833909}
   - {fileID: 883306986}
-  - {fileID: 1680032183}
   - {fileID: 1212946927}
   - {fileID: 436424616}
   - {fileID: 2081860539}
   - {fileID: 1065258399}
   - {fileID: 1871129452}
   - {fileID: 2001843541}
-  - {fileID: 1698172256}
+  - {fileID: 1680032183}
   - {fileID: 699832372}
   m_Father: {fileID: 0}
   m_RootOrder: 11
@@ -2929,7 +2917,7 @@ Transform:
   - {fileID: 651705551}
   - {fileID: 402958176}
   m_Father: {fileID: 2042424003}
-  m_RootOrder: 7
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &2146704369
 Prefab:
