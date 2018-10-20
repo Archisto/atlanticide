@@ -32,8 +32,9 @@ namespace Atlanticide
 
             _ui = GameManager.Instance.GetUI();
             _currentLevel = GameManager.Instance.CurrentLevel;
-            _ui.levelName.text = _currentLevel.LevelSceneName + " - " +
-                _currentLevel.GetCurrentPuzzleName();
+            string puzzleName = _currentLevel.GetCurrentPuzzleName();
+            _ui.levelName.text = _currentLevel.LevelSceneName + (puzzleName != null ?
+                " - " + _currentLevel.GetCurrentPuzzleName() : "");
         }
 
         /// <summary>

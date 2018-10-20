@@ -272,6 +272,18 @@ namespace Atlanticide
                 {
                     _camera.SetFirstPersonPlayer(_camera.firstPersonMode ? null : _players[0]);
                 }
+
+                // Save game
+                if (Input.GetKeyDown(KeyCode.F5))
+                {
+                    GameManager.Instance.SaveGame();
+                }
+
+                // Load game
+                if (Input.GetKeyDown(KeyCode.F9))
+                {
+                    GameManager.Instance.LoadGame();
+                }
             }
         }
 

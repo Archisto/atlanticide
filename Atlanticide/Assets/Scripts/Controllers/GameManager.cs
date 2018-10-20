@@ -1,8 +1,9 @@
 ﻿using System;
-using System.Collections;
+using System.IO;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Atlanticide.Persistence;
 using Atlanticide.UI;
 
 namespace Atlanticide
@@ -65,6 +66,7 @@ namespace Atlanticide
         private Transform[] _telegrabs;
         private InputController _input;
         private SettingsManager _settings;
+        private SaveSystem _saveSystem;
         private FadeToColor _fade;
         private bool _updateAtSceneStart = true;
         private bool _freshGameStart = true;
@@ -96,7 +98,9 @@ namespace Atlanticide
             }
         }
 
-        public Level CurrentLevel { get; set; }
+        public int LevelsUnlocked { get; private set; }
+
+        public Level CurrentLevel { get; private set; }
 
         public int CurrentScore { get; private set; }
 
@@ -144,7 +148,7 @@ namespace Atlanticide
         #endregion Fields
 
         /// <summary>
-        /// Initializes the object.
+        /// Initializes the singleton instance.
         /// </summary>
         private void Awake()
         {
@@ -160,23 +164,7 @@ namespace Atlanticide
             else
             {
                 DontDestroyOnLoad(gameObject);
-                SceneManager.activeSceneChanged += InitScene;
-                InitSettings();
-
-                if (SceneManager.GetActiveScene().name == MainMenuKey)
-                {
-                    GameState = State.MainMenu;
-                }
-                else
-                {
-                    GameState = State.Play;
-                }
-
-                InitLevels();
-                PlayerCount = 2;
-                _playerTools = new PlayerTool[MaxPlayers];
-                _inputDevices = new InputDevice[MaxPlayers];
-                _updateAtSceneStart = true;
+                Init();
             }
         }
 
@@ -205,6 +193,31 @@ namespace Atlanticide
         }
 
         #region Initialization
+
+        /// <summary>
+        /// Initializes the object.
+        /// </summary>
+        private void Init()
+        {
+            _saveSystem = new SaveSystem(new JSONPersistence(SavePath));
+            InitSettings();
+            SceneManager.activeSceneChanged += InitScene;
+
+            if (SceneManager.GetActiveScene().name == MainMenuKey)
+            {
+                GameState = State.MainMenu;
+            }
+            else
+            {
+                GameState = State.Play;
+            }
+
+            InitLevels();
+            PlayerCount = 2;
+            _playerTools = new PlayerTool[MaxPlayers];
+            _inputDevices = new InputDevice[MaxPlayers];
+            _updateAtSceneStart = true;
+        }
 
         private void LevelStartInit()
         {
@@ -301,14 +314,16 @@ namespace Atlanticide
         private void InitLevels()
         {
             _levels = new List<Level>();
+            _levels.Add(new Level(0, "Debug", 1));
             _levels.Add(new Level(1, "Level1", 3));
             _levels.Add(new Level(2, "Level2", 3));
 
-            _levels[0].SetPuzzleNames(
-                "First Tutorial", "Second Tutorial", "Third Tutorial");
             _levels[1].SetPuzzleNames(
+                "First Tutorial", "Second Tutorial", "Third Tutorial");
+            _levels[2].SetPuzzleNames(
                 "Iosefka's Clinic", "Central Yharnam", "Cathedral Ward");
 
+            LevelsUnlocked = 1;
             CurrentLevel = _levels[0];
         }
 
@@ -353,7 +368,7 @@ namespace Atlanticide
                 PlayerTool tool = GetPlayerTool(i);
                 _players[i].Tool = tool;
                 _players[i].transform.position = _levelManager.GetSpawnPoint(tool);
-                Debug.Log("Player " + (i + 1) + " input device: " + _players[i].Input.InputDevice);
+                //Debug.Log("Player " + (i + 1) + " input device: " + _players[i].Input.InputDevice);
             }
 
             if (_freshGameStart)
@@ -770,22 +785,7 @@ namespace Atlanticide
         /// <param name="levelNum">A level number</param>
         public void LoadLevel(int levelNum)
         {
-            if (!SceneChanging)
-            {
-                if (levelNum >= 1 && levelNum <= _levels.Count)
-                {
-                    CurrentLevel = _levels[levelNum - 1];
-                    LoadPuzzle(1);
-                }
-                else
-                {
-                    Debug.LogError(string.Format("Invalid level number ({0}).", levelNum));
-                }
-            }
-            else
-            {
-                Debug.LogWarning("Scene is already changing.");
-            }
+            LoadLevelAndPuzzle(levelNum, 1);
         }
 
         /// <summary>
@@ -811,12 +811,33 @@ namespace Atlanticide
             }
         }
 
+        public void LoadLevelAndPuzzle(int levelNum, int puzzleNum)
+        {
+            if (!SceneChanging)
+            {
+                if (levelNum >= 1 && levelNum <= _levels.Count)
+                {
+                    CurrentLevel = _levels[levelNum];
+                    LoadPuzzle(puzzleNum);
+                }
+                else
+                {
+                    Debug.LogError(string.Format("Invalid level number ({0}).", levelNum));
+                }
+            }
+            else
+            {
+                Debug.LogWarning("Scene is already changing.");
+            }
+        }
+
         /// <summary>
         /// Testing.
         /// Loads a level: Lauri's Colosseum.
         /// </summary>
         public void LoadTestLevel()
         {
+            CurrentLevel = _levels[0];
             StartLoadingScene("Lauri's Colosseum");
             GameState = State.Play;
         }
@@ -879,13 +900,33 @@ namespace Atlanticide
             _levelResultAudioSrc = SFXPlayer.Instance.Play(Sound.Success);
 
             bool loadNextPuzzle =
+                CurrentLevel.CurrentPuzzleNumber > 0 &&
                 LoadPuzzle(CurrentLevel.CurrentPuzzleNumber + 1);
 
             // The level's last puzzle was completed so the
             // next level's first puzzle is loaded instead
             if (!loadNextPuzzle)
             {
-                LoadLevel(CurrentLevel.Number + 1);
+                int nextLevel = CurrentLevel.Number + 1;
+                TryUnlockLevel(nextLevel);
+                LoadLevel(nextLevel);
+            }
+
+            SaveGame();
+        }
+
+        /// <summary>
+        /// Unlocks the given level if it's valid
+        /// and hasn't been unlocked yet.
+        /// </summary>
+        /// <param name="levelNum">A level number</param>
+        private void TryUnlockLevel(int levelNum)
+        {
+            if (levelNum > LevelsUnlocked &&
+                levelNum >= 1 && levelNum <= _levels.Count)
+            {
+                LevelsUnlocked = levelNum;
+                Debug.Log("Level " + levelNum + " unlocked");
             }
         }
 
@@ -941,6 +982,98 @@ namespace Atlanticide
         }
 
         #endregion Level Methods
+
+        #region Persistence
+
+        /// <summary>
+        /// The file path where the game is saved. On Windows, points to
+        /// %userprofile%\AppData\LocalLow\<companyname>\<productname>\<savefile>.
+        /// </summary>
+        public string SavePath
+        {
+            get
+            {
+                return Path.Combine(Application.persistentDataPath, "save_data");
+            }
+        }
+
+        /// <summary>
+        /// Gets data from the game and stores it to a data object.
+        /// </summary>
+        public void SaveGame()
+        {
+            GameData data = new GameData();
+
+            data.LevelsUnlocked = LevelsUnlocked;
+            data.LevelNum = CurrentLevel.Number;
+            data.PuzzleNum = CurrentLevel.CurrentPuzzleNumber;
+            data.Score = CurrentScore; // TODO: Highscores for levels
+
+            foreach (PlayerCharacter player in _players)
+            {
+                data.PlayerDataList.Add((PlayerData) player.GetSaveData());
+            }
+
+            _saveSystem.Save(data);
+            Debug.Log(string.Format("Game saved (level {0}-{1})",
+                CurrentLevel.Number, CurrentLevel.CurrentPuzzleNumber));
+        }
+
+        /// <summary>
+        /// Loads saved data.
+        /// </summary>
+        /// <returns>Loaded game data</returns>
+        public GameData LoadGame()
+        {
+            GameData data = _saveSystem.Load();
+
+            if (data == null)
+            {
+                Debug.LogWarning("Save data not loaded.");
+                return null;
+            }
+
+            LevelsUnlocked = data.LevelsUnlocked;
+            SetScore(data.Score); // TODO: Highscores for levels
+
+            bool inLevel = false;
+            if (data.LevelNum >= 1 && data.LevelNum <= _levels.Count)
+            {
+                inLevel = true;
+                CurrentLevel =
+                    _levels.Find(level => level.Number == data.LevelNum);
+
+                if (CurrentLevel.ValidPuzzleNumber(data.PuzzleNum))
+                {
+                    CurrentLevel.CurrentPuzzleNumber = data.PuzzleNum;
+                }
+            }
+
+            Utils.TrySetData(_players, data.PlayerDataList, false);
+            SavePlayerTools();
+
+            if (inLevel)
+            {
+                Debug.Log(string.Format("Game loaded (level {0}-{1})",
+                    CurrentLevel.Number, CurrentLevel.CurrentPuzzleNumber));
+
+                LoadLevelAndPuzzle(CurrentLevel.Number,
+                    CurrentLevel.CurrentPuzzleNumber);
+            }
+            else
+            {
+                Debug.Log("Game loaded (no level in progress)");
+            }
+            
+            return data;
+        }
+
+        public void ResetSaveData()
+        {
+            // TODO
+        }
+
+        #endregion Persistence
 
         private void OnDisable()
         {
