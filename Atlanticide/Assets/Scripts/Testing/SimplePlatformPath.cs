@@ -5,7 +5,7 @@ using UnityEngine;
 namespace Atlanticide
 {
 
-    public class SimplePlatformPath : MonoBehaviour
+    public class SimplePlatformPath : LevelObject
     {
 
         [Header("Objects")]
@@ -57,43 +57,12 @@ namespace Atlanticide
         // Use this for initialization
         void Start()
         {
+            _defaultPosition = transform.position;
             TowardsTarget = false;
             if (LockToPath)
             {
                 FinishMovement();
             }
-        }
-
-        // Update is called once per frame
-        void Update()
-        {
-            // Do nothing if object is on target and lock is ON
-            if(IsAtTarget() && LockToTarget)
-            {
-                return;
-            }
-
-            // Check whether key/energytarget should be checked
-            if (IsDone() || AllowCheck()) {
-                if (UsingKey)
-                {
-                    CheckKey();
-                }
-                else
-                {
-                    CheckEnergyTarget();
-                }
-            }
-
-            // If object is on target, do not move
-            if (OnTarget)
-            {
-                return;
-            }
-
-            // move and check if is done
-            Moving();
-            IsDone();
         }
 
         /// <summary>
@@ -205,6 +174,45 @@ namespace Atlanticide
         private bool IsAtNormal()
         {
             return !TowardsTarget && IsDone();
+        }
+
+        public override void ResetObject()
+        {
+            base.ResetObject();
+            TowardsTarget = false;
+            SetToDefaultPosition();
+        }
+
+        protected override void UpdateObject()
+        {
+            // Do nothing if object is on target and lock is ON
+            if (IsAtTarget() && LockToTarget)
+            {
+                return;
+            }
+
+            // Check whether key/energytarget should be checked
+            if (IsDone() || AllowCheck())
+            {
+                if (UsingKey)
+                {
+                    CheckKey();
+                }
+                else
+                {
+                    CheckEnergyTarget();
+                }
+            }
+
+            // If object is on target, do not move
+            if (OnTarget)
+            {
+                return;
+            }
+
+            // move and check if is done
+            Moving();
+            IsDone();
         }
 
     }

@@ -391,5 +391,6 @@ namespace Atlanticide
                 return Vector3.Distance(start, end) <= distance;
             }
         }
+
     }
 }
