@@ -51,10 +51,13 @@ namespace Atlanticide
             StartingScene = 3
         }
 
-        private LevelManager _level;
+        #region Fields
+
+        private LevelManager _levelManager;
         private PlayerCharacter _playerPrefab;
         private PlayerCharacter[] _players;
         private PlayerTool[] _playerTools;
+        private InputDevice[] _inputDevices;
         private NonPlayerCharacter[] _npcs;
         private UIController _ui;
         private List<Level> _levels;
@@ -67,10 +70,11 @@ namespace Atlanticide
         private bool _freshGameStart = true;
         private string _nextSceneName;
         private int _deadPlayerCount;
+        private AudioSource _levelResultAudioSrc;
 
         public State GameState { get; set; }
 
-        public TransitionPhase Transition { get; set; }
+        public TransitionPhase SceneTransition { get; set; }
 
         public int PlayerCount { get; private set; }
 
@@ -85,10 +89,7 @@ namespace Atlanticide
                 if (value >= 0)
                 {
                     _deadPlayerCount = value;
-                    if (LevelFailed)
-                    {
-                        StartSceneReset();
-                    }
+                    CheckLevelFailure();
 
                     SetScore(_deadPlayerCount);
                 }
@@ -108,8 +109,8 @@ namespace Atlanticide
         {
             get
             {
-                return Transition == TransitionPhase.ExitingScene ||
-                    Transition == TransitionPhase.StartingScene;
+                return SceneTransition == TransitionPhase.ExitingScene ||
+                    SceneTransition == TransitionPhase.StartingScene;
             }
         }
 
@@ -130,13 +131,17 @@ namespace Atlanticide
             }
         }
 
-        public bool LevelFailed
+        public bool AllPlayersDied
         {
             get
             {
                 return DeadPlayerCount == PlayerCount;
             }
         }
+
+        public bool LevelFailed { get; private set; }
+
+        #endregion Fields
 
         /// <summary>
         /// Initializes the object.
@@ -170,6 +175,7 @@ namespace Atlanticide
                 InitLevels();
                 PlayerCount = 2;
                 _playerTools = new PlayerTool[MaxPlayers];
+                _inputDevices = new InputDevice[MaxPlayers];
                 _updateAtSceneStart = true;
             }
         }
@@ -179,15 +185,15 @@ namespace Atlanticide
         /// </summary>
         private void Update()
         {
-            if (Transition == TransitionPhase.ExitingScene
+            if (SceneTransition == TransitionPhase.ExitingScene
                 && _fade.FadedOut)
             {
                 LoadScene(_nextSceneName);
             }
-            else if (Transition == TransitionPhase.ResetingScene
+            else if (SceneTransition == TransitionPhase.ResetingScene
                      && _fade.FadedOut)
             {
-                Transition = TransitionPhase.None;
+                SceneTransition = TransitionPhase.None;
                 ActivatePauseScreen(false, "");
                 ResetScene();
             }
@@ -198,10 +204,13 @@ namespace Atlanticide
             }
         }
 
+        #region Initialization
+
         private void LevelStartInit()
         {
             if (GameState == State.Play)
             {
+                _freshGameStart = false;
                 Debug.Log("Level starts");
             }
             else
@@ -209,7 +218,6 @@ namespace Atlanticide
                 Debug.Log("Menu starts");
             }
 
-            _freshGameStart = false;
             _updateAtSceneStart = false;
         }
 
@@ -233,7 +241,7 @@ namespace Atlanticide
                 _levelObjects = FindObjectsOfType<LevelObject>();
             }
 
-            Transition = TransitionPhase.None;
+            SceneTransition = TransitionPhase.None;
             _updateAtSceneStart = true;
         }
 
@@ -257,9 +265,9 @@ namespace Atlanticide
             _fade = FindObjectOfType<FadeToColor>();
             if (_fade != null)
             {
-                _fade.Init(_ui.GetFade());
+                _fade.Init(_ui.fadeScreen);
 
-                if (Transition == TransitionPhase.StartingScene)
+                if (SceneTransition == TransitionPhase.StartingScene)
                 {
                     _fade.StartFadeIn(true);
                 }
@@ -283,10 +291,10 @@ namespace Atlanticide
         /// </summary>
         private void InitLevelManager()
         {
-            _level = FindObjectOfType<LevelManager>();
-            if (_level == null)
+            _levelManager = FindObjectOfType<LevelManager>();
+            if (_levelManager == null)
             {
-                Debug.LogError(Utils.GetFieldNullString("LevelManager"));
+                Debug.LogError(Utils.GetObjectMissingString("LevelManager"));
             }
         }
 
@@ -303,6 +311,18 @@ namespace Atlanticide
 
             CurrentLevel = _levels[0];
         }
+
+        /// <summary>
+        /// Initializes the non-player characters.
+        /// </summary>
+        private void InitNPCs()
+        {
+            _npcs = FindObjectsOfType<NonPlayerCharacter>();
+        }
+
+        #endregion Initialization
+
+        #region Player Setup
 
         /// <summary>
         /// Initializes the player characters.
@@ -329,14 +349,18 @@ namespace Atlanticide
                 _players[i] = Instantiate(_playerPrefab);
                 _players[i].ID = i;
                 _players[i].name = "Player " + (i + 1);
-                _players[i].Input = new PlayerInput(i);
+                _players[i].Input = new PlayerInput(GetPlayerInputDevice(i));
                 PlayerTool tool = GetPlayerTool(i);
                 _players[i].Tool = tool;
-                _players[i].transform.position = _level.GetSpawnPoint(tool);
+                _players[i].transform.position = _levelManager.GetSpawnPoint(tool);
                 Debug.Log("Player " + (i + 1) + " input device: " + _players[i].Input.InputDevice);
             }
 
-            SavePlayerTools();
+            if (_freshGameStart)
+            {
+                SaveInputDevices();
+                SavePlayerTools();
+            }
         }
 
         /// <summary>
@@ -363,17 +387,10 @@ namespace Atlanticide
             }
         }
 
-        /// <summary>
-        /// Initializes the non-player characters.
-        /// </summary>
-        private void InitNPCs()
-        {
-            _npcs = FindObjectsOfType<NonPlayerCharacter>();
-        }
+        #endregion Player Setup
 
         public UIController GetUI()
         {
-            Debug.Log(_ui);
             return _ui;
         }
 
@@ -404,16 +421,7 @@ namespace Atlanticide
             }
         }
 
-        public void ChangeScore(int score)
-        {
-            SetScore(CurrentScore + score);
-        }
-
-        public void SetScore(int score)
-        {
-            CurrentScore = score;
-            _ui.UpdateScoreCounter();
-        }
+        #region Player Methods
 
         /// <summary>
         /// Returns the player character closest to the given position.
@@ -678,12 +686,50 @@ namespace Atlanticide
             return player.Tool;
         }
 
+        public InputDevice GetPlayerInputDevice(int playerID)
+        {
+            InputDevice result = InputDevice.Keyboard;
+
+            if (_freshGameStart)
+            {
+                // Testing PS controller
+                //if (playerID != 0)
+                //{
+                //    playerID = 2;
+                //}
+                result = (InputDevice) playerID;
+            }
+            else
+            {
+                result = _inputDevices[playerID];
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Saves which player is using which input device.
+        /// </summary>
+        public void SaveInputDevices()
+        {
+            for (int i = 0; i < _players.Length; i++)
+            {
+                _inputDevices[i] = _players[i].Input.InputDevice;
+                //Debug.Log(string.Format("Input device saved: {0} has {1}",
+                //    _players[i].name, _players[i].Input.InputDevice));
+            }
+        }
+
+        #endregion Player Methods
+
+        #region Scene Management
+
         /// <summary>
         /// Starts reseting level with a fade-out.
         /// </summary>
         public void StartSceneReset()
         {
-            Transition = TransitionPhase.ResetingScene;
+            SceneTransition = TransitionPhase.ResetingScene;
             _fade.StartFadeOut(LevelFailed);
             Debug.Log("Restarting level");
         }
@@ -695,14 +741,16 @@ namespace Atlanticide
         {
             SetScore(0);
             World.Instance.ResetWorld();
-            _level.ResetLevel();
+            _levelManager.ResetLevel();
             _input.ResetInput();
             _players.ForEach(pc => pc.CancelActions());
-            _players.ForEach(pc => pc.RespawnPosition = _level.GetSpawnPoint(pc.Tool));
+            _players.ForEach
+                (pc => pc.RespawnPosition =_levelManager.GetSpawnPoint(pc.Tool));
             ForEachActivePlayerChar(pc => pc.Respawn());
             _npcs.ForEach(npc => npc.Respawn());
             _levelObjects.ForEach(obj => obj.ResetObject());
             _ui.ResetUI();
+            LevelFailed = false;
             DeadPlayerCount = 0;
             _fade.StartFadeIn(true);
         }
@@ -752,13 +800,13 @@ namespace Atlanticide
             {
                 Debug.Log(string.Format("Going to level {0} puzzle {1}: {2}",
                     CurrentLevel.Number, puzzleNum, puzzleName));
+                CurrentLevel.CurrentPuzzleNumber = puzzleNum;
                 StartLoadingScene(CurrentLevel.GetPuzzleSceneName(puzzleNum));
                 GameState = State.Play;
                 return true;
             }
             else
             {
-                Debug.LogError("Invalid puzzle number.");
                 return false;
             }
         }
@@ -779,7 +827,7 @@ namespace Atlanticide
         /// <param name="sceneName">The scene's name</param>
         public void StartLoadingScene(string sceneName)
         {
-            if (Transition != TransitionPhase.ExitingScene)
+            if (SceneTransition != TransitionPhase.ExitingScene)
             {
                 Debug.Log("Loading scene: " + sceneName);
 
@@ -789,7 +837,7 @@ namespace Atlanticide
                     World.Instance.ResetWorld();
                 }
 
-                Transition = TransitionPhase.ExitingScene;
+                SceneTransition = TransitionPhase.ExitingScene;
                 _nextSceneName = sceneName;
                 _fade.StartFadeOut(false);
             }
@@ -801,7 +849,7 @@ namespace Atlanticide
         /// <param name="sceneName">The scene's name</param>
         private void LoadScene(string sceneName)
         {
-            Transition = TransitionPhase.StartingScene;
+            SceneTransition = TransitionPhase.StartingScene;
             SceneManager.LoadScene(sceneName);
         }
 
@@ -815,9 +863,69 @@ namespace Atlanticide
             InitScene();
         }
 
+        #endregion Scene Management
+
+        #region Level Methods
+
+        /// <summary>
+        /// Completes a puzzle and either loads the
+        /// next one in the level or loads the next
+        /// level's first puzzle.
+        /// </summary>
+        public void CompletePuzzle()
+        {
+            Debug.Log("Level completed");
+            ResetLevelResultAudioSource();
+            _levelResultAudioSrc = SFXPlayer.Instance.Play(Sound.Success);
+
+            bool loadNextPuzzle =
+                LoadPuzzle(CurrentLevel.CurrentPuzzleNumber + 1);
+
+            // The level's last puzzle was completed so the
+            // next level's first puzzle is loaded instead
+            if (!loadNextPuzzle)
+            {
+                LoadLevel(CurrentLevel.Number + 1);
+            }
+        }
+
+        /// <summary>
+        /// Restarts the level if the players failed.
+        /// </summary>
+        public void CheckLevelFailure()
+        {
+            if (AllPlayersDied)
+            {
+                Debug.Log("Level failed");
+                LevelFailed = true;
+                ResetLevelResultAudioSource();
+                _levelResultAudioSrc = SFXPlayer.Instance.Play(Sound.Failure);
+                StartSceneReset();
+            }
+        }
+
+        private void ResetLevelResultAudioSource()
+        {
+            if (_levelResultAudioSrc != null && _levelResultAudioSrc.isPlaying)
+            {
+                _levelResultAudioSrc.Stop();
+            }
+        }
+
+        public void ChangeScore(int score)
+        {
+            SetScore(CurrentScore + score);
+        }
+
+        public void SetScore(int score)
+        {
+            CurrentScore = score;
+            _ui.UpdateScoreCounter();
+        }
+
         public void ActivatePauseScreen(bool activate, string playerName)
         {
-            if (activate || Transition == TransitionPhase.None)
+            if (activate || SceneTransition == TransitionPhase.None)
             {
                 _ui.ActivatePauseScreen(activate, playerName);
             }
@@ -831,6 +939,8 @@ namespace Atlanticide
                 _ui.ActivateTargetIcon(activate, playerID, position);
             }
         }
+
+        #endregion Level Methods
 
         private void OnDisable()
         {

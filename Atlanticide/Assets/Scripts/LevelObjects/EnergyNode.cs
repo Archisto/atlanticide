@@ -6,16 +6,27 @@ namespace Atlanticide
 {
     public class EnergyNode : LevelObject
     {
+        [SerializeField]
+        private bool _active = true;
+
         public int currentCharges;
 
         [SerializeField, Range(1, 20)]
         protected int _maxCharges = 1;
 
         [SerializeField]
-        protected int _startCharges = 1;
+        protected int _defaultCharges = 0;
+
+        [Header("RANGE BOX")]
 
         [SerializeField]
-        private bool _active = true;
+        private bool _useRangeBox;
+
+        [SerializeField]
+        private Vector3 _boxCorner1 = Vector3.one * -1;
+
+        [SerializeField]
+        private Vector3 _boxCorner2 = Vector3.one;
 
         protected KeyCodeSwitch _keyCodeSwitch;
         protected PlayerCharacter _energyCollectorPlayer;
@@ -43,20 +54,38 @@ namespace Atlanticide
             get { return currentCharges == 0; }
         }
 
+        private Vector3 BoxCorner1 { get; set; }
+
+        private Vector3 BoxCorner2 { get; set; }
+
         /// <summary>
         /// Initializes the object.
         /// </summary>
         protected virtual void Start()
         {
-            if (_startCharges > _maxCharges)
+            if (_defaultCharges > _maxCharges)
             {
-                _startCharges = _maxCharges;
+                _defaultCharges = _maxCharges;
             }
 
-            currentCharges = _startCharges;
+            currentCharges = _defaultCharges;
             _activeByDefault = _active;
             Active = _active;
             _keyCodeSwitch = GetComponent<KeyCodeSwitch>();
+
+            // Gives BoxCorner1 the smaller axis values
+            // and BoxCorner2 the larger ones
+            if (_useRangeBox)
+            {
+                float minX = Mathf.Min(_boxCorner1.x, _boxCorner2.x);
+                float maxX = Mathf.Max(_boxCorner1.x, _boxCorner2.x);
+                float minY = Mathf.Min(_boxCorner1.y, _boxCorner2.y);
+                float maxY = Mathf.Max(_boxCorner1.y, _boxCorner2.y);
+                float minZ = Mathf.Min(_boxCorner1.z, _boxCorner2.z);
+                float maxZ = Mathf.Max(_boxCorner1.z, _boxCorner2.z);
+                BoxCorner1 = transform.position + new Vector3(minX, minY, minZ);
+                BoxCorner2 = transform.position + new Vector3(maxX, maxY, maxZ);
+            }
         }
 
         /// <summary>
@@ -90,8 +119,8 @@ namespace Atlanticide
             if (_energyCollectorPlayer == null ||
                 _energyCollectorPlayer.Tool != PlayerTool.EnergyCollector)
             {
-                _energyCollectorPlayer =
-                    GameManager.Instance.GetPlayerWithTool(PlayerTool.EnergyCollector, true);
+                _energyCollectorPlayer = GameManager.Instance.
+                    GetPlayerWithTool(PlayerTool.EnergyCollector, true);
             }
         }
 
@@ -100,12 +129,24 @@ namespace Atlanticide
             if (EnergyCollectorPlayerIsAvailable() &&
                 _energyCollectorPlayer.EnergyCollector.Target != this)
             {
-                float distance = Vector3.Distance
-                    (transform.position, _energyCollectorPlayer.EnergyCollector.transform.position);
-                if (distance <= World.Instance.energyCollectRadius)
+                if (PositionWithinRange(_energyCollectorPlayer.
+                        EnergyCollector.transform.position))
                 {
                     _energyCollectorPlayer.EnergyCollector.Target = this;
                 }
+            }
+        }
+
+        public bool PositionWithinRange(Vector3 position)
+        {
+            if (_useRangeBox)
+            {
+                return Utils.WithinRangeBox(position, BoxCorner1, BoxCorner2);
+            }
+            else
+            {
+                float distance = Vector3.Distance(transform.position, position);
+                return distance <= World.Instance.energyCollectRadius;
             }
         }
 
@@ -180,7 +221,7 @@ namespace Atlanticide
         public override void ResetObject()
         {
             Active = _activeByDefault;
-            currentCharges = _startCharges;
+            currentCharges = _defaultCharges;
             base.ResetObject();
         }
 
@@ -198,8 +239,39 @@ namespace Atlanticide
                     Gizmos.color = Color.yellow;
                 }
 
-                Gizmos.DrawWireSphere(transform.position, World.Instance.energyCollectRadius);
+                if (_useRangeBox)
+                {
+                    if (!Application.isPlaying)
+                    {
+                        BoxCorner1 = transform.position + _boxCorner1;
+                        BoxCorner2 = transform.position + _boxCorner2;
+                    }
 
+                    Vector3 p1 = new Vector3(BoxCorner2.x, BoxCorner1.y, BoxCorner1.z);
+                    Vector3 p2 = new Vector3(BoxCorner2.x, BoxCorner1.y, BoxCorner2.z);
+                    Vector3 p3 = new Vector3(BoxCorner2.x, BoxCorner2.y, BoxCorner1.z);
+                    Vector3 p4 = new Vector3(BoxCorner1.x, BoxCorner2.y, BoxCorner2.z);
+                    Vector3 p5 = new Vector3(BoxCorner1.x, BoxCorner2.y, BoxCorner1.z);
+                    Vector3 p6 = new Vector3(BoxCorner1.x, BoxCorner1.y, BoxCorner2.z);
+                    Gizmos.DrawLine(BoxCorner1, p1);
+                    Gizmos.DrawLine(BoxCorner1, p5);
+                    Gizmos.DrawLine(BoxCorner1, p6);
+                    Gizmos.DrawLine(p1, p2);
+                    Gizmos.DrawLine(p1, p3);
+                    Gizmos.DrawLine(p2, p6);
+                    Gizmos.DrawLine(p3, p5);
+                    Gizmos.DrawLine(p4, p5);
+                    Gizmos.DrawLine(p4, p6);
+                    Gizmos.DrawLine(p2, BoxCorner2);
+                    Gizmos.DrawLine(p3, BoxCorner2);
+                    Gizmos.DrawLine(p4, BoxCorner2);
+                }
+                else
+                {
+                    Gizmos.DrawWireSphere
+                        (transform.position, World.Instance.energyCollectRadius);
+                }
+                
                 Gizmos.color = (MaxCharge ? Color.green : Color.black);
                 Utils.DrawProgressBarGizmo(transform.position + Vector3.back * 1f,
                     ((float) currentCharges / _maxCharges), Gizmos.color, Color.yellow);

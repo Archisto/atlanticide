@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Atlanticide.UI;
 
 namespace Atlanticide
 {
@@ -11,6 +12,9 @@ namespace Atlanticide
 
         [SerializeField]
         private Transform _shieldPlayerSpawnPoint;
+
+        private UIController _ui;
+        private Level _currentLevel;
 
         /// <summary>
         /// Initializes the object.
@@ -25,6 +29,11 @@ namespace Atlanticide
             {
                 Debug.LogError(Utils.GetFieldNullString("Player 2 spawn point"));
             }
+
+            _ui = GameManager.Instance.GetUI();
+            _currentLevel = GameManager.Instance.CurrentLevel;
+            _ui.levelName.text = _currentLevel.LevelSceneName + " - " +
+                _currentLevel.GetCurrentPuzzleName();
         }
 
         /// <summary>

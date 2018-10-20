@@ -6,7 +6,7 @@ namespace Atlanticide
 {
     public class EnergyCollector : MonoBehaviour
     {
-        private enum Mode
+        public enum ECMode
         {
             Idle = 0,
             Draining = 1,
@@ -23,15 +23,26 @@ namespace Atlanticide
         private float _emitTime = 1f;
 
         private float _elapsedTime;
-        private Mode _mode;
         private EnergyNode _tempNode;
+
+        public ECMode Mode { get; private set; }
 
         public EnergyNode Target { get; set; }
 
         /// <summary>
-        /// Is the energy collector in an idle state.
+        /// Is the energy collector in idle state.
         /// </summary>
-        public bool IsIdle { get { return _mode == Mode.Idle; } }
+        public bool IsIdle { get { return Mode == ECMode.Idle; } }
+
+        /// <summary>
+        /// Is the energy collector in draining state.
+        /// </summary>
+        public bool IsDraining { get { return Mode == ECMode.Draining; } }
+
+        /// <summary>
+        /// Is the energy collector in emitting state.
+        /// </summary>
+        public bool IsEmitting { get { return Mode == ECMode.Emitting; } }
 
         /// <summary>
         /// Initializes the object.
@@ -48,19 +59,19 @@ namespace Atlanticide
         {
             if (!World.Instance.GamePaused)
             {
-                if (_mode != Mode.Idle)
+                if (Mode != ECMode.Idle)
                 {
-                    UpdateChargingOrEmitting();
+                    UpdateDrainingOrEmitting();
                 }
 
                 UpdateTarget();
             }
         }
 
-        private void UpdateChargingOrEmitting()
+        private void UpdateDrainingOrEmitting()
         {
             _elapsedTime += World.Instance.DeltaTime;
-            float targetTime = (_mode == Mode.Draining ? _drainTime : _emitTime);
+            float targetTime = (Mode == ECMode.Draining ? _drainTime : _emitTime);
             if (_elapsedTime >= targetTime)
             {
                 ReturnToIdle();
@@ -70,8 +81,7 @@ namespace Atlanticide
         public void UpdateTarget()
         {
             if (Target != null &&
-                Vector3.Distance(transform.position, Target.transform.position)
-                    > World.Instance.energyCollectRadius)
+                !Target.PositionWithinRange(transform.position))
             {
                 Target = null;
                 //Debug.Log("Node lost, too far");
@@ -93,7 +103,7 @@ namespace Atlanticide
 
         public void TryDrainingOrEmitting()
         {
-            if (_mode == Mode.Idle && Target != null)
+            if (Mode == ECMode.Idle && Target != null)
             {
                 if (!Target.Active)
                 {
@@ -121,7 +131,7 @@ namespace Atlanticide
 
         private bool CanDrainOrEmit()
         {
-            if (_mode == Mode.Idle && Target != null)
+            if (Mode == ECMode.Idle && Target != null)
             {
                 if (!Target.Active)
                 {
@@ -169,7 +179,7 @@ namespace Atlanticide
             {
                 //Debug.Log("Draining energy");
                 _elapsedTime = 0f;
-                _mode = Mode.Draining;
+                Mode = ECMode.Draining;
                 _energyObject.SetActive(true);
                 Drain();
             }
@@ -181,7 +191,7 @@ namespace Atlanticide
             {
                 //Debug.Log("Emitting energy");
                 _elapsedTime = 0f;
-                _mode = Mode.Emitting;
+                Mode = ECMode.Emitting;
                 _energyObject.SetActive(true);
                 Emit();
             }
@@ -211,7 +221,7 @@ namespace Atlanticide
         {
             World.Instance.EmittingEnergy = false;
             World.Instance.DrainingEnergy = false;
-            _mode = Mode.Idle;
+            Mode = ECMode.Idle;
             _energyObject.SetActive(false);
             _tempNode = null;
         }

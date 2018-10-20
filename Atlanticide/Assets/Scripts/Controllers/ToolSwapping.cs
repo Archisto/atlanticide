@@ -67,7 +67,7 @@ namespace Atlanticide
         {
             _players = GameManager.Instance.GetPlayers();
             _ui = FindObjectOfType<UIController>();
-            _swapIcon = _ui.GetSwapIcon();
+            _swapIcon = _ui.swapIcon;
             if (_swapIcon != null)
             {
                 _swapIcon.gameObject.SetActive(false);

@@ -32,7 +32,7 @@ namespace Atlanticide
         /// </summary>
         private void Start()
         {
-            _defaultPosition = transform.position;
+            _defaultPosition = transform.localPosition;
             ResetPosition();
         }
 
@@ -56,13 +56,13 @@ namespace Atlanticide
             {
                 _elapsedTime = 0f;
                 _reverse = !_reverse;
-                transform.position = _targetPosition;
+                transform.localPosition = _targetPosition;
                 _startPosition = _targetPosition;
                 UpdateTargetPosition();
             }
             else
             {
-                transform.position = Vector3.Lerp(_startPosition, _targetPosition, ApplyModifiersToRatio(ratio));
+                transform.localPosition = Vector3.Lerp(_startPosition, _targetPosition, ApplyModifiersToRatio(ratio));
             }
         }
 
@@ -87,7 +87,7 @@ namespace Atlanticide
 
         public void ResetPosition()
         {
-            transform.position = _defaultPosition;
+            transform.localPosition = _defaultPosition;
             _startPosition = _defaultPosition;
             _reverse = false;
             _elapsedTime = _oneDirTime * _startRatio;

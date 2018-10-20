@@ -49,7 +49,9 @@ namespace Atlanticide
         Shield_Bash = 24,
         Shield_Deflect_1 = 25,
         Shield_Deflect_2 = 26,
-        Lifting_Shield = 27
+        Lifting_Shield = 27,
+        Success = 28,
+        Failure = 29
     }
 
     public class SFXPlayer : MonoBehaviour
@@ -74,6 +76,7 @@ namespace Atlanticide
 
                     instance =
                         Instantiate(Resources.Load<SFXPlayer>("SFXPlayer"));
+                    instance.Init();
                 }
 
                 return instance;
