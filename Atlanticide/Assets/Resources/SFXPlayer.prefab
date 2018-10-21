@@ -85,5 +85,5 @@ MonoBehaviour:
   audioSrcPrefab: {fileID: 1660063342897128, guid: 8c0e527bb61a12441914ae58356bf2ee,
     type: 2}
   volume: 1
-  audioSrcPoolSize: 5
+  audioSrcPoolSize: 15
   flexiblePoolSize: 0
