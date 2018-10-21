@@ -34,6 +34,7 @@ namespace Atlanticide
         public const int MaxPlayers = 2;
         public const int LevelCount = 2;
 
+        private const string PressStartKey = "PressStart";
         private const string MainMenuKey = "MainMenu";
         private const string LevelKey = "Level";
 
@@ -146,7 +147,7 @@ namespace Atlanticide
 
         public bool LevelFailed { get; private set; }
 
-        public PlayerInput MenuPlayerInput { get; private set; }
+        public PlayerInput MenuPlayerInput { get; set; }
 
         #endregion Fields
 
@@ -206,14 +207,19 @@ namespace Atlanticide
             InitSettings();
             SceneManager.activeSceneChanged += InitScene;
 
-            if (SceneManager.GetActiveScene().name == MainMenuKey)
+            if (SceneManager.GetActiveScene().name.Equals(MainMenuKey))
             {
                 GameState = State.MainMenu;
+            }
+            else if (SceneManager.GetActiveScene().name.Equals(PressStartKey))
+            {
+                GameState = State.PressStart;
             }
             else
             {
                 GameState = State.Play;
             }
+            
 
             InitLevels();
             PlayerCount = 2;
@@ -221,7 +227,6 @@ namespace Atlanticide
             _inputDevices = new InputDevice[MaxPlayers];
             _updateAtSceneStart = true;
 
-            // TODO: "Press Start" screen determines player 1's input
             MenuPlayerInput = new PlayerInput(InputDevice.Keyboard);
         }
 

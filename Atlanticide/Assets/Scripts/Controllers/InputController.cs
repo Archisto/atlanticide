@@ -203,7 +203,12 @@ namespace Atlanticide
         {
             foreach (PlayerInput input in _inputs)
             {
-                input.GetPressStartInput();
+                if (input.GetPressStartInput())
+                {
+                    GameManager.Instance.MenuPlayerInput = input;
+                    GameManager.Instance.LoadMainMenu();
+                    break;
+                }
             }
         }
 
