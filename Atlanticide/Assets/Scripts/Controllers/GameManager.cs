@@ -146,6 +146,8 @@ namespace Atlanticide
 
         public bool LevelFailed { get; private set; }
 
+        public PlayerInput MenuPlayerInput { get; private set; }
+
         #endregion Fields
 
         /// <summary>
@@ -218,6 +220,9 @@ namespace Atlanticide
             _playerTools = new PlayerTool[MaxPlayers];
             _inputDevices = new InputDevice[MaxPlayers];
             _updateAtSceneStart = true;
+
+            // TODO: "Press Start" screen determines player 1's input
+            MenuPlayerInput = new PlayerInput(InputDevice.Keyboard);
         }
 
         private void LevelStartInit()
@@ -245,7 +250,7 @@ namespace Atlanticide
             World.Instance.Init();
             InitUI();
             InitFade();
-            InitInput();
+            InitInputController();
 
             if (GameState == State.Play)
             {
@@ -291,7 +296,7 @@ namespace Atlanticide
         /// <summary>
         /// Initializes the input controller.
         /// </summary>
-        private void InitInput()
+        private void InitInputController()
         {
             _input = FindObjectOfType<InputController>();
             if (_input == null)
@@ -365,11 +370,23 @@ namespace Atlanticide
                 _players[i] = Instantiate(_playerPrefab);
                 _players[i].ID = i;
                 _players[i].name = "Player " + (i + 1);
-                _players[i].Input = new PlayerInput(GetPlayerInputDevice(i));
+
+                // TODO: Player 1 uses the same input as in the main menu.
+                // The other player uses other input.
+                PlayerInput input = new PlayerInput(GetPlayerInputDevice(i));
+
+                _players[i].Input = input;
                 PlayerTool tool = GetPlayerTool(i);
                 _players[i].Tool = tool;
                 _players[i].transform.position = _levelManager.GetSpawnPoint(tool);
                 //Debug.Log("Player " + (i + 1) + " input device: " + _players[i].Input.InputDevice);
+
+                // TODO: Needs to be removed because player 1 already
+                // should have the menu input as their input
+                if (i == 0)
+                {
+                    MenuPlayerInput = input;
+                }
             }
 
             if (_freshGameStart)
