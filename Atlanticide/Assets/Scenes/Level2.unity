@@ -302,6 +302,11 @@ Prefab:
       propertyPath: m_RootOrder
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 114666515403901816, guid: b321307b1658fb1428ad3f189be73bcb,
+        type: 2}
+      propertyPath: _swapIcon
+      value: 
+      objectReference: {fileID: 2010999202}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b321307b1658fb1428ad3f189be73bcb, type: 2}
   m_IsPrefabAsset: 0
@@ -405,6 +410,12 @@ Prefab:
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 933fb5427eaf36848b49493b36609d93, type: 2}
   m_IsPrefabAsset: 0
+--- !u!114 &2010999202 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 114271999281220748, guid: 933fb5427eaf36848b49493b36609d93,
+    type: 2}
+  m_PrefabInternal: {fileID: 2010999201}
+  m_Script: {fileID: -765806418, guid: f70555f144d8491a825f0804e09c671c, type: 3}
 --- !u!1001 &2057314439
 Prefab:
   m_ObjectHideFlags: 0

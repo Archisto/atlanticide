@@ -12,6 +12,9 @@ namespace Atlanticide
         private Color _color;
 
         [SerializeField]
+        private Color _altColor;
+
+        [SerializeField]
         private float _fadeOutTime = 1;
 
         [SerializeField]
@@ -19,8 +22,12 @@ namespace Atlanticide
 
         private Image _screenCoverImage;
         private bool _fadeOut;
+        private bool _useAltColor;
         private float _fadeProgress;
         private float _elapsedTime;
+        private bool _wait;
+        private short _maxWaitFrames = 2;
+        private short _waitedFrames;
 
         public bool Active { get; private set; }
 
@@ -73,29 +80,33 @@ namespace Atlanticide
 
             if (_fadeOut)
             {
-                StartFadeOut();
+                StartFadeOut(false);
             }
             else
             {
-                StartFadeIn();
+                StartFadeIn(false);
             }
         }
 
         /// <summary>
         /// Starts fading out.
         /// </summary>
-        public void StartFadeOut()
+        public void StartFadeOut(bool useAltColor)
         {
             _fadeOut = true;
+            _useAltColor = useAltColor;
+            _wait = false;
             StartFade();
         }
 
         /// <summary>
         /// Starts fading in.
         /// </summary>
-        public void StartFadeIn()
+        public void StartFadeIn(bool wait)
         {
             _fadeOut = false;
+            _wait = wait;
+            _waitedFrames = 0;
             StartFade();
         }
 
@@ -107,6 +118,7 @@ namespace Atlanticide
             _fadeProgress = 0;
             _elapsedTime = 0;
             Active = true;
+            UpdateTransparency();
         }
 
         /// <summary>
@@ -125,6 +137,20 @@ namespace Atlanticide
         {
             if (Active)
             {
+                // If the framerate is very low when faded out, 
+                // wait a few frames to give it time to go back
+                // to normal and only then continue to fade in
+                if (_wait)
+                {
+                    _waitedFrames++;
+                    if (_waitedFrames >= _maxWaitFrames)
+                    {
+                        _wait = false;
+                    }
+
+                    return;
+                }
+
                 // Increases the elapsed time
                 _elapsedTime += Time.deltaTime;
 
@@ -177,7 +203,7 @@ namespace Atlanticide
         {
             if (_screenCoverImage != null)
             {
-                Color newColor = _color;
+                Color newColor = (_useAltColor ? _altColor : _color);
 
                 if (_fadeOut)
                 {
@@ -190,6 +216,14 @@ namespace Atlanticide
 
                 _screenCoverImage.color = newColor;
             }
+        }
+
+        private void InstantFadeOut()
+        {
+            Color newColor = _color;
+            newColor.a = 1f;
+            _screenCoverImage.color = newColor;
+            Debug.Log("Instant fade-out");
         }
     }
 }
