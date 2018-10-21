@@ -380,6 +380,7 @@ namespace Atlanticide
 
         public void CheckConnectedControllers()
         {
+            Debug.Log("Controllers connected: " + Input.GetJoystickNames().Length);
             for (int i = 0; i < Input.GetJoystickNames().Length; i++)
             {
                 if (string.IsNullOrEmpty(Input.GetJoystickNames()[i]))
