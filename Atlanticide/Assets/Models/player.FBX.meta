@@ -3,107 +3,217 @@ guid: 267f950cc649ef74583c0a4a0f0642e8
 ModelImporter:
   serializedVersion: 23
   fileIDToRecycleName:
-    100000: Head
-    100002: head
-    100004: helmet
-    100006: Hip
-    100008: L_Clavicle
-    100010: L_Foot
-    100012: L_Hand
-    100014: L_Lower_Arm
-    100016: L_Shin
-    100018: L_Thigh
-    100020: L_Toe
-    100022: L_Upper_Arm
-    100024: Mane
-    100026: mane
-    100028: Neck
-    100030: //RootNode
-    100032: R_Clavicle
-    100034: R_Foot
-    100036: R_Hand
-    100038: R_Lower_Arm
-    100040: R_Shin
-    100042: R_Thigh
-    100044: R_Toe
-    100046: R_Upper_Arm
-    100048: Spine
-    100050: torso
-    100052: Head_END
-    100054: Head_HELPER
-    100056: L_Hand_END
-    100058: L_LowerArm
-    100060: L_Toe_END
-    100062: L_UpperArm
-    100064: Mane_END
-    100066: Mane_HELPER
-    100068: Pelvis
-    100070: Pelvis_END
-    100072: Pelvis_HELPER
-    100074: R_Hand_END
-    100076: R_LowerArm
-    100078: R_Toe_END
-    100080: R_UpperArm
-    400000: Head
-    400002: head
-    400004: helmet
-    400006: Hip
-    400008: L_Clavicle
-    400010: L_Foot
-    400012: L_Hand
-    400014: L_Lower_Arm
-    400016: L_Shin
-    400018: L_Thigh
-    400020: L_Toe
-    400022: L_Upper_Arm
-    400024: Mane
-    400026: mane
-    400028: Neck
-    400030: //RootNode
-    400032: R_Clavicle
-    400034: R_Foot
-    400036: R_Hand
-    400038: R_Lower_Arm
-    400040: R_Shin
-    400042: R_Thigh
-    400044: R_Toe
-    400046: R_Upper_Arm
-    400048: Spine
-    400050: torso
-    400052: Head_END
-    400054: Head_HELPER
-    400056: L_Hand_END
-    400058: L_LowerArm
-    400060: L_Toe_END
-    400062: L_UpperArm
-    400064: Mane_END
-    400066: Mane_HELPER
-    400068: Pelvis
-    400070: Pelvis_END
-    400072: Pelvis_HELPER
-    400074: R_Hand_END
-    400076: R_LowerArm
-    400078: R_Toe_END
-    400080: R_UpperArm
+    100000: breastplate
+    100002: emblem
+    100004: greaves
+    100006: Head
+    100008: head
+    100010: Head_END
+    100012: helmet
+    100014: L_Clavicle
+    100016: L_Foot
+    100018: L_Hand
+    100020: L_Hand_END
+    100022: L_LowerArm
+    100024: L_Shin
+    100026: L_Thigh
+    100028: L_Toe
+    100030: L_Toe_END
+    100032: L_UpperArm
+    100034: legs
+    100036: Mane
+    100038: mane
+    100040: Mane_END
+    100042: Neck
+    100044: Pelvis
+    100046: Pelvis_END
+    100048: Pelvis_HELPER
+    100050: //RootNode
+    100052: R_Clavicle
+    100054: R_Foot
+    100056: R_Hand
+    100058: R_Hand_END
+    100060: R_LowerArm
+    100062: R_Shin
+    100064: R_Thigh
+    100066: R_Toe
+    100068: R_Toe_END
+    100070: R_UpperArm
+    100072: skirt
+    100074: Spine
+    100076: upper torso
+    100078: ROOT_NODE
+    100080: Head_HELPER
+    100082: L_Clavicle_HELPER
+    100084: L_Foot_HELPER
+    100086: L_Hand_HELPER
+    100088: L_Heel_HELPER
+    100090: L_HeelPeel_HELPER
+    100092: L_LowerArm_HELPER
+    100094: L_ToeLift_HELPER
+    100096: L_ToeTap_HELPER
+    100098: L_UpperArm_HELPER
+    100100: Mane_HELPER
+    100102: R_Clavicle_HELPER
+    100104: R_Foot_HELPER
+    100106: R_Hand_HELPER
+    100108: R_Heel_HELPER
+    100110: R_HeelPeel_HELPER
+    100112: R_LowerArm_HELPER
+    100114: R_ToeLift_HELPER
+    100116: R_ToeTap_HELPER
+    100118: R_UpperArm_HELPER
+    100120: Spine_HELPER
+    100122: ROOT
+    100124: Segment_BONE_000
+    100126: Segment_BONE_001
+    100128: Segment_BONE_002
+    100130: Segment_BONE_003
+    100132: Segment_BONE_004
+    100134: Segment_BONE_005
+    100136: Segment_BONE_006
+    100138: Segment_BONE_007
+    100140: Segment_BONE_008
+    100142: Segment_BONE_009
+    100144: Segment_BONE_010
+    100146: Segment_BONE_011
+    100148: Segment_BONE_012
+    100150: Segment_BONE_013
+    100152: Segment_BONE_014
+    100154: Segment_BONE_015
+    100156: Segment_BONE_016
+    100158: Segment_BONE_017
+    100160: shield brace
+    100162: shield force field
+    100164: shield rotator
+    100166: shield segments
+    400000: breastplate
+    400002: emblem
+    400004: greaves
+    400006: Head
+    400008: head
+    400010: Head_END
+    400012: helmet
+    400014: L_Clavicle
+    400016: L_Foot
+    400018: L_Hand
+    400020: L_Hand_END
+    400022: L_LowerArm
+    400024: L_Shin
+    400026: L_Thigh
+    400028: L_Toe
+    400030: L_Toe_END
+    400032: L_UpperArm
+    400034: legs
+    400036: Mane
+    400038: mane
+    400040: Mane_END
+    400042: Neck
+    400044: Pelvis
+    400046: Pelvis_END
+    400048: Pelvis_HELPER
+    400050: //RootNode
+    400052: R_Clavicle
+    400054: R_Foot
+    400056: R_Hand
+    400058: R_Hand_END
+    400060: R_LowerArm
+    400062: R_Shin
+    400064: R_Thigh
+    400066: R_Toe
+    400068: R_Toe_END
+    400070: R_UpperArm
+    400072: skirt
+    400074: Spine
+    400076: upper torso
+    400078: ROOT_NODE
+    400080: Head_HELPER
+    400082: L_Clavicle_HELPER
+    400084: L_Foot_HELPER
+    400086: L_Hand_HELPER
+    400088: L_Heel_HELPER
+    400090: L_HeelPeel_HELPER
+    400092: L_LowerArm_HELPER
+    400094: L_ToeLift_HELPER
+    400096: L_ToeTap_HELPER
+    400098: L_UpperArm_HELPER
+    400100: Mane_HELPER
+    400102: R_Clavicle_HELPER
+    400104: R_Foot_HELPER
+    400106: R_Hand_HELPER
+    400108: R_Heel_HELPER
+    400110: R_HeelPeel_HELPER
+    400112: R_LowerArm_HELPER
+    400114: R_ToeLift_HELPER
+    400116: R_ToeTap_HELPER
+    400118: R_UpperArm_HELPER
+    400120: Spine_HELPER
+    400122: ROOT
+    400124: Segment_BONE_000
+    400126: Segment_BONE_001
+    400128: Segment_BONE_002
+    400130: Segment_BONE_003
+    400132: Segment_BONE_004
+    400134: Segment_BONE_005
+    400136: Segment_BONE_006
+    400138: Segment_BONE_007
+    400140: Segment_BONE_008
+    400142: Segment_BONE_009
+    400144: Segment_BONE_010
+    400146: Segment_BONE_011
+    400148: Segment_BONE_012
+    400150: Segment_BONE_013
+    400152: Segment_BONE_014
+    400154: Segment_BONE_015
+    400156: Segment_BONE_016
+    400158: Segment_BONE_017
+    400160: shield brace
+    400162: shield force field
+    400164: shield rotator
+    400166: shield segments
     2100000: 07 - Default
-    2300000: head
-    2300002: helmet
-    2300004: mane
-    2300006: torso
-    3300000: head
-    3300002: helmet
-    3300004: mane
-    3300006: torso
+    2100002: No Name
+    2100004: shield_segments
+    2100006: 15 - Default
+    2300000: shield brace
+    2300002: shield force field
+    2300004: shield rotator
+    3300000: shield brace
+    3300002: shield force field
+    3300004: shield rotator
     4300000: head
-    4300002: torso
+    4300002: upper torso
     4300004: helmet
     4300006: mane
-    7400000: Idle
+    4300008: greaves
+    4300010: breastplate
+    4300012: legs
+    4300014: skirt
+    4300016: emblem
+    4300018: shield brace
+    4300020: shield segments
+    4300022: shield rotator
+    4300024: shield force field
+    7400000: Look Around
+    7400002: Idle
+    7400004: T-Pose
+    7400006: Run
+    7400008: Walk
+    7400010: Shield Raise
+    7400012: Shield Idle
+    7400014: All Animations
     9500000: //RootNode
-    13700000: head
-    13700002: helmet
-    13700004: mane
-    13700006: torso
+    13700000: breastplate
+    13700002: emblem
+    13700004: greaves
+    13700006: head
+    13700008: helmet
+    13700010: legs
+    13700012: mane
+    13700014: skirt
+    13700016: upper torso
+    13700018: shield segments
+    2186277476908879412: ImportLogs
   externalObjects: {}
   materials:
     importMaterials: 0
@@ -133,10 +243,94 @@ ModelImporter:
     extraUserProperties: []
     clipAnimations:
     - serializedVersion: 16
+      name: Look Around
+      takeName: Take 001
+      firstFrame: 1
+      lastFrame: 120
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 0
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
       name: Idle
       takeName: Take 001
-      firstFrame: 2
-      lastFrame: 160
+      firstFrame: 130
+      lastFrame: 190
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: T-Pose
+      takeName: Take 001
+      firstFrame: 0
+      lastFrame: 0
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: Run
+      takeName: Take 001
+      firstFrame: 200
+      lastFrame: 240
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
@@ -160,6 +354,118 @@ ModelImporter:
       maskType: 3
       maskSource: {instanceID: 0}
       additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: Walk
+      takeName: Take 001
+      firstFrame: 250
+      lastFrame: 289
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 1
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 1
+    - serializedVersion: 16
+      name: Shield Raise
+      takeName: Take 001
+      firstFrame: 300
+      lastFrame: 310
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 1
+    - serializedVersion: 16
+      name: Shield Idle
+      takeName: Take 001
+      firstFrame: 311
+      lastFrame: 320
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 1
+    - serializedVersion: 16
+      name: All Animations
+      takeName: Take 001
+      firstFrame: 0
+      lastFrame: 320
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 1
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 1
     isReadable: 1
   meshes:
     lODScreenPercentages: []
@@ -203,8 +509,8 @@ ModelImporter:
     armStretch: 0.05
     legStretch: 0.05
     feetSpacing: 0
-    rootMotionBoneName: 
-    rootMotionBoneRotation: {x: 0, y: 0, z: 0, w: 1}
+    rootMotionBoneName: ROOT_NODE
+    rootMotionBoneRotation: {x: -0.7071068, y: -0, z: -0, w: 0.7071068}
     hasTranslationDoF: 0
     hasExtraRoot: 0
     skeletonHasParents: 1
