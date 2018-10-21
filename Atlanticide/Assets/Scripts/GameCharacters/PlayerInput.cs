@@ -25,8 +25,8 @@ namespace Atlanticide
 
         private HoldInput _holdActionInput;
 
-        public string HorizontalMenuKey { get; private set}
-        public string VerticalMenuKey { get; private set}
+        public string HorizontalMenuKey { get; private set; }
+        public string VerticalMenuKey { get; private set; }
 
         private InputDevice _inputDevice;
         public InputDevice InputDevice
