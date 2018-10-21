@@ -442,7 +442,7 @@ namespace Atlanticide
                 {
                     World.Instance.PauseGame(false);
                 }
-                GameManager.Instance.LoadTestLevel();
+                GameManager.Instance.LoadDebugLevel();
                 return;
             }
             else if (Input.GetKeyDown(KeyCode.Keypad1))
@@ -468,7 +468,7 @@ namespace Atlanticide
             {
                 if (level)
                 {
-                    GameManager.Instance.LoadLevel(levelOrPuzzle);
+                    GameManager.Instance.LoadLevelFromBeginning(levelOrPuzzle);
                 }
                 else
                 {

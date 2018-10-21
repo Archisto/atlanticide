@@ -800,9 +800,17 @@ namespace Atlanticide
         /// Loads a level.
         /// </summary>
         /// <param name="levelNum">A level number</param>
-        public void LoadLevel(int levelNum)
+        public void LoadLevelFromBeginning(int levelNum)
         {
-            LoadLevelAndPuzzle(levelNum, 1);
+            if (levelNum >= 1)
+            {
+                LoadLevelAndPuzzle(levelNum, 1);
+            }
+            else
+            {
+                Debug.LogWarning("You cannot load a debug level like this. " +
+                    "Load it with LoadDebugLevel(string sceneName).");
+            }
         }
 
         /// <summary>
@@ -815,10 +823,21 @@ namespace Atlanticide
             string puzzleName = CurrentLevel.GetPuzzleName(puzzleNum);
             if (puzzleName != null)
             {
-                Debug.Log(string.Format("Going to level {0} puzzle {1}: {2}",
-                    CurrentLevel.Number, puzzleNum, puzzleName));
-                CurrentLevel.CurrentPuzzleNumber = puzzleNum;
-                StartLoadingScene(CurrentLevel.GetPuzzleSceneName(puzzleNum));
+                string sceneName = "";
+                if (CurrentLevel.Number == 0)
+                {
+                    sceneName = SceneManager.GetActiveScene().name;
+                    Debug.Log("Going to level: " + sceneName);
+                }
+                else
+                {
+                    Debug.Log(string.Format("Going to level {0} puzzle {1}: {2}",
+                        CurrentLevel.Number, puzzleNum, puzzleName));
+                    CurrentLevel.CurrentPuzzleNumber = puzzleNum;
+                    sceneName = CurrentLevel.GetPuzzleSceneName(puzzleNum);
+                }
+
+                StartLoadingScene(sceneName);
                 GameState = State.Play;
                 return true;
             }
@@ -850,12 +869,20 @@ namespace Atlanticide
 
         /// <summary>
         /// Testing.
-        /// Loads a level: Lauri's Colosseum.
+        /// Loads a debug level: Lauri's Colosseum.
         /// </summary>
-        public void LoadTestLevel()
+        public void LoadDebugLevel()
+        {
+            LoadDebugLevel("Lauri's Colosseum");
+        }
+
+        /// <summary>
+        /// Testing. Loads a debug level.
+        /// </summary>
+        public void LoadDebugLevel(string sceneName)
         {
             CurrentLevel = _levels[0];
-            StartLoadingScene("Lauri's Colosseum");
+            StartLoadingScene(sceneName);
             GameState = State.Play;
         }
 
@@ -926,7 +953,7 @@ namespace Atlanticide
             {
                 int nextLevel = CurrentLevel.Number + 1;
                 TryUnlockLevel(nextLevel);
-                LoadLevel(nextLevel);
+                LoadLevelFromBeginning(nextLevel);
             }
 
             SaveGame();

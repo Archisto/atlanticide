@@ -61,7 +61,7 @@ namespace Atlanticide.UI
 
         public void StartNewGame()
         {
-            GameManager.Instance.LoadLevel(levelNumber);
+            GameManager.Instance.LoadLevelFromBeginning(levelNumber);
 
             // If a save file exists and the player presses the button, there
             // should be a confirmation asking whether the player truly wants to 
