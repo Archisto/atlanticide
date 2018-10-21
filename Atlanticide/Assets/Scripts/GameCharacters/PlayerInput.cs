@@ -180,6 +180,21 @@ namespace Atlanticide
             return Input.GetButtonDown(_pauseKey);
         }
 
+        public bool GetPressStartInput()
+        {
+            bool pressedEnterKey = false;
+
+            if (InputDevice == InputDevice.Keyboard)
+            {
+                if (Input.GetKeyDown(KeyCode.Return))
+                {
+                    pressedEnterKey = true;
+                }
+            }
+
+            return Input.GetButtonDown(_jumpKey) || Input.GetButtonDown(_pauseKey) || pressedEnterKey;
+        }
+
         public void ResetInput()
         {
             _holdActionInput.ResetHold();

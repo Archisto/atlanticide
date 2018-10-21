@@ -39,9 +39,10 @@ namespace Atlanticide
 
         public enum State
         {
-            MainMenu = 0,
-            Play = 1,
-            LevelEnd = 2
+            PressStart = 0,
+            MainMenu = 1,
+            Play = 2,
+            LevelEnd = 3
         }
 
         public enum TransitionPhase

@@ -27,6 +27,8 @@ namespace Atlanticide.UI
         public GameObject mainMenuScreen;
         public GameObject settingsScreen;
 
+        private PlayerInput playerInput;
+
         /// <summary>
         /// Initializes the object.
         /// </summary>
@@ -39,6 +41,8 @@ namespace Atlanticide.UI
             es.SetSelectedGameObject(es.firstSelectedGameObject);
 
             sim = es.gameObject.GetComponent<StandaloneInputModule>();
+
+            playerInput = new PlayerInput(InputDevice.Keyboard);
 
             MainMenu();
 
@@ -78,7 +82,8 @@ namespace Atlanticide.UI
             mainMenuScreen.SetActive(true);
             settingsScreen.SetActive(false);
 
-            sim.horizontalAxis = GameManager.Instance.GetAnyPlayer(true).Input.HorizontalMenuKey;
+            sim.horizontalAxis = playerInput.HorizontalMenuKey;
+            sim.verticalAxis = playerInput.VerticalMenuKey;
         }
 
         public void SettingsMenu()

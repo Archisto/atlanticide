@@ -33,6 +33,8 @@ namespace Atlanticide
         // "Wireless Controller"
         private const int PSControllerNameLength = 19;
 
+        public List<PlayerInput> _inputs;
+
         private PlayerCharacter[] _players;
         private ToolSwapping _toolSwap;
         private CameraController _camera;
@@ -49,6 +51,14 @@ namespace Atlanticide
         /// </summary>
         private void Start()
         {
+            _inputs = new List<PlayerInput>
+            {
+                new PlayerInput(InputDevice.Keyboard),
+                new PlayerInput(InputDevice.Gamepad1),
+                new PlayerInput(InputDevice.Gamepad2),
+                new PlayerInput(InputDevice.Gamepad3)
+            };
+
             _players = GameManager.Instance.GetPlayers();
             _toolSwap = FindObjectOfType<ToolSwapping>();
             _camera = FindObjectOfType<CameraController>();
@@ -68,11 +78,17 @@ namespace Atlanticide
                     CheckPlayerInput();
                 }
 
-                if (GameManager.Instance.GameState != GameManager.State.Play
+                if (GameManager.Instance.GameState == GameManager.State.PressStart)
+                {
+                    CheckPressStartInput();
+                }
+                else if (GameManager.Instance.GameState != GameManager.State.Play
                     || World.Instance.GamePaused)
                 {
                     CheckMenuInput();
                 }
+
+
 
                 // Testing
                 CheckDebugInput();
@@ -181,6 +197,14 @@ namespace Atlanticide
         private void CheckMenuInput()
         {
             // TODO
+        }
+
+        private void CheckPressStartInput()
+        {
+            foreach (PlayerInput input in _inputs)
+            {
+                input.GetPressStartInput();
+            }
         }
 
         /// <summary>

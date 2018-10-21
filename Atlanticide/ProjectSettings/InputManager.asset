@@ -70,6 +70,38 @@ InputManager:
     axis: 0
     joyNum: 0
   - serializedVersion: 3
+    m_Name: HorizontalMenuKeyboard
+    descriptiveName: 
+    descriptiveNegativeName: 
+    negativeButton: left
+    positiveButton: right
+    altNegativeButton: a
+    altPositiveButton: d
+    gravity: 1000
+    dead: 0.001
+    sensitivity: 1000
+    snap: 1
+    invert: 0
+    type: 0
+    axis: 0
+    joyNum: 0
+  - serializedVersion: 3
+    m_Name: VerticalMenuKeyboard
+    descriptiveName: 
+    descriptiveNegativeName: 
+    negativeButton: down
+    positiveButton: up
+    altNegativeButton: s
+    altPositiveButton: w
+    gravity: 1000
+    dead: 0.001
+    sensitivity: 1000
+    snap: 1
+    invert: 0
+    type: 0
+    axis: 0
+    joyNum: 0
+  - serializedVersion: 3
     m_Name: ActionKeyboard
     descriptiveName: 
     descriptiveNegativeName: 
