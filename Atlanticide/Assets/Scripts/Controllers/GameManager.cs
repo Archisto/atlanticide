@@ -326,11 +326,11 @@ namespace Atlanticide
         {
             _levels = new List<Level>();
             _levels.Add(new Level(0, "Debug", 1));
-            _levels.Add(new Level(1, "Level1", 3));
+            _levels.Add(new Level(1, "DemoLevel1", 1));
             _levels.Add(new Level(2, "Level2", 3));
 
             _levels[1].SetPuzzleNames(
-                "First Tutorial", "Second Tutorial", "Third Tutorial");
+                "First Tutorial");
             _levels[2].SetPuzzleNames(
                 "Iosefka's Clinic", "Central Yharnam", "Cathedral Ward");
 
