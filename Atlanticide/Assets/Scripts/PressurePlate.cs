@@ -34,7 +34,7 @@ namespace Atlanticide
         {
             base.Start();
             _hitbox.mask = _mask;
-            _pushDownTimer = new Timer(_pressTime, true, true);
+            _pushDownTimer = new Timer(_pressTime, true);
             _plateDefaultPosition = _plate.transform.localPosition;
             _platePushedPosition = _plateDefaultPosition
                 + Vector3.up * _pressYMovement;
@@ -100,7 +100,7 @@ namespace Atlanticide
             {
                 _plate.transform.localPosition =
                     Vector3.Lerp(startPos, targetPos, ratio);
-                _pushDownTimer.Update();
+                _pushDownTimer.Check();
                 ratio = _pushDownTimer.GetRatio();
                 yield return null;
             }

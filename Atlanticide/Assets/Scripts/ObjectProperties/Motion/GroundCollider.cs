@@ -64,7 +64,7 @@ namespace Atlanticide
 
             _objectSize = GetComponent<Collider>().bounds.size;
             _headHeightFromPosition = (_positionIsOnGround ? 1f : 0.5f) * _objectSize.y;
-            _groundHitDist = _headHeightFromPosition + 0.01f;
+            _groundHitDist = (_positionIsOnGround ? 1f : 2f) * _headHeightFromPosition + 0.01f;
             _minRiseDist = 0.80f * _objectSize.y;
             _maxRiseDist = 0.99f * _objectSize.y;
             UpdateTopOfHeadAndFootPositions();

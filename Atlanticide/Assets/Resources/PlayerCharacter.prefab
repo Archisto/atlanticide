@@ -195,7 +195,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1465877221674398}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -10.392701, y: 3.1100893, z: -4}
+  m_LocalPosition: {x: -3.685037, y: 3.8841605, z: -4}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4643413983326668}
@@ -442,6 +442,7 @@ MonoBehaviour:
   _speed: 7
   _turningSpeed: 0.3
   _maxHitpoints: 1
+  _characterBody: {fileID: 1465877221674398}
   _jumpHeight: 3.5
   _climbSpeed: 4
   _respawnTime: 1
@@ -474,7 +475,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _energyObject: {fileID: 1317634307110344}
-  _chargeTime: 1
+  _drainTime: 1
   _emitTime: 1
 --- !u!114 &114712899263160512
 MonoBehaviour:
@@ -490,6 +491,7 @@ MonoBehaviour:
   _mask:
     serializedVersion: 2
     m_Bits: 9728
+  _positionIsOnGround: 0
 --- !u!114 &114731449764415192
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -505,6 +507,7 @@ MonoBehaviour:
   _platformMask:
     serializedVersion: 2
     m_Bits: 256
+  _positionIsOnGround: 0
   _riseSpeed: 5
   _maxFallDistance: 20
 --- !u!114 &114952992052952158
