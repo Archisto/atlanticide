@@ -33,6 +33,8 @@ namespace Atlanticide
         // "Wireless Controller"
         private const int PSControllerNameLength = 19;
 
+        public List<PlayerInput> _inputs;
+
         private PlayerCharacter[] _players;
         private ToolSwapping _toolSwap;
         private CameraController _camera;
@@ -49,6 +51,14 @@ namespace Atlanticide
         /// </summary>
         private void Start()
         {
+            _inputs = new List<PlayerInput>
+            {
+                new PlayerInput(InputDevice.Keyboard),
+                new PlayerInput(InputDevice.Gamepad1),
+                new PlayerInput(InputDevice.Gamepad2),
+                new PlayerInput(InputDevice.Gamepad3)
+            };
+
             _players = GameManager.Instance.GetPlayers();
             _toolSwap = FindObjectOfType<ToolSwapping>();
             _camera = FindObjectOfType<CameraController>();
@@ -68,11 +78,17 @@ namespace Atlanticide
                     CheckPlayerInput();
                 }
 
-                if (GameManager.Instance.GameState != GameManager.State.Play
+                if (GameManager.Instance.GameState == GameManager.State.PressStart)
+                {
+                    CheckPressStartInput();
+                }
+                else if (GameManager.Instance.GameState != GameManager.State.Play
                     || World.Instance.GamePaused)
                 {
                     CheckMenuInput();
                 }
+
+
 
                 // Testing
                 CheckDebugInput();
@@ -183,6 +199,19 @@ namespace Atlanticide
             // TODO
         }
 
+        private void CheckPressStartInput()
+        {
+            foreach (PlayerInput input in _inputs)
+            {
+                if (input.GetPressStartInput())
+                {
+                    GameManager.Instance.MenuPlayerInput = input;
+                    GameManager.Instance.LoadMainMenu();
+                    break;
+                }
+            }
+        }
+
         /// <summary>
         /// Checks debugging input.
         /// </summary>
@@ -271,6 +300,18 @@ namespace Atlanticide
                 if (Input.GetKeyDown(KeyCode.O))
                 {
                     _camera.SetFirstPersonPlayer(_camera.firstPersonMode ? null : _players[0]);
+                }
+
+                // Save game
+                if (Input.GetKeyDown(KeyCode.F5))
+                {
+                    GameManager.Instance.SaveGame();
+                }
+
+                // Load game
+                if (Input.GetKeyDown(KeyCode.F9))
+                {
+                    GameManager.Instance.LoadGame();
                 }
             }
         }
@@ -368,6 +409,7 @@ namespace Atlanticide
 
         public void CheckConnectedControllers()
         {
+            Debug.Log("Controllers connected: " + Input.GetJoystickNames().Length);
             for (int i = 0; i < Input.GetJoystickNames().Length; i++)
             {
                 if (string.IsNullOrEmpty(Input.GetJoystickNames()[i]))
@@ -429,7 +471,7 @@ namespace Atlanticide
                 {
                     World.Instance.PauseGame(false);
                 }
-                GameManager.Instance.LoadTestLevel();
+                GameManager.Instance.LoadDebugLevel();
                 return;
             }
             else if (Input.GetKeyDown(KeyCode.Keypad1))
@@ -455,7 +497,7 @@ namespace Atlanticide
             {
                 if (level)
                 {
-                    GameManager.Instance.LoadLevel(levelOrPuzzle);
+                    GameManager.Instance.LoadLevelFromBeginning(levelOrPuzzle);
                 }
                 else
                 {

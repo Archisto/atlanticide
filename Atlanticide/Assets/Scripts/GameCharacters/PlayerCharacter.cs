@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Atlanticide.Persistence;
+using System;
 
 namespace Atlanticide
 {
@@ -11,7 +13,7 @@ namespace Atlanticide
         Shield = 2
     }
 
-    public class PlayerCharacter : GameCharacter
+    public class PlayerCharacter : GameCharacter, ISavable
     {
         [SerializeField, Range(0.2f, 20f)]
         private float _jumpHeight = 1f;
@@ -596,6 +598,44 @@ namespace Atlanticide
             EndPush();
             InteractionTarget = null;
         }
+
+        #region Persistence
+
+        /// <summary>
+        /// Returns the object's save data.
+        /// </summary>
+        public ISaveData GetSaveData()
+        {
+            return new PlayerData
+            {
+                ID = ID,
+                Tool = Tool
+            };
+        }
+
+        /// <summary>
+        /// Sets the object's values from the save data.
+        /// </summary>
+        /// <param name="data">Save data</param>
+        public void SetData(ISaveData data)
+        {
+            PlayerData playerData = (PlayerData) data;
+            if (playerData != null)
+            {
+                Tool = playerData.Tool;
+            }
+        }
+
+        /// <summary>
+        /// Returns the correct save data type.
+        /// </summary>
+        /// <returns>The save data type</returns>
+        public Type GetSaveDataType()
+        {
+            return typeof(PlayerData);
+        }
+
+        #endregion Persistence
 
         protected override void OnDrawGizmos()
         {

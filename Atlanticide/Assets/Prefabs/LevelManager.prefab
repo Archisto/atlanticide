@@ -20,9 +20,10 @@ GameObject:
   m_Component:
   - component: {fileID: 4414935867648102}
   - component: {fileID: 114870816128330676}
+  - component: {fileID: 114949632137208592}
   - component: {fileID: 114666515403901816}
   m_Layer: 0
-  m_Name: Level
+  m_Name: LevelManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -39,7 +40,7 @@ GameObject:
   m_Layer: 0
   m_Name: ShieldPlayerSpawnPoint
   m_TagString: Untagged
-  m_Icon: {fileID: 6519382022992737161, guid: 0000000000000000d000000000000000, type: 0}
+  m_Icon: {fileID: -5487077368411116049, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
@@ -54,7 +55,7 @@ GameObject:
   m_Layer: 0
   m_Name: EnergyCollPlayerSpawnPoint
   m_TagString: Untagged
-  m_Icon: {fileID: 1206586993520771344, guid: 0000000000000000d000000000000000, type: 0}
+  m_Icon: {fileID: -5397416234189338067, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
@@ -128,3 +129,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _energyCollPlayerSpawnPoint: {fileID: 4525349788122696}
   _shieldPlayerSpawnPoint: {fileID: 4787080142380638}
+--- !u!114 &114949632137208592
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1247031363536192}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: caca84da6b51ac84f9c8b43ac4522ae4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _color: {r: 0, g: 0, b: 0, a: 1}
+  _altColor: {r: 1, g: 0, b: 0, a: 1}
+  _fadeOutTime: 0.5
+  _fadeInTime: 0.5

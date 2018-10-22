@@ -1,7 +1,8 @@
 ﻿using System;
-using System.Collections;
+using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
+using Atlanticide.Persistence;
 
 namespace Atlanticide
 {
@@ -107,20 +108,6 @@ namespace Atlanticide
         }
 
         /// <summary>
-        /// Invokes an action on each item of the array.
-        /// </summary>
-        /// <param name="array">An array</param>
-        /// <param name="action">An action</param>
-        /// <typeparam name="T">A type</typeparam>
-        public static void ForEach<T>(this T[] array, Action<T> action)
-        {
-            foreach (T obj in array)
-            {
-                action(obj);
-            }
-        }
-
-        /// <summary>
         /// Sets the value of the preference identified by key.
         /// </summary>
         /// <param name="key">The key</param>
@@ -141,6 +128,20 @@ namespace Atlanticide
             return (value == 1);
         }
 
+        /// <summary>
+        /// Invokes an action on each item of the array.
+        /// </summary>
+        /// <param name="array">An array</param>
+        /// <param name="action">An action</param>
+        /// <typeparam name="T">A type</typeparam>
+        public static void ForEach<T>(this T[] array, Action<T> action)
+        {
+            foreach (T obj in array)
+            {
+                action(obj);
+            }
+        }
+
         public static bool AddIfNew<T>(this List<T> list, T itemToAdd)
         {
             foreach (T item in list)
@@ -153,6 +154,52 @@ namespace Atlanticide
 
             list.Add(itemToAdd);
             return true;
+        }
+
+        public static void TrySetData<TSavable, TSaveData>(TSavable[] savables,
+                                                           List<TSaveData> dataList,
+                                                           bool checkID)
+            where TSavable : ISavable
+            where TSaveData : ISaveData
+        {
+            if (savables.Length == 0 || dataList.Count == 0 ||
+                savables.Length != dataList.Count)
+            {
+                Debug.LogWarning(string.Format
+                    ("Savables: {0}. Data list count: {1}.",
+                    savables.Length,
+                    dataList.Count));
+                return;
+            }
+            else if (savables[0].GetSaveDataType() != typeof(TSaveData))
+            {
+                Debug.LogError(string.Format
+                    ("Incompatible save data types: {0} and {1}",
+                    savables[0].GetSaveDataType(),
+                    typeof(TSaveData)));
+                return;
+            }
+
+            for (int i = 0; i < dataList.Count; i++)
+            {
+                TSavable savable = savables[i];
+                ISaveData data = dataList[i];
+
+                if (checkID)
+                {
+                    savable = savables.FirstOrDefault
+                        (sav => sav.ID == data.ID);
+
+                    if (savable != null)
+                    {
+                        savable.SetData(data);
+                    }
+                }
+                else
+                {
+                    savable.SetData(data);
+                }
+            }
         }
 
         public static Vector3 GetRotationOnAxis(Axis axis, float angle)

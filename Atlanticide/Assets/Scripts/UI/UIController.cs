@@ -97,6 +97,13 @@ namespace Atlanticide.UI
             }
         }
 
+        public void UpdateAll()
+        {
+            UpdatePlayerToolImages();
+            UpdateEnergyBar(World.Instance.GetEnergyRatio());
+            UpdateScoreCounter();
+        }
+
         /// <summary>
         /// Updates the score counter.
         /// </summary>
@@ -119,6 +126,14 @@ namespace Atlanticide.UI
             if (_playerStatuses != null && _playerStatuses[playerNum] != null)
             {
                 _playerStatuses[playerNum].SetToolImage(_toolImages[(int) tool]);
+            }
+        }
+
+        public void UpdatePlayerToolImages()
+        {
+            for (int i = 0; i < _players.Length; i++)
+            {
+                UpdatePlayerToolImage(i, _players[i].Tool);
             }
         }
 

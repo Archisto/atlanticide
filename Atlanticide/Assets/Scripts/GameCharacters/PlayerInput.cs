@@ -25,6 +25,9 @@ namespace Atlanticide
 
         private HoldInput _holdActionInput;
 
+        public string HorizontalMenuKey { get; private set; }
+        public string VerticalMenuKey { get; private set; }
+
         private InputDevice _inputDevice;
         public InputDevice InputDevice
         {
@@ -84,6 +87,9 @@ namespace Atlanticide
             _jumpKey = "Jump" + InputDevice.ToString();
             _toolSwapKey = "ToolSwap" + InputDevice.ToString();
             _pauseKey = "Pause" + InputDevice.ToString();
+
+            HorizontalMenuKey = "HorizontalMenu" + InputDevice.ToString();
+            VerticalMenuKey = "VerticalMenu" + InputDevice.ToString();
         }
 
         /// <summary>
@@ -172,6 +178,21 @@ namespace Atlanticide
         public bool GetPauseInput()
         {
             return Input.GetButtonDown(_pauseKey);
+        }
+
+        public bool GetPressStartInput()
+        {
+            bool pressedEnterKey = false;
+
+            if (InputDevice == InputDevice.Keyboard)
+            {
+                if (Input.GetKeyDown(KeyCode.Return))
+                {
+                    pressedEnterKey = true;
+                }
+            }
+
+            return Input.GetButtonDown(_jumpKey) || Input.GetButtonDown(_pauseKey) || pressedEnterKey;
         }
 
         public void ResetInput()
