@@ -33,12 +33,12 @@ namespace Atlanticide
         /// <summary>
         /// List of enemies that are taking part of the tactics currently
         /// </summary>
-        private List<EnemyCharacter> Enemies;
+        private List<EnemyBase> Enemies;
 
         // Use this for initialization
         void Start()
         {
-            Enemies = new List<EnemyCharacter>();
+            Enemies = new List<EnemyBase>();
         }
 
         // Update is called once per frame
