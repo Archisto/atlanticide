@@ -39,27 +39,29 @@ namespace Atlanticide
         #region Variables
 
         // Whether hit detection is checked
+        private bool _Hitting;
+
         public bool Hitting
         {
-            get;
-            private set;
+            get { return _Hitting; }
+            set
+            {
+                _Hitting = value;
+                HitType = HitCastType.NONE;
+            }
         }
 
         // What is hit
-        public enum HitType
+        public enum HitCastType
         {
             NONE, SHIELD, PLAYER
         }
 
         // what this HitCast hit
-        private HitType _HitType;
-
-        // Return _HitType and set it as NONE
-        public HitType GetHitType()
+        public HitCastType HitType
         {
-            HitType temp = _HitType;
-            _HitType = HitType.NONE;
-            return temp;
+            get;
+            private set;
         }
 
         #endregion
@@ -70,7 +72,7 @@ namespace Atlanticide
         void Start()
         {
             Hitting = false;
-            _HitType = HitType.NONE;
+            HitType = HitCastType.NONE;
         }
 
         // Update is called once per frame
@@ -106,11 +108,16 @@ namespace Atlanticide
                     if (character != null && !character.IsDead)
                     {
                         HitCharacter(character);
-                    } else
+                    }
+                    else
                     {
-                        _HitType = HitType.NONE;
+                        HitType = HitCastType.NONE;
                     }
                 }
+            }
+            else
+            {
+                HitType = HitCastType.NONE;
             }
         }
 
@@ -121,7 +128,7 @@ namespace Atlanticide
         protected virtual void HitShield(Shield shield)
         {
             shield.Hit();
-            _HitType = HitType.SHIELD;
+            HitType = HitCastType.SHIELD;
             Debug.Log("shield hit");
         }
 
@@ -132,7 +139,7 @@ namespace Atlanticide
         protected virtual void HitCharacter(GameCharacter character)
         {
             character.TakeDamage(Damage);
-            _HitType = HitType.PLAYER;
+            HitType = HitCastType.PLAYER;
             Debug.Log("character hit");
         }
 
