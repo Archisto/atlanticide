@@ -65,6 +65,37 @@ namespace Atlanticide
             }
         }
 
+        // Update object
+        protected override void UpdateObject()
+        {
+            // Do nothing if object is on target and lock is ON
+            if (IsAtTarget() && LockToTarget)
+            {
+                return;
+            }
+
+            // Check whether key/energytarget should be checked
+            if (IsDone() || AllowCheck())
+            {
+                if (UsingKey)
+                {
+                    CheckKey();
+                }
+                else
+                {
+                    CheckEnergyTarget();
+                }
+            }
+
+            // If object is not on target, move
+            if (!OnTarget)
+            {
+                // move and check if movement is done
+                Moving();
+                IsDone();
+            }  
+        }
+
         /// <summary>
         /// Checks some preferences to see if CheckKey/CheckEnergyTarget should be called
         /// </summary>
@@ -122,9 +153,8 @@ namespace Atlanticide
                 CallForMovement(true);
             }
 
-            if (!World.Instance.EmittingEnergy)
+            if (Target.HasJustBeenReset)
             {
-                Target.currentCharges = 0;
                 CallForMovement(false);
             }
         }
@@ -181,38 +211,6 @@ namespace Atlanticide
             base.ResetObject();
             TowardsTarget = false;
             SetToDefaultPosition();
-        }
-
-        protected override void UpdateObject()
-        {
-            // Do nothing if object is on target and lock is ON
-            if (IsAtTarget() && LockToTarget)
-            {
-                return;
-            }
-
-            // Check whether key/energytarget should be checked
-            if (IsDone() || AllowCheck())
-            {
-                if (UsingKey)
-                {
-                    CheckKey();
-                }
-                else
-                {
-                    CheckEnergyTarget();
-                }
-            }
-
-            // If object is on target, do not move
-            if (OnTarget)
-            {
-                return;
-            }
-
-            // move and check if is done
-            Moving();
-            IsDone();
         }
 
     }

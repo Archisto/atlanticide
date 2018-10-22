@@ -80,6 +80,12 @@ namespace Atlanticide
         // Update is called once per frame
         protected sealed override void Update()
         {
+
+            if (World.Instance.GamePaused)
+            {
+                return;
+            }
+
             base.Update();
 
             // Check conditions for changing state
@@ -99,7 +105,7 @@ namespace Atlanticide
             CurrentState.DrawGizmos();
 
             // elapse time
-            StateTimeElapsed += Time.deltaTime;
+            StateTimeElapsed += World.Instance.DeltaTime;
         }
 
         /// <summary>
