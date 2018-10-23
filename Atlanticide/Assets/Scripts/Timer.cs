@@ -35,11 +35,6 @@ namespace Atlanticide
         {
             this.targetTime = targetTime;
             _pausable = pausable;
-
-            if (targetTime <= 0f)
-            {
-                Debug.LogError("Target time must be a positive value.");
-            }
         }
 
         /// <summary>
