@@ -21,9 +21,18 @@ namespace Atlanticide
         #region Getters
 
         // Get _HitCast
-        protected HitCast Hitcast
+        public HitCast Hitcast
         {
             get { return _HitCast; }
+        }
+
+        // Get Speed
+        public float Speed() { return _speed; }
+
+        // Add new GizmoDraw
+        public void AddGizmoAction(GizmoAction gizmo)
+        {
+            GizmoActions.Add(gizmo);
         }
 
         #endregion
@@ -31,7 +40,7 @@ namespace Atlanticide
         #region Variables
 
         // Target of the actions of EnemyBase
-        protected GameCharacter Target
+        public GameCharacter Target
         {
             get;
             set;
@@ -42,6 +51,9 @@ namespace Atlanticide
         {
             get; private set;
         }
+
+        // List of GizmoDraws iterated in OnDrawGizmos
+        protected List<GizmoAction> GizmoActions;
 
         #endregion
 
@@ -61,27 +73,50 @@ namespace Atlanticide
         protected sealed override void Start()
         {
             base.Start();
-            CurrentState = CreateBirthState();
-            CurrentState.Instantiate();
-            StateTimeElapsed = 0f;
+            GizmoActions = new List<GizmoAction>();
+            SetState(CreateBirthState());
         }
 
         // Update is called once per frame
         protected sealed override void Update()
         {
+
+            if (World.Instance.GamePaused)
+            {
+                return;
+            }
+
             base.Update();
 
-            // act
+            // Check conditions for changing state
             IEnemyState state = CurrentState.Conditions(StateTimeElapsed);
-            if(state != null)
+
+            // if state should be changed, do it
+            if (state != null)
             {
                 CurrentState.Finish();
-                CurrentState = state;
-                CurrentState.Instantiate();
-                StateTimeElapsed = 0;
+                SetState(state);
             }
+
+            // Action
             CurrentState.Action(StateTimeElapsed);
-            StateTimeElapsed += Time.deltaTime;
+
+            // Draw Gizmos
+            CurrentState.DrawGizmos();
+
+            // elapse time
+            StateTimeElapsed += World.Instance.DeltaTime;
+        }
+
+        /// <summary>
+        /// Sets new IEnemyState, instantiates it and resets StateTimeElapsed
+        /// </summary>
+        /// <param name="state">new IEnemyState</param>
+        private void SetState(IEnemyState state)
+        {
+            CurrentState = state;
+            CurrentState.Instantiate(this);
+            StateTimeElapsed = 0;
         }
 
         /// <summary>
@@ -90,9 +125,7 @@ namespace Atlanticide
         public override void Kill()
         {
             base.Kill();
-            CurrentState = CreateDeathState();
-            CurrentState.Instantiate();
-            StateTimeElapsed = 0;
+            SetState(CreateDeathState());
         }
 
         /// <summary>
@@ -104,6 +137,60 @@ namespace Atlanticide
         /// Called on Kill() to get new death state
         /// </summary>
         protected abstract IEnemyState CreateDeathState();
+
+        // Draws a List of Gizmos
+        protected override void OnDrawGizmos()
+        {
+            base.OnDrawGizmos();
+
+            // go through GizmoActions
+            if(GizmoActions == null)
+            {
+                return;
+            }
+            foreach (GizmoAction gizmo in GizmoActions)
+            {
+                Gizmos.color = gizmo.color;
+                switch (gizmo.gizmoType)
+                {
+                    case "line":
+                        Gizmos.DrawLine(gizmo.vector, gizmo.vector2);
+                        break;
+                    case "wire_cube":
+                        Gizmos.DrawWireCube(gizmo.vector, gizmo.vector2);
+                        break;
+                    case "wire_sphere":
+                        Gizmos.DrawWireSphere(gizmo.vector, gizmo.range);
+                        break;
+                }
+            }
+            GizmoActions.Clear();
+        }
+
+        #region Struct for Gizmos
+
+        /// <summary>
+        /// Contains drawing information to draw Gizmos
+        /// </summary>
+        public struct GizmoAction
+        {
+            public GizmoAction(string t, Color c, Vector3 v, Vector3 v2, float r)
+            {
+                gizmoType = t;
+                color = c;
+                vector = v;
+                vector2 = v2;
+                range = r;
+            }
+
+            public string gizmoType;
+            public Color color;
+            public Vector3 vector;
+            public Vector3 vector2;
+            public float range;
+        }
+
+        #endregion
 
         #endregion
 
@@ -117,8 +204,15 @@ namespace Atlanticide
         /// <param name="rotate">should object rotate towards the target</param>
         /// <param name="rise">character is raised by this amount</param>
         /// <param name="speed">character moves with this speed * Time.deltaTime</param>
-        protected void MoveTowardsTarget(Vector3 target, bool look, bool rotate, float rise, float speed)
+        public void MoveTowardsTarget(Vector3 target, bool look, bool rotate, float rise, float speed)
         {
+            // Draw Gizmos
+            Vector3 right = Vector3.right * 3;
+            Vector3 up = Vector3.up * 3;
+            AddGizmoAction(new GizmoAction("line", Color.green, target - up, target + up, 0));
+            AddGizmoAction(new GizmoAction("line", Color.green, target - right, target + right, 0));
+
+
             // modify target y
             target.Set(target.x, transform.position.y, target.z);
 
@@ -128,8 +222,10 @@ namespace Atlanticide
             // look or rotate towards target
             if (look)
             {
-                LookTowards(target);
-            } else if (rotate)
+                transform.LookAt(target);
+                //LookTowards(target);
+            }
+            else if (rotate)
             {
                 RotateTowards(target);
             }
@@ -152,8 +248,11 @@ namespace Atlanticide
         /// <param name="distance">to what distance the distance between vectors is compared to</param>
         /// <param name="negateY">Are y axis values neutralized from the calculation</param>
         /// <returns></returns>
-        protected bool Distance(bool bigger, Vector3 start, Vector3 end, float distance, bool negateY)
+        public bool Distance(bool bigger, Vector3 start, Vector3 end, float distance, bool negateY)
         {
+            // Draw line
+            AddGizmoAction(new GizmoAction("line", Color.white, start, end, 0));
+
             // remove y values from the calculation
             if (negateY)
             {
@@ -170,6 +269,35 @@ namespace Atlanticide
             {
                 return Vector3.Distance(start, end) <= distance;
             }
+        }
+
+        /// <summary>
+        /// Searches for players inside the Range
+        /// </summary>
+        /// <param name="Range">Range of the search</param>
+        /// <returns>true if target found</returns>
+        public bool SearhForTarget(float Range)
+        {
+            AddGizmoAction(new GizmoAction("wire_sphere", Color.yellow, transform.position, Vector3.zero, Range));
+
+            GameCharacter[] players = GameManager.Instance.GetPlayersWithinRange(transform.position, Range);
+
+            if (players[0] != null)
+            {
+                Target = players[0];
+                return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Checks if Target exists, is still alive and withing MaxDistance
+        /// </summary>
+        /// <param name="MaxDistance">Maximum allowed distance between EnemyBase and Target</param>
+        /// <returns>true if Target is still valid</returns>
+        public bool ValidateTarget(float MaxDistance)
+        {
+            return Target != null && !Target.IsDead && Distance(false, transform.position, Target.transform.position, MaxDistance, false);
         }
 
         #endregion

@@ -246,10 +246,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 89a8361a7a784104da619e49c74f9e23, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _speed: 1
+  _speed: 3
   _turningSpeed: 1
   _maxHitpoints: 1
   _HitCast: {fileID: 114970186478653024}
+  _IdleWanderRange: 5
+  _SearchRange: 10
+  _AttackRange: 7
+  _ChaseRange: 15
 --- !u!114 &114970186478653024
 MonoBehaviour:
   m_ObjectHideFlags: 1

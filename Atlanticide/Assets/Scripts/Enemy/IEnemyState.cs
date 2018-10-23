@@ -2,11 +2,16 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public interface IEnemyState {
+namespace Atlanticide
+{
 
-    void Instantiate();
-    IEnemyState Conditions(float timeElapsed);
-    void Action(float TimeElapsed);
-    void Finish();
-	
+    public interface IEnemyState
+    {
+
+        void Instantiate(EnemyBase enemy);
+        IEnemyState Conditions(float timeElapsed);
+        void Action(float TimeElapsed);
+        void Finish();
+        void DrawGizmos();
+    }
 }
