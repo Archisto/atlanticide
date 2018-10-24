@@ -367,7 +367,7 @@ namespace Atlanticide
             Gizmos.DrawLine(pos3, pos4);
         }
 
-        public static void DrawHPGizmo(Vector3 position, int hitpoints, int maxHitpoints, Color color)
+        public static void DrawDotGizmos(Vector3 position, int dots, int maxDots, Color color)
         {
             Gizmos.color = color;
             float spacing = 0.8f;
@@ -377,8 +377,8 @@ namespace Atlanticide
                 new Vector3(-0.5f * lineLength * spacing, -0.4f * spacing, 0); 
             Gizmos.DrawLine(lineStart, lineStart + Vector3.right * lineLength * spacing);
         
-            position.x -= 0.5f * (maxHitpoints - 1) * spacing;
-            for (int i = 0; i < hitpoints; i++)
+            position.x -= 0.5f * (maxDots - 1) * spacing;
+            for (int i = 0; i < dots; i++)
             {
                 Gizmos.DrawSphere(position, 0.2f);
                 position.x += spacing;

@@ -16,6 +16,9 @@ namespace Atlanticide
         [SerializeField]
         protected int _maxHitpoints = 3;
 
+        [SerializeField]
+        protected GameObject _characterBody;
+
         protected int _hitpoints;
         protected Vector3 _characterSize;
         protected GroundCollider _groundCollider;
@@ -37,8 +40,8 @@ namespace Atlanticide
         {
             ResetBaseValues();
             RespawnPosition = transform.position;
-            _characterSize = GetComponent<Collider>().bounds.size;
-            _groundCollider = GetComponent<GroundCollider>();
+            _characterSize = _characterBody.GetComponent<Collider>().bounds.size;
+            _groundCollider = _characterBody.GetComponent<GroundCollider>();
         }
 
         /// <summary>
@@ -145,16 +148,6 @@ namespace Atlanticide
         /// </summary>
         protected virtual void OnDrawGizmos()
         {
-            // Character dimensions
-            Gizmos.color = Color.blue;
-            Vector3 p1 = transform.position + -0.5f * _characterSize;
-            Vector3 p2 = transform.position + new Vector3(-0.5f * _characterSize.x, -0.5f * _characterSize.y, 0.5f * _characterSize.z);
-            Vector3 p3 = transform.position + new Vector3(0.5f * _characterSize.x, -0.5f * _characterSize.y, 0.5f * _characterSize.z);
-            Vector3 p4 = transform.position + new Vector3(0.5f * _characterSize.x, -0.5f * _characterSize.y, -0.5f * _characterSize.z);
-            Gizmos.DrawLine(p1, p2);
-            Gizmos.DrawLine(p2, p3);
-            Gizmos.DrawLine(p3, p4);
-            Gizmos.DrawLine(p4, p1);
         }
     }
 }

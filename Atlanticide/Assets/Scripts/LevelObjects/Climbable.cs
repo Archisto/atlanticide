@@ -51,7 +51,7 @@ namespace Atlanticide
             foreach (ContactPoint cp in collision.contacts)
             {
                 PlayerCharacter pc = cp.otherCollider.gameObject.GetComponent<PlayerCharacter>();
-                if (pc != null && !pc.Climbing)
+                if (pc != null)
                 {
                     pc.StartClimb(this);
                     break;
