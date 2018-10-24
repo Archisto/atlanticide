@@ -24,7 +24,10 @@ namespace Atlanticide
         [SerializeField]
         private float _respawnTime = 1f;
 
-        private Weapon _weapon;
+        [SerializeField]
+        private GameObject _body;
+
+        private Vector3 _size;
         private Climbable _climbable;
         private Interactable _interactionTarget;
         private float _jumpForce;
@@ -128,13 +131,18 @@ namespace Atlanticide
                     !Climbing && !Pushing && ToolIsIdle);
         }
 
+        public Vector3 GetSize()
+        {
+            return _size;
+        }
+
         /// <summary>
         /// Initializes the object.
         /// </summary>
         protected override void Start()
         {
             base.Start();
-            _weapon = GetComponentInChildren<Weapon>();
+            _size = _body.GetComponent<Collider>().bounds.size;
             EnergyCollector = GetComponentInChildren<EnergyCollector>();
             Shield = GetComponentInChildren<Shield>();
         }
@@ -408,17 +416,6 @@ namespace Atlanticide
             }
 
             return result;
-        }
-
-        /// <summary>
-        /// Fires the player character's weapon.
-        /// </summary>
-        public void FireWeapon()
-        {
-            if (_weapon != null)
-            {
-                _weapon.Fire();
-            }
         }
 
         public void StartClimb(Climbable climbable)

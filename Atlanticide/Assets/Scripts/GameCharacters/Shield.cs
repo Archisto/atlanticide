@@ -60,12 +60,13 @@ namespace Atlanticide
         {
             _player = GetComponentInParent<PlayerCharacter>();
             _defaultPosition = transform.localPosition;
-            _raisedPosition = Vector3.up * _defaultPosition.z;
+            _raisedPosition = Vector3.up * ((_player.GetSize().y / 2f) + 0.2f);
             _defaultRotation = transform.localRotation;
             _raisedRotation = Quaternion.Euler(Vector3.zero);
             gameObject.layer = LayerMask.NameToLayer(DefaultKey);
 
-            // Testing shield opening with transparency
+            // Testing shield opening with transparency;
+            // by default, the shield is invisible
             _tp = GetComponent<Transparency>();
             _tp.SetAlpha(_openProgress);
         }

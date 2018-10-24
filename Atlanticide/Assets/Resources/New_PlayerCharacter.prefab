@@ -711,7 +711,7 @@ GameObject:
   - component: {fileID: 4969512976999836}
   - component: {fileID: 33117986139862748}
   - component: {fileID: 23420719709958970}
-  - component: {fileID: 136823747797092964}
+  - component: {fileID: 65624726870168610}
   - component: {fileID: 114312330421133904}
   - component: {fileID: 114217366019495744}
   m_Layer: 13
@@ -2779,6 +2779,18 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1635213457276342}
   m_Mesh: {fileID: 4300024, guid: 267f950cc649ef74583c0a4a0f0642e8, type: 3}
+--- !u!65 &65624726870168610
+BoxCollider:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1536382168075846}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 1.0000001, y: 2.0000005, z: 1.0000005}
+  m_Center: {x: 0.000000059604645, y: -2.032879e-20, z: -0.00000008940699}
 --- !u!65 &65692854306446856
 BoxCollider:
   m_ObjectHideFlags: 1
@@ -2902,6 +2914,7 @@ MonoBehaviour:
   _jumpHeight: 3.5
   _climbSpeed: 4
   _respawnTime: 1
+  _body: {fileID: 1502272592879614}
 --- !u!136 &136456160309431914
 CapsuleCollider:
   m_ObjectHideFlags: 1
@@ -2915,19 +2928,6 @@ CapsuleCollider:
   m_Height: 1.9
   m_Direction: 1
   m_Center: {x: 0, y: 0.93, z: 0}
---- !u!136 &136823747797092964
-CapsuleCollider:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1536382168075846}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  m_Radius: 0.5000001
-  m_Height: 2
-  m_Direction: 1
-  m_Center: {x: 0.000000059604645, y: 0, z: -0.00000008940697}
 --- !u!137 &137058729941095434
 SkinnedMeshRenderer:
   m_ObjectHideFlags: 1
