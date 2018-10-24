@@ -102,14 +102,28 @@ namespace Atlanticide
             {
                 //Debug.Log("move x: " + movingInput.x + ", y: " + movingInput.y + "; mag: " + moveMagnitude);
 
-                float movementFactor = ((moveMagnitude - _inputDeadZone) / (1 - _inputDeadZone));
-                movementFactor = (movementFactor > 1f ? 1f : movementFactor);
-                movingInput = movingInput.normalized * movementFactor;
+                Vector3 direction = movingInput.normalized;
+                float movementFactor = GetMinSpeedTo1MovementFactor(moveMagnitude);
+                movingInput = direction * movementFactor;
 
                 return movingInput;
             }
 
             return Vector3.zero;
+        }
+
+        private float Get0To1MovementFactor(float moveMagnitude)
+        {
+            float result = (moveMagnitude - _inputDeadZone) / (1 - _inputDeadZone);
+            return (result > 1f ? 1f : result);
+        }
+
+        private float GetMinSpeedTo1MovementFactor(float moveMagnitude)
+        {
+            float minSpeed = World.Instance.minWalkingSpeedPercentage;
+            float result = minSpeed + (1 - minSpeed) *
+                ((moveMagnitude - _inputDeadZone) / (1 - _inputDeadZone));
+            return (result > 1f ? 1f : result);
         }
 
         private Vector3 GetFinalLookingInput(Vector3 lookingInput)

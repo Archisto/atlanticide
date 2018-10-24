@@ -53,6 +53,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gravity: 8
   pushSpeed: 1
+  minWalkingSpeedPercentage: 0.3
   telegrabRadius: 2
   energyCollectRadius: 2
   _maxEnergyCharges: 15

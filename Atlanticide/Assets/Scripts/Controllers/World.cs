@@ -31,6 +31,9 @@ namespace Atlanticide
         public float gravity = 1f;
         public float pushSpeed = 1f;
 
+        [Range(0f, 1f)]
+        public float minWalkingSpeedPercentage = 0.2f;
+
         [SerializeField, Range(0.1f, 5f)]
         public float telegrabRadius = 1f;
 
