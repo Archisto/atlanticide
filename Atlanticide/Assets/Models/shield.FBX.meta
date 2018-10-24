@@ -99,7 +99,7 @@ ModelImporter:
       name: Shield Idle
       takeName: Take 001
       firstFrame: 0
-      lastFrame: 1
+      lastFrame: 10
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
@@ -210,8 +210,8 @@ ModelImporter:
     - serializedVersion: 16
       name: Shield Open Idle
       takeName: Take 001
-      firstFrame: 41
-      lastFrame: 42
+      firstFrame: 40
+      lastFrame: 50
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
