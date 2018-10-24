@@ -51,7 +51,27 @@ namespace Atlanticide
         Shield_Deflect_2 = 26,
         Lifting_Shield = 27,
         Success = 28,
-        Failure = 29
+        Failure = 29,
+        Spaceship_Passing = 30,
+        Mining_Orichalcum = 31,
+        People_Screaming = 32,
+        Cyclops_Exploding = 33,
+        Cyclops_Hovering = 34,
+        Cyclops_Laser_Start = 35,
+        Cyclops_Laser_Beam = 36,
+        Cyclops_Shortcircuit = 37,
+        Cyclops_Waking_Up = 38,
+        Distant_Explosions_1 = 39,
+        Distant_Explosions_2 = 40,
+        Explosion = 41,
+        Explosion_With_Rubble_1 = 42,
+        Explosion_With_Rubble_2 = 43,
+        Rubble = 44,
+        Rubble_And_Debris = 45,
+        Short_Explosion = 46,
+        Orichalcum_Before_Exploding = 47,
+        Setting_Trap = 48,
+        Springing_Trap = 49
     }
 
     public class SFXPlayer : MonoBehaviour
