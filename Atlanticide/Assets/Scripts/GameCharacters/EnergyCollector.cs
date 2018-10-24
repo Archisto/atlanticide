@@ -23,7 +23,12 @@ namespace Atlanticide
         private float _emitTime = 1f;
 
         private float _elapsedTime;
-        private EnergyNode _tempNode;
+
+        /// <summary>
+        /// The energy node target which is currently
+        /// being used by the active energy collector.
+        /// </summary>
+        private EnergyNode _activeTarget;
 
         public ECMode Mode { get; private set; }
 
@@ -105,13 +110,13 @@ namespace Atlanticide
         {
             if (Mode == ECMode.Idle && Target != null)
             {
-                if (!Target.Active)
+                if (!Target.Usable)
                 {
                     Target = null;
                     return;
                 }
 
-                _tempNode = Target;
+                _activeTarget = Target;
                 if (Target is EnergySource)
                 {
                     if (!Target.ZeroCharge)
@@ -133,7 +138,7 @@ namespace Atlanticide
         {
             if (Mode == ECMode.Idle && Target != null)
             {
-                if (!Target.Active)
+                if (!Target.Usable)
                 {
                     Target = null;
                     return false;
@@ -149,10 +154,9 @@ namespace Atlanticide
 
         public bool TryDraining()
         {
-            if (CanDrainOrEmit() && Target is EnergySource
-                && !Target.ZeroCharge)
+            if (CanDrainOrEmit() && Target.IsValidEnergySource())
             {
-                _tempNode = Target;
+                _activeTarget = Target;
                 StartDraining();
                 return true;
             }
@@ -162,10 +166,9 @@ namespace Atlanticide
 
         public bool TryEmitting()
         {
-            if (CanDrainOrEmit() && Target is EnergyTarget
-                && !Target.MaxCharge)
+            if (CanDrainOrEmit() && Target.IsValidEnergyTarget())
             {
-                _tempNode = Target;
+                _activeTarget = Target;
                 StartEmitting();
                 return true;
             }
@@ -199,16 +202,16 @@ namespace Atlanticide
 
         private void Drain()
         {
-            ChangeCharges(1);
-            _tempNode.LoseCharge();
             World.Instance.DrainingEnergy = true;
+            ChangeCharges(1);
+            _activeTarget.LoseCharge();
         }
 
         private void Emit()
         {
             World.Instance.EmittingEnergy = true;
             ChangeCharges(-1);
-            _tempNode.GainCharge();
+            _activeTarget.GainCharge();
         }
 
         public void ChangeCharges(int charges)
@@ -219,11 +222,11 @@ namespace Atlanticide
 
         public void ReturnToIdle()
         {
-            World.Instance.EmittingEnergy = false;
             World.Instance.DrainingEnergy = false;
+            World.Instance.EmittingEnergy = false;
             Mode = ECMode.Idle;
             _energyObject.SetActive(false);
-            _tempNode = null;
+            _activeTarget = null;
         }
 
         public void ResetEnergyCollector()

@@ -7,7 +7,7 @@ namespace Atlanticide
     public class EnergyNode : LevelObject
     {
         [SerializeField]
-        private bool _active = true;
+        private bool _usable = true;
 
         public int currentCharges;
 
@@ -32,15 +32,15 @@ namespace Atlanticide
         protected PlayerCharacter _energyCollectorPlayer;
         private bool _activeByDefault;
 
-        public bool Active
+        public bool Usable
         {
             get
             {
-                return _active;
+                return _usable;
             }
             protected set
             {
-                _active = value;
+                _usable = value;
             }
         }
 
@@ -73,8 +73,8 @@ namespace Atlanticide
             }
 
             currentCharges = _defaultCharges;
-            _activeByDefault = _active;
-            Active = _active;
+            _activeByDefault = _usable;
+            Usable = _usable;
             _keyCodeSwitch = GetComponent<KeyCodeSwitch>();
 
             // Gives BoxCorner1 the smaller axis values
@@ -97,7 +97,7 @@ namespace Atlanticide
         /// </summary>
         protected override void UpdateObject()
         {
-            if (Active)
+            if (Usable)
             {
                 UpdateEnergyCollectorPlayer();
                 UpdateEnergyCollectorTarget();
@@ -116,7 +116,7 @@ namespace Atlanticide
         {
             if (_keyCodeSwitch != null)
             {
-                Active = _keyCodeSwitch.Activated;
+                Usable = _keyCodeSwitch.Activated;
             }
         }
 
@@ -141,6 +141,16 @@ namespace Atlanticide
                     _energyCollectorPlayer.EnergyCollector.Target = this;
                 }
             }
+        }
+
+        public virtual bool IsValidEnergySource()
+        {
+            return !ZeroCharge;
+        }
+
+        public virtual bool IsValidEnergyTarget()
+        {
+            return !MaxCharge;
         }
 
         public bool PositionWithinRange(Vector3 position)
@@ -194,7 +204,7 @@ namespace Atlanticide
 
         public virtual bool GainCharge()
         {
-            if (Active && currentCharges < _maxCharges)
+            if (Usable && currentCharges < _maxCharges)
             {
                 currentCharges++;
                 return true;
@@ -205,7 +215,7 @@ namespace Atlanticide
 
         public virtual bool LoseCharge()
         {
-            if (Active && currentCharges > 0)
+            if (Usable && currentCharges > 0)
             {
                 currentCharges--;
                 return true;
@@ -216,9 +226,9 @@ namespace Atlanticide
 
         public virtual void SetActive(bool active)
         {
-            Active = active;
+            Usable = active;
 
-            if (!Active)
+            if (!Usable)
             {
                 RemoveEnergyCollectorPlayer();
             }
@@ -232,7 +242,7 @@ namespace Atlanticide
 
         public override void ResetObject()
         {
-            Active = _activeByDefault;
+            Usable = _activeByDefault;
             currentCharges = _defaultCharges;
             base.ResetObject();
         }
@@ -242,35 +252,57 @@ namespace Atlanticide
         /// </summary>
         protected virtual void OnDrawGizmos()
         {
-            if (Active)
+            if (Usable)
+            {
+                DrawRangeGizmos();
+                DrawProgressBarGizmos();
+            }
+        }
+
+        protected void DrawRangeGizmos()
+        {
+            if (EnergyCollectorPlayerIsAvailable() &&
+                _energyCollectorPlayer.EnergyCollector.Target == this)
+            {
+                Gizmos.color = Color.yellow;
+            }
+            else
             {
                 Gizmos.color = Color.black;
-                if (EnergyCollectorPlayerIsAvailable() &&
-                    _energyCollectorPlayer.EnergyCollector.Target == this)
-                {
-                    Gizmos.color = Color.yellow;
-                }
-
-                if (_useRangeBox)
-                {
-                    if (!Application.isPlaying)
-                    {
-                        BoxCorner1 = transform.position + _boxCorner1;
-                        BoxCorner2 = transform.position + _boxCorner2;
-                    }
-
-                    Utils.DrawBoxGizmo(BoxCorner1, BoxCorner2);
-                }
-                else
-                {
-                    Gizmos.DrawWireSphere
-                        (transform.position, World.Instance.energyCollectRadius);
-                }
-                
-                Gizmos.color = (MaxCharge ? Color.green : Color.black);
-                Utils.DrawProgressBarGizmo(transform.position + Vector3.back * 1f,
-                    ((float) currentCharges / _maxCharges), Gizmos.color, Color.yellow);
             }
+
+            if (_useRangeBox)
+            {
+                DrawRangeBoxGizmo();
+            }
+            else
+            {
+                DrawRangeSphereGizmo();
+            }
+        }
+
+        private void DrawRangeSphereGizmo()
+        {
+            Gizmos.DrawWireSphere
+                (transform.position, World.Instance.energyCollectRadius);
+        }
+
+        private void DrawRangeBoxGizmo()
+        {
+            if (!Application.isPlaying)
+            {
+                BoxCorner1 = transform.position + _boxCorner1;
+                BoxCorner2 = transform.position + _boxCorner2;
+            }
+
+            Utils.DrawBoxGizmo(BoxCorner1, BoxCorner2);
+        }
+
+        protected void DrawProgressBarGizmos()
+        {
+            Gizmos.color = (MaxCharge ? Color.green : Color.black);
+            Utils.DrawProgressBarGizmo(transform.position + Vector3.back * 1f,
+                ((float) currentCharges / _maxCharges), Gizmos.color, Color.yellow);
         }
     }
 }

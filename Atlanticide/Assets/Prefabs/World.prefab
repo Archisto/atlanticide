@@ -55,4 +55,6 @@ MonoBehaviour:
   pushSpeed: 1
   telegrabRadius: 2
   energyCollectRadius: 2
+  _maxEnergyCharges: 15
+  _interactRange: 3
   keyCodes: 
