@@ -24,9 +24,6 @@ namespace Atlanticide
         [SerializeField]
         private float _respawnTime = 1f;
 
-        [SerializeField]
-        private GameObject _body;
-
         private Vector3 _size;
         private Climbable _climbable;
         private Interactable _interactionTarget;
@@ -131,9 +128,31 @@ namespace Atlanticide
                     !Climbing && !Pushing && ToolIsIdle);
         }
 
-        public Vector3 GetSize()
+        private bool CanJump()
         {
-            return _size;
+            bool restrictions = Jumping || !_groundCollider.onGround ||
+                !Shield.IsIdle;
+            bool permissions = Climbing;
+            return !restrictions || permissions;
+        }
+
+        private bool CanClimb()
+        {
+            bool restrictions = Climbing || !EnergyCollector.IsIdle ||
+                !Shield.IsIdle;
+            return !restrictions;
+        }
+
+        private bool CanUseEnergyCollector()
+        {
+            bool restrictions = Climbing;
+            return !restrictions;
+        }
+
+        private bool CanActivateShield()
+        {
+            bool restrictions = Climbing || Shield.Active;
+            return !restrictions;
         }
 
         /// <summary>
@@ -142,10 +161,11 @@ namespace Atlanticide
         protected override void Start()
         {
             base.Start();
-            _size = _body.GetComponent<Collider>().bounds.size;
             EnergyCollector = GetComponentInChildren<EnergyCollector>();
             Shield = GetComponentInChildren<Shield>();
         }
+
+        #region Updating
 
         /// <summary>
         /// Updates the object once per frame.
@@ -177,30 +197,15 @@ namespace Atlanticide
         }
 
         /// <summary>
-        /// Makes the player character jump.
+        /// Updates the respawn timer.
         /// </summary>
-        /// <returns>Does the character jump</returns>
-        public bool Jump()
+        private void UpdateRespawnTimer()
         {
-            if ((!Jumping && _groundCollider.onGround) || Climbing)
+            _elapsedRespawnTime += World.Instance.DeltaTime;
+            if (_elapsedRespawnTime >= _respawnTime)
             {
-                if (Climbing)
-                {
-                    EndClimb();
-                }
-                if (Pushing)
-                {
-                    EndPush();
-                }
-
-                Jumping = true;
-                _jumpForce = _jumpHeight * 4;
-                _groundCollider.onGround = false;
-                SFXPlayer.Instance.Play(Sound.Jump_1);
-                return true;
+                Respawn();
             }
-
-            return false;
         }
 
         /// <summary>
@@ -224,17 +229,7 @@ namespace Atlanticide
             }
         }
 
-        /// <summary>
-        /// Updates the respawn timer.
-        /// </summary>
-        private void UpdateRespawnTimer()
-        {
-            _elapsedRespawnTime += World.Instance.DeltaTime;
-            if (_elapsedRespawnTime >= _respawnTime)
-            {
-                Respawn();
-            }
-        }
+        #endregion Updating
 
         #region Input
 
@@ -286,12 +281,17 @@ namespace Atlanticide
             bool active = Input.GetActionInput(out inputHeld, out inputjustReleased);
             bool result = false;
 
-            if (Tool == PlayerTool.EnergyCollector && active)
+            if (Tool == PlayerTool.EnergyCollector &&
+                CanUseEnergyCollector())
             {
                 // Drain
-                result = UseEnergyCollector(drain: true);
+                if (active)
+                {
+                    result = UseEnergyCollector(drain: true);
+                }
             }
-            else if (Tool == PlayerTool.Shield)
+            else if (Tool == PlayerTool.Shield &&
+                (Shield.Active || CanActivateShield()))
             {
                 // Open the shield if the action button is held down
                 if (inputHeld && !Shield.Active)
@@ -318,7 +318,8 @@ namespace Atlanticide
 
             if (active)
             {
-                if (Tool == PlayerTool.EnergyCollector)
+                if (Tool == PlayerTool.EnergyCollector &&
+                    CanUseEnergyCollector())
                 {
                     // Emit
                     result = UseEnergyCollector(drain: false);
@@ -403,7 +404,7 @@ namespace Atlanticide
         public bool UseEnergyCollector(bool drain)
         {
             bool result = false;
-            if (EnergyCollector != null)
+            if (EnergyCollector != null && EnergyCollector.IsIdle)
             {
                 if (drain)
                 {
@@ -418,9 +419,36 @@ namespace Atlanticide
             return result;
         }
 
+        /// <summary>
+        /// Makes the player character jump.
+        /// </summary>
+        /// <returns>Does the character jump</returns>
+        public bool Jump()
+        {
+            if (CanJump())
+            {
+                if (Climbing)
+                {
+                    EndClimb();
+                }
+                if (Pushing)
+                {
+                    EndPush();
+                }
+
+                Jumping = true;
+                _jumpForce = _jumpHeight * 4;
+                _groundCollider.onGround = false;
+                SFXPlayer.Instance.Play(Sound.Jump_1);
+                return true;
+            }
+
+            return false;
+        }
+
         public void StartClimb(Climbable climbable)
         {
-            if (!Climbing)
+            if (CanClimb())
             {
                 Debug.Log(name + " started climbing " + climbable.name);
                 Climbing = true;

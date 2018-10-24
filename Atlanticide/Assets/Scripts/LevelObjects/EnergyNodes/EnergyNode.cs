@@ -17,7 +17,10 @@ namespace Atlanticide
         [SerializeField]
         protected int _defaultCharges = 0;
 
-        [Header("RANGE BOX")]
+        [Header("RANGE")]
+
+        [SerializeField, Range(0.1f, 10f)]
+        public float _range = 3f;
 
         [SerializeField]
         private bool _useRangeBox;
@@ -162,7 +165,7 @@ namespace Atlanticide
             else
             {
                 float distance = Vector3.Distance(transform.position, position);
-                return distance <= World.Instance.energyCollectRadius;
+                return distance <= _range;
             }
         }
 
@@ -284,7 +287,7 @@ namespace Atlanticide
         private void DrawRangeSphereGizmo()
         {
             Gizmos.DrawWireSphere
-                (transform.position, World.Instance.energyCollectRadius);
+                (transform.position, _range);
         }
 
         private void DrawRangeBoxGizmo()

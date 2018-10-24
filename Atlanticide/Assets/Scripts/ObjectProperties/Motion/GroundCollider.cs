@@ -7,6 +7,8 @@ namespace Atlanticide
     [RequireComponent(typeof(Collider))]
     public class GroundCollider : MonoBehaviour
     {
+        private const string SlopeKey = "Slope";
+
         public bool onGround = true;
 
         [SerializeField]
@@ -64,8 +66,8 @@ namespace Atlanticide
 
             _objectSize = GetComponent<Collider>().bounds.size;
             _headHeightFromPosition = (_positionIsOnGround ? 1f : 0.5f) * _objectSize.y;
-            _groundHitDist = (_positionIsOnGround ? 1f : 2f) * _headHeightFromPosition + 0.01f;
-            _minRiseDist = 0.80f * _objectSize.y;
+            _groundHitDist = 0.5f;
+            _minRiseDist = 0.9f * _objectSize.y;
             _maxRiseDist = 0.99f * _objectSize.y;
             UpdateTopOfHeadAndFootPositions();
         }
@@ -131,23 +133,27 @@ namespace Atlanticide
                     }
                 }
 
+                //Debug.Log("onground: " + onGround);
                 _usedToBeOnGround = onGround;
             }
         }
 
         private bool CheckIfObjOnGround()
         {
-            Vector3 p1 = _topOfHead + new Vector3(-0.5f * _objectSize.x, 0, 0.5f * _objectSize.z);
-            Vector3 p2 = _topOfHead + new Vector3(-0.5f * _objectSize.x, 0, 0.5f * _objectSize.z);
-            Vector3 p3 = _topOfHead + new Vector3(0.5f * _objectSize.x, 0, 0.5f * _objectSize.z);
-            Vector3 p4 = _topOfHead + new Vector3(0.5f * _objectSize.x, 0, -0.5f * _objectSize.z);
+            Vector3 p0 = _foot + Vector3.up * _groundHitDist;
+            Vector3 p1 = _foot + new Vector3(-0.5f * _objectSize.x, _groundHitDist, 0.5f * _objectSize.z);
+            Vector3 p2 = _foot + new Vector3(-0.5f * _objectSize.x, _groundHitDist, 0.5f * _objectSize.z);
+            Vector3 p3 = _foot + new Vector3(0.5f * _objectSize.x, _groundHitDist, 0.5f * _objectSize.z);
+            Vector3 p4 = _foot + new Vector3(0.5f * _objectSize.x, _groundHitDist, -0.5f * _objectSize.z);
             RaycastHit hit;
             bool touchingPlatform =
-                Physics.Raycast(new Ray(p1, Vector3.down), out hit, _groundHitDist, _platformMask) ||
-                Physics.Raycast(new Ray(p2, Vector3.down), out hit, _groundHitDist, _platformMask) ||
-                Physics.Raycast(new Ray(p3, Vector3.down), out hit, _groundHitDist, _platformMask) ||
-                Physics.Raycast(new Ray(p4, Vector3.down), out hit, _groundHitDist, _platformMask);
+                Physics.Raycast(new Ray(p0, Vector3.down), out hit, _groundHitDist + 0.01f, _platformMask) ||
+                Physics.Raycast(new Ray(p1, Vector3.down), out hit, _groundHitDist + 0.01f, _platformMask) ||
+                Physics.Raycast(new Ray(p2, Vector3.down), out hit, _groundHitDist + 0.01f, _platformMask) ||
+                Physics.Raycast(new Ray(p3, Vector3.down), out hit, _groundHitDist + 0.01f, _platformMask) ||
+                Physics.Raycast(new Ray(p4, Vector3.down), out hit, _groundHitDist + 0.01f, _platformMask);
 
+            //Debug.Log("Hit " + touchingPlatform);
             return touchingPlatform;
         }
 
@@ -193,6 +199,14 @@ namespace Atlanticide
             return result;
         }
 
+        /// <summary>
+        /// Returns the ground height difference between <paramref name="position"/>
+        /// and the object's current position if the ground is tagged as slope.
+        /// If there's no ground, the ground is not tagged as slope,
+        /// or the height difference is big, returns -10.
+        /// </summary>
+        /// <param name="position">A position different from current</param>
+        /// <returns>Ground height difference</returns>
         public float GroundHeightDifference(Vector3 position)
         {
             float groundY = _obj.transform.position.y -
@@ -203,7 +217,7 @@ namespace Atlanticide
             bool touchingPlatform =
                 Physics.Raycast(new Ray(position, Vector3.down), out hit, _objectSize.y, _platformMask);
 
-            if (touchingPlatform)
+            if (touchingPlatform && hit.transform.tag.Equals(SlopeKey))
             {
                 // Positive value for higher ground,
                 // negative for lower
@@ -300,7 +314,7 @@ namespace Atlanticide
                 // Slopes that are too steep upwards are handled with the Rise method.
                 // Super minimal height differences are also ignored.
                 if (groundHeightDiff > -0.1f * _objectSize.y &&
-                    groundHeightDiff < 0.2f * _objectSize.y &&
+                    groundHeightDiff < 0.15f * _objectSize.y &&
                     (groundHeightDiff < -0.0001f * _objectSize.y ||
                     groundHeightDiff > 0.0001f * _objectSize.y))
                 {
@@ -351,13 +365,12 @@ namespace Atlanticide
             if (_obj != null)
             {
                 // Max rise distance
-                Gizmos.color = Color.yellow;
-                Vector3 topOfHead = _obj.transform.position +
-                    Vector3.up * _headHeightFromPosition;
-                Gizmos.DrawLine(topOfHead, topOfHead + Vector3.down * _maxRiseDist);
+                //Gizmos.color = Color.yellow;
+                //Vector3 topOfHead = _obj.transform.position +
+                //    Vector3.up * _headHeightFromPosition;
+                //Gizmos.DrawLine(topOfHead, topOfHead + Vector3.down * _maxRiseDist);
 
                 //Gizmos.DrawLine(topOfHead, Vector3.down * _minRiseDist);
-
 
                 // Object dimensions
                 Gizmos.color = Color.blue;

@@ -37,9 +37,6 @@ namespace Atlanticide
         [SerializeField, Range(0.1f, 5f)]
         public float telegrabRadius = 1f;
 
-        [SerializeField, Range(0.1f, 5f)]
-        public float energyCollectRadius = 1f;
-
         [SerializeField, Range(1, 20)]
         private int _maxEnergyCharges = 5;
 

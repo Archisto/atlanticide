@@ -60,7 +60,7 @@ namespace Atlanticide
         {
             _player = GetComponentInParent<PlayerCharacter>();
             _defaultPosition = transform.localPosition;
-            _raisedPosition = Vector3.up * ((_player.GetSize().y / 2f) + 0.2f);
+            _raisedPosition = Vector3.up * ((_player.Size.y / 2f) + 0.2f);
             _defaultRotation = transform.localRotation;
             _raisedRotation = Quaternion.Euler(Vector3.zero);
             gameObject.layer = LayerMask.NameToLayer(DefaultKey);
@@ -168,8 +168,7 @@ namespace Atlanticide
 
         public bool Bash()
         {
-            if (!BashActive &&
-                BlocksDamage)
+            if (BlocksDamage)
             {
                 BashActive = true;
                 _updateBash = true;
