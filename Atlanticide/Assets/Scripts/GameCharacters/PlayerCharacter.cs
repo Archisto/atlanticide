@@ -466,7 +466,7 @@ namespace Atlanticide
                 Climbing = false;
                 _climbable = null;
 
-                SFXPlayer.Instance.StopAllSFXPlayback();
+                SFXPlayer.Instance.StopIndividualSFX("Climbing Pillar");
             }
         }
 
