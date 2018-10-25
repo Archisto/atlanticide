@@ -43,6 +43,7 @@ namespace Atlanticide.UI
             sim = es.gameObject.GetComponent<StandaloneInputModule>();
 
             playerInput = new PlayerInput(InputDevice.Keyboard);
+            //playerInput = new PlayerInput(InputDevice.Gamepad1);
 
             MainMenu();
 
@@ -51,8 +52,16 @@ namespace Atlanticide.UI
             // if (SaveSlot != null)
             // continueButton.interactable = true;
             // else 
-            continueButton.interactable = false;
-        
+            //continueButton.interactable = false;
+            
+            if (GameManager.Instance.CurrentLevel.Number >= 1)
+            {
+                continueButton.interactable = true;
+            }
+            else
+            {
+                continueButton.interactable = false;
+            }
 
             // If a save game exists, the delete save data button should be interactable.
             // Otherwise, it should not.
@@ -74,7 +83,8 @@ namespace Atlanticide.UI
 
         public void Continue()
         {
-            // Takes the player to the puzzle they were last at according to the save file.
+            GameManager.Instance.LoadGame();
+            GameManager.Instance.LoadLevelAndPuzzle(GameManager.Instance.CurrentLevel.Number, GameManager.Instance.CurrentLevel.CurrentPuzzleNumber);
         }
 
         public void MainMenu()
