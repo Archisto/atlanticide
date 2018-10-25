@@ -34,6 +34,7 @@ namespace Atlanticide.UI
         [SerializeField]
         private List<Sprite> _toolImages;
 
+        private Canvas _canvas;
         private Vector2 _canvasSize;
         private Vector2 _uiOffset;
         private Camera _camera;
@@ -48,15 +49,15 @@ namespace Atlanticide.UI
         /// </summary>
         private void Start()
         {
-            _canvasSize = GetComponent<Canvas>().pixelRect.size;
-            _uiOffset = new Vector2(-0.5f * _canvasSize.x, -0.5f * _canvasSize.y);
+            _canvas = GetComponent<Canvas>();
+            UpdateCanvasSize();
             _camera = FindObjectOfType<CameraController>().GetComponent<Camera>();
             _input = FindObjectOfType<InputController>();
             _pauseScreen = GetComponentInChildren<PauseScreen>(true);
 
             if (_pauseScreen != null)
             {
-                _pauseScreen.SetInput(_input);
+                _pauseScreen.Input = _input;
             }
 
             _players = GameManager.Instance.GetPlayers();
@@ -104,6 +105,12 @@ namespace Atlanticide.UI
             UpdateScoreCounter();
         }
 
+        public void UpdateCanvasSize()
+        {
+            _canvasSize = _canvas.pixelRect.size;
+            _uiOffset = new Vector2(-0.5f * _canvasSize.x, -0.5f * _canvasSize.y);
+        }
+
         /// <summary>
         /// Updates the score counter.
         /// </summary>
@@ -139,8 +146,9 @@ namespace Atlanticide.UI
 
         public void ActivatePauseScreen(bool activate, string playerName)
         {
-            _pauseScreen.gameObject.SetActive(activate);
+            UpdateCanvasSize();
             _pauseScreen.pausingPlayerText.text = playerName;
+            _pauseScreen.Activate(activate);
         }
 
         public void MoveUIObjToWorldPoint(Image uiObj,

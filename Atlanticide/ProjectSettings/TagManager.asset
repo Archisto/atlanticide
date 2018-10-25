@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Invisible
   - NoCollision
+  - Slope
   layers:
   - Default
   - TransparentFX

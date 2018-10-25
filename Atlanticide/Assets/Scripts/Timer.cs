@@ -10,7 +10,6 @@ namespace Atlanticide
 
         private float _elapsedTime;
         private bool _pausable;
-        private bool _oneShot;
 
         public bool Active { get; private set; }
         public bool Finished { get; private set; }
@@ -21,11 +20,9 @@ namespace Atlanticide
         /// <param name="targetTime">The target time</param>
         /// <param name="pausable">Is the timer paused when
         /// the game is paused</param>
-        /// <param name="oneShot">Will the timer stay activated
-        /// after the time is up until reset</param>
-        public Timer(float targetTime, bool pausable, bool oneShot)
+        public Timer(float targetTime, bool pausable)
         {
-            Init(targetTime, pausable, oneShot);
+            Init(targetTime, pausable);
         }
 
         /// <summary>
@@ -34,30 +31,26 @@ namespace Atlanticide
         /// <param name="targetTime">The target time</param>
         /// <param name="pausable">Is the timer paused when
         /// the game is paused</param>
-        /// <param name="oneShot">Will the timer stay activated
-        /// after the time is up until reset</param>
-        public void Init(float targetTime, bool pausable, bool oneShot)
+        public void Init(float targetTime, bool pausable)
         {
             this.targetTime = targetTime;
             _pausable = pausable;
-            _oneShot = oneShot;
-
-            if (targetTime <= 0f)
-            {
-                Debug.LogError("Target time must be a positive value.");
-            }
         }
 
+        /// <summary>
+        /// Activates the timer.
+        /// </summary>
         public void Activate()
         {
+            Reset();
             Active = true;
         }
 
         /// <summary>
-        /// Updates the timer.
+        /// Updates the timer and returns whether the time is up.
         /// </summary>
         /// <returns>Is the time up</returns>
-        public bool Update()
+        public bool Check()
         {
             if (Active)
             {
@@ -66,13 +59,13 @@ namespace Atlanticide
 
                 if (_elapsedTime >= targetTime)
                 {
-                    if (!_oneShot)
-                    {
-                        Finished = true;
-                    }
-
+                    Finish();
                     return true;
                 }
+            }
+            else if (Finished)
+            {
+                return true;
             }
 
             return false;
@@ -80,17 +73,33 @@ namespace Atlanticide
 
         /// <summary>
         /// Returns the elapsed time ratio.
-        /// If the timer is not active, returns 0.
+        /// If the timer is finished, returns 1,
+        /// and if the timer is inactive, returns 0.
         /// </summary>
         /// <returns>A float from 0 to 1</returns>
         public float GetRatio()
         {
-            if (!Active)
+            if (Finished || targetTime <= 0f)
+            {
+                return 1f;
+            }
+            else if (!Active)
             {
                 return 0f;
             }
+            else
+            {
+                return Mathf.Clamp01(_elapsedTime / targetTime);
+            }
+        }
 
-            return Mathf.Clamp01(_elapsedTime / targetTime);
+        /// <summary>
+        /// Sets the timer finished and deactivates it.
+        /// </summary>
+        public void Finish()
+        {
+            Finished = true;
+            Active = false;
         }
 
         /// <summary>
