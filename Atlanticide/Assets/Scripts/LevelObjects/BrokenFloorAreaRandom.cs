@@ -15,6 +15,9 @@ namespace Atlanticide
         [SerializeField]
         private bool _Clear;
 
+        [SerializeField]
+        private bool _Break;
+
         [Header("Floor parameters")]
 
         [SerializeField]
@@ -56,6 +59,14 @@ namespace Atlanticide
         {
             base.UpdateObject();
 
+            if (_Break)
+            {
+                _Break = false;
+                foreach(BrokenFloor floor in _Platforms)
+                {
+                    floor.Break = true;
+                }
+            }
         }
 
         public override void ResetObject()
@@ -73,6 +84,18 @@ namespace Atlanticide
                     DestroyImmediate(transform.GetChild(i).gameObject);
                 }
                 _Platforms = new BrokenFloor[0];
+            } else
+            {
+                _Platforms = new BrokenFloor[transform.childCount];
+                for (int i = 0; i < _Platforms.Length; i++)
+                {
+                    BrokenFloor floor = transform.GetChild(i).GetComponent<BrokenFloor>();
+                    if(floor == null)
+                    {
+                        Debug.LogError("Child object number " + i + " has no BrokenFloor component");
+                    }
+                    AddToList(floor, i, floor.transform.localScale);
+                }
             }
 
             if (!_Create)
@@ -100,12 +123,24 @@ namespace Atlanticide
                 float posX = transform.position.x - _Size.x / 2 + (ao.startX * factorX) + width / 2;
                 float posZ = transform.position.z - _Size.y/2 + (ao.startY * factorY) + height/2;
                 PlatformPosition = new Vector3(posX, transform.position.y + Random.Range(YPosBetween.x, YPosBetween.y), posZ);
-                _Platforms[index] = Instantiate(_PlatformPrefab, PlatformPosition, _PlatformPrefab.transform.rotation, transform).GetComponent<BrokenFloor>();
-                _Platforms[index].transform.localScale = PlatformSize;
-                _Platforms[index].Bedrock = _Bedrock;
-                _Platforms[index].name = "BrokenFloor" + index;
+                BrokenFloor floor = Instantiate(_PlatformPrefab, PlatformPosition, _PlatformPrefab.transform.rotation, transform).GetComponent<BrokenFloor>();
+                AddToList(floor, index, PlatformSize);
                 index++;
             }
+        }
+
+        /// <summary>
+        /// Adds BrokenFloor to _Platforms list, sets name, scale and bedrock
+        /// </summary>
+        /// <param name="floor">BrokenFloor</param>
+        /// <param name="index">Index of _Platforms[] & Index of name</param>
+        /// <param name="localScale">localScale of the floor</param>
+        private void AddToList(BrokenFloor floor, int index, Vector3 localScale)
+        {
+            floor.transform.localScale = localScale;
+            floor.Bedrock = _Bedrock;
+            floor.name = "BrokenFloor" + index;
+            _Platforms[index] = floor;
         }
 
         private void CheckVariables()
