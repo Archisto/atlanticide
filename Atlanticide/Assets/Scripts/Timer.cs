@@ -10,6 +10,7 @@ namespace Atlanticide
 
         private float _elapsedTime;
         private bool _pausable;
+        private bool _locked;
 
         public bool Active { get; private set; }
         public bool Finished { get; private set; }
@@ -42,8 +43,11 @@ namespace Atlanticide
         /// </summary>
         public void Activate()
         {
-            Reset();
-            Active = true;
+            if (!_locked)
+            {
+                Reset();
+                Active = true;
+            }
         }
 
         /// <summary>
@@ -100,6 +104,11 @@ namespace Atlanticide
         {
             Finished = true;
             Active = false;
+        }
+
+        public void SetLock(bool locked)
+        {
+            _locked = locked;
         }
 
         /// <summary>

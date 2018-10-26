@@ -458,7 +458,6 @@ MonoBehaviour:
   _jumpHeight: 3.5
   _climbSpeed: 4
   _respawnTime: 1
-  _body: {fileID: 1465877221674398}
 --- !u!114 &114647026059868110
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -517,12 +516,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   onGround: 1
+  _levelObj: {fileID: 0}
+  _character: {fileID: 114626275593767968}
   _platformMask:
     serializedVersion: 2
     m_Bits: 256
-  _positionIsOnGround: 0
+  _pivotPointOnFoot: 0
   _riseSpeed: 5
   _maxFallDistance: 20
+  _hoverOffset: 0.01
 --- !u!114 &114952992052952158
 MonoBehaviour:
   m_ObjectHideFlags: 1
