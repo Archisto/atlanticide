@@ -9,7 +9,7 @@ namespace Atlanticide
     /// </summary>
     public class PlayerInput
     {
-        private const float HoldTime = 0.35f;
+        private float _holdTime = 0.2f;
 
         private string _horizontalMoveKey;
         private string _verticalMoveKey;
@@ -58,7 +58,7 @@ namespace Atlanticide
                 InputDevice = (InputDevice) playerNum;
             }
 
-            _holdActionInput = new HoldInput(HoldTime);
+            InitHoldInput(_holdTime);
         }
 
         /// <summary>
@@ -68,7 +68,13 @@ namespace Atlanticide
         public PlayerInput(InputDevice inputDevice)
         {
             InputDevice = inputDevice;
-            _holdActionInput = new HoldInput(HoldTime);
+            InitHoldInput(_holdTime);
+        }
+
+        public void InitHoldInput(float holdTime)
+        {
+            _holdTime = holdTime;
+            _holdActionInput = new HoldInput(holdTime);
         }
 
         /// <summary>

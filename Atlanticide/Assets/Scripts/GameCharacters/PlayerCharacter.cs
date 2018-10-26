@@ -130,7 +130,7 @@ namespace Atlanticide
 
         private bool CanJump()
         {
-            bool restrictions = Jumping || !_groundCollider.onGround ||
+            bool restrictions = Jumping || !_groundCollider.AbleToJump ||
                 !Shield.IsIdle;
             bool permissions = Climbing;
             return !restrictions || permissions;
@@ -186,14 +186,25 @@ namespace Atlanticide
         /// <param name="input">Movement input</param>
         private void Move(Vector3 input)
         {
-            Vector3 movement = new Vector3(input.x, 0, input.y) * _speed * World.Instance.DeltaTime;
-            Vector3 newPosition = transform.position + movement * (Pushing ? 0.3f : 1f);
-            transform.position = newPosition;
+            float speed = _speed;
 
-            if (!ShieldIsActive)
+            if (!Shield.IsIdle)
+            {
+                speed = _speed * Shield.PlayerSpeedModifier;
+            }
+            else
             {
                 RotateTowards(input);
             }
+
+            Vector3 movement = new Vector3(input.x, 0, input.y) * speed * World.Instance.DeltaTime;
+            Vector3 newPosition = transform.position + movement * (Pushing ? 0.3f : 1f);
+            transform.position = newPosition;
+
+            //if (!ShieldIsActive)
+            //{
+            //    RotateTowards(input);
+            //}
         }
 
         /// <summary>
@@ -438,7 +449,7 @@ namespace Atlanticide
 
                 Jumping = true;
                 _jumpForce = _jumpHeight * 4;
-                _groundCollider.onGround = false;
+                _groundCollider.JumpOffGround();
                 SFXPlayer.Instance.Play(Sound.Jump_1);
                 return true;
             }

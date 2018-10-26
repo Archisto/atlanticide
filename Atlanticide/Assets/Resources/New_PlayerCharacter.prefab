@@ -356,7 +356,8 @@ GameObject:
   - component: {fileID: 4522838400778818}
   - component: {fileID: 95163237765322446}
   - component: {fileID: 114934710857222084}
-  m_Layer: 0
+  - component: {fileID: 54519367090818950}
+  m_Layer: 10
   m_Name: New_PlayerCharacter
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -648,7 +649,7 @@ GameObject:
   - component: {fileID: 136456160309431914}
   - component: {fileID: 114669899146295194}
   - component: {fileID: 114520660696778282}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Body
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -714,7 +715,7 @@ GameObject:
   - component: {fileID: 65624726870168610}
   - component: {fileID: 114312330421133904}
   - component: {fileID: 114217366019495744}
-  m_Layer: 13
+  m_Layer: 0
   m_Name: Shield
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -2779,6 +2780,21 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1635213457276342}
   m_Mesh: {fileID: 4300024, guid: 267f950cc649ef74583c0a4a0f0642e8, type: 3}
+--- !u!54 &54519367090818950
+Rigidbody:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1299063480890758}
+  serializedVersion: 2
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0
+  m_UseGravity: 0
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 126
+  m_CollisionDetection: 0
 --- !u!65 &65624726870168610
 BoxCollider:
   m_ObjectHideFlags: 1
@@ -2847,6 +2863,7 @@ MonoBehaviour:
   _openTime: 0.5
   _bashTime: 0.1
   _bashRecoveryTime: 0.5
+  _playerSpeedModifier: 0.5
   _openProgress: 0
   _bashProgress: 0
 --- !u!114 &114520660696778282
@@ -2861,12 +2878,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   onGround: 1
+  onMovingPlatform: 0
+  _levelObj: {fileID: 0}
+  _character: {fileID: 114934710857222084}
   _platformMask:
     serializedVersion: 2
     m_Bits: 256
-  _positionIsOnGround: 1
+  _pivotPointOnFoot: 1
   _riseSpeed: 5
   _maxFallDistance: 20
+  _hoverOffset: 0.03
+  _disableJumpTime: 0.15
 --- !u!114 &114669899146295194
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2914,7 +2936,6 @@ MonoBehaviour:
   _jumpHeight: 3.5
   _climbSpeed: 4
   _respawnTime: 1
-  _body: {fileID: 1502272592879614}
 --- !u!136 &136456160309431914
 CapsuleCollider:
   m_ObjectHideFlags: 1

@@ -333,23 +333,23 @@ namespace Atlanticide
         public static void DrawBoxGizmo(Vector3 boxCorner1, Vector3 boxCorner2)
         {
             Vector3 p1 = new Vector3(boxCorner2.x, boxCorner1.y, boxCorner1.z);
-            Vector3 p2 = new Vector3(boxCorner2.x, boxCorner1.y, boxCorner2.z);
-            Vector3 p3 = new Vector3(boxCorner2.x, boxCorner2.y, boxCorner1.z);
-            Vector3 p4 = new Vector3(boxCorner1.x, boxCorner2.y, boxCorner2.z);
-            Vector3 p5 = new Vector3(boxCorner1.x, boxCorner2.y, boxCorner1.z);
-            Vector3 p6 = new Vector3(boxCorner1.x, boxCorner1.y, boxCorner2.z);
+            Vector3 p2 = new Vector3(boxCorner1.x, boxCorner2.y, boxCorner1.z);
+            Vector3 p3 = new Vector3(boxCorner1.x, boxCorner1.y, boxCorner2.z);
+            Vector3 p4 = new Vector3(boxCorner2.x, boxCorner2.y, boxCorner1.z);
+            Vector3 p5 = new Vector3(boxCorner2.x, boxCorner1.y, boxCorner2.z);
+            Vector3 p6 = new Vector3(boxCorner1.x, boxCorner2.y, boxCorner2.z);
             Gizmos.DrawLine(boxCorner1, p1);
-            Gizmos.DrawLine(boxCorner1, p5);
-            Gizmos.DrawLine(boxCorner1, p6);
-            Gizmos.DrawLine(p1, p2);
-            Gizmos.DrawLine(p1, p3);
+            Gizmos.DrawLine(boxCorner1, p2);
+            Gizmos.DrawLine(boxCorner1, p3);
+            Gizmos.DrawLine(p1, p4);
+            Gizmos.DrawLine(p1, p5);
+            Gizmos.DrawLine(p2, p4);
             Gizmos.DrawLine(p2, p6);
             Gizmos.DrawLine(p3, p5);
-            Gizmos.DrawLine(p4, p5);
-            Gizmos.DrawLine(p4, p6);
-            Gizmos.DrawLine(p2, boxCorner2);
-            Gizmos.DrawLine(p3, boxCorner2);
+            Gizmos.DrawLine(p3, p6);
             Gizmos.DrawLine(p4, boxCorner2);
+            Gizmos.DrawLine(p5, boxCorner2);
+            Gizmos.DrawLine(p6, boxCorner2);
         }
 
         public static void DrawProgressBarGizmo(Vector3 position, float progress, Color barColor, Color indicatorColor)
