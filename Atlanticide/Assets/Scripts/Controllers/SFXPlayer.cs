@@ -369,6 +369,18 @@ namespace Atlanticide
             }
         }
 
+        public void StopIndividualSFX(string clipName)
+        {
+            foreach (AudioSource audioSrc in audioSrcPool)
+            {
+                if (audioSrc.enabled && audioSrc.clip.name == clipName)
+                {
+                    Debug.Log("Stopped sound effect " + audioSrc.clip.name);
+                    audioSrc.Stop();
+                }
+            }
+        }
+
         private void DeactivateAudioSrc(AudioSource audioSrc)
         {
             //RemoveForbiddenDuplicate(audioSrc.clip.name);
