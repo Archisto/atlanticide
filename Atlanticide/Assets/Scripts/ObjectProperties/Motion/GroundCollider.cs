@@ -10,12 +10,23 @@ namespace Atlanticide
         private const string SlopeKey = "Slope";
 
         public bool onGround = true;
+        public bool onMovingPlatform;
+
+        [Header("OBJECT (choose one)")]
+
+        [SerializeField]
+        private LevelObject _levelObj;
+
+        [SerializeField]
+        private GameCharacter _character;
+
+        [Header("CONFIG")]
 
         [SerializeField]
         private LayerMask _platformMask;
 
         [SerializeField]
-        private bool _positionIsOnGround;
+        private bool _pivotPointOnFoot;
 
         [SerializeField]
         private float _riseSpeed = 5f;
@@ -23,58 +34,87 @@ namespace Atlanticide
         [SerializeField]
         private float _maxFallDistance = 20f;
 
+        [SerializeField]
+        private float _hoverOffset;
+
+        [SerializeField, Range(0.05f, 1f)]
+        private float _jumpDisableTime = 0.1f;
+
+        private GameObject _rootObj;
+        private PlayerCharacter _player;
         private Vector3 _objectSize;
         private bool _usedToBeOnGround;
         private bool _isRising;
         private float _headHeightFromPosition;
         private float _groundHitDist;
-        private float _minRiseDist;
-        private float _maxRiseDist;
+        private float _startRisingDist;
+        private float _stopRisingDist;
         private bool _fallenOffMap;
         private Vector3 _topOfHead;
         private Vector3 _foot;
         private Vector3 _oldPosition;
-        private GameObject _obj;
-        private LevelObject _levelObj;
-        private GameCharacter _character;
-        private PlayerCharacter _player;
+        private float _jumpDisableElapsedTime;
+
+        private Vector3 _oldMovingPlatformPos;
+
+        // Testing
+        //private float _groundHeightDiff;
 
         public float DistanceFallen { get; set; }
+
+        public bool AbleToJump
+        {
+            get { return _jumpDisableElapsedTime < _jumpDisableTime; }
+        }
 
         /// <summary>
         /// Initializes the object.
         /// </summary>
         private void Start()
         {
-            _obj = transform.root.gameObject;
-            _levelObj = _obj.GetComponent<LevelObject>();
-            if (_levelObj == null)
-            {
-                // TODO
-                _character = _obj.GetComponent<GameCharacter>();
+            InitObject();
+            _objectSize = GetComponent<Collider>().bounds.size;
+            _headHeightFromPosition = (_pivotPointOnFoot ? 1f : 0.5f) * _objectSize.y;
+            _groundHitDist = 0.5f;
+            _startRisingDist = 0.98f * _objectSize.y;
+            _stopRisingDist = 1f * _objectSize.y;
+            UpdateTopOfHeadAndFootPositions();
+        }
 
-                if (_character != null)
+        private void InitObject()
+        {
+            if (_character != null)
+            {
+                _player = _character as PlayerCharacter;
+            }
+
+            if (_levelObj != null || _character != null)
+            {
+                if (_levelObj != null)
                 {
-                    _player = _character as PlayerCharacter;
+                    _rootObj = _levelObj.gameObject;
+                }
+                else
+                {
+                    _rootObj = _character.gameObject;
                 }
             }
-
-            if (_levelObj == null && _character == null)
+            else
             {
-                Debug.LogWarning("Object type unknown.");
+                // NOTE:
+                // If the object is the child of a game object
+                // just for keeping the scene hierarchy tidy
+                // (e.g. Environment object), this may break the game!
+                // Please always set _levelObj or _character.
+                _rootObj = transform.root.gameObject;
+                Debug.LogWarning("Object type unknown. The root object is now "
+                    + _rootObj.name + ".");
             }
-
-            _objectSize = GetComponent<Collider>().bounds.size;
-            _headHeightFromPosition = (_positionIsOnGround ? 1f : 0.5f) * _objectSize.y;
-            _groundHitDist = 0.5f;
-            _minRiseDist = 0.9f * _objectSize.y;
-            _maxRiseDist = 0.99f * _objectSize.y;
-            UpdateTopOfHeadAndFootPositions();
         }
 
         private void UpdateTopOfHeadAndFootPositions()
         {
-            _topOfHead = _obj.transform.position +
+            _topOfHead = _rootObj.transform.position +
                 Vector3.up * _headHeightFromPosition;
             _foot = _topOfHead + Vector3.down * _objectSize.y;
         }
@@ -84,8 +124,6 @@ namespace Atlanticide
         /// </summary>
         private void Update()
         {
-            // TODO: If the platform moves, the object moves with it.
-
             if (!World.Instance.GamePaused)
             {
                 UpdateTopOfHeadAndFootPositions();
@@ -95,12 +133,13 @@ namespace Atlanticide
                     UpdateFallingAndRising();
                     _oldPosition = transform.position;
                 }
+
+                UpdateTopOfHeadAndFootPositions();
             }
         }
 
         private void UpdateFallingAndRising()
         {
-            // TODO: Fix shaking up and down (Rise, Fall and falsely not being on ground).
             // TODO: Fix being lowered into the ground if the character's right side
             // hangs off a ledge while colliding with a wall in front. 
 
@@ -116,26 +155,58 @@ namespace Atlanticide
                 onGround = CheckIfObjOnGround();
                 StartOrStopRising(true);
                 //if (!onGround) Debug.Log(name + " onGround: " + onGround);
-                if (!onGround && !_isRising)
+                if (onGround)
                 {
-                    Fall();
+                    //Debug.Log("On ground");
+                    UpdateOnGround();
                 }
                 else
                 {
-                    if (!_usedToBeOnGround)
-                    {
-                        DistanceFallen = 0f;
-                    }
-
-                    if (_obj.transform.position != _oldPosition)
-                    {
-                        SmoothMove();
-                    }
+                    //Debug.Log("Off ground");
+                    UpdateOffGround();
                 }
 
-                //Debug.Log("onground: " + onGround);
                 _usedToBeOnGround = onGround;
             }
+        }
+
+        private void UpdateOnGround()
+        {
+            if (!_usedToBeOnGround)
+            {
+                DistanceFallen = 0f;
+                _jumpDisableElapsedTime = 0f;
+            }
+
+            if (_rootObj.transform.position != _oldPosition)
+            {
+                SmoothMove();
+            }
+        }
+
+        private void UpdateOffGround()
+        {
+            if (_usedToBeOnGround)
+            {
+                onMovingPlatform = false;
+            }
+
+            if (!_isRising)
+            {
+                Fall();
+
+                if (AbleToJump)
+                {
+                    _jumpDisableElapsedTime += World.Instance.DeltaTime;
+                }
+            }
+        }
+
+        public void JumpOffGround()
+        {
+            onGround = false;
+            onMovingPlatform = false;
+            _jumpDisableElapsedTime = _jumpDisableTime;
         }
 
         private bool CheckIfObjOnGround()
@@ -147,26 +218,39 @@ namespace Atlanticide
             Vector3 p4 = _foot + new Vector3(0.5f * _objectSize.x, _groundHitDist, -0.5f * _objectSize.z);
             RaycastHit hit;
             bool touchingPlatform =
-                Physics.Raycast(new Ray(p0, Vector3.down), out hit, _groundHitDist + 0.01f, _platformMask) ||
-                Physics.Raycast(new Ray(p1, Vector3.down), out hit, _groundHitDist + 0.01f, _platformMask) ||
-                Physics.Raycast(new Ray(p2, Vector3.down), out hit, _groundHitDist + 0.01f, _platformMask) ||
-                Physics.Raycast(new Ray(p3, Vector3.down), out hit, _groundHitDist + 0.01f, _platformMask) ||
-                Physics.Raycast(new Ray(p4, Vector3.down), out hit, _groundHitDist + 0.01f, _platformMask);
+                Physics.Raycast(new Ray(p0, Vector3.down), out hit, _groundHitDist + _hoverOffset, _platformMask) ||
+                Physics.Raycast(new Ray(p1, Vector3.down), out hit, _groundHitDist + _hoverOffset, _platformMask) ||
+                Physics.Raycast(new Ray(p2, Vector3.down), out hit, _groundHitDist + _hoverOffset, _platformMask) ||
+                Physics.Raycast(new Ray(p3, Vector3.down), out hit, _groundHitDist + _hoverOffset, _platformMask) ||
+                Physics.Raycast(new Ray(p4, Vector3.down), out hit, _groundHitDist + _hoverOffset, _platformMask);
+
+            if (touchingPlatform && hit.transform.tag.Equals("Moving"))
+            {
+                Vector3 newMovingPlatformPos = hit.transform.position;
+
+                if (onMovingPlatform)
+                {
+                    _rootObj.transform.position += (newMovingPlatformPos - _oldMovingPlatformPos);
+                }
+
+                _oldMovingPlatformPos = hit.transform.position;
+                onMovingPlatform = true;
+            }
 
             //Debug.Log("Hit " + touchingPlatform);
             return touchingPlatform;
         }
 
-        private bool CheckIfObjOnGroundSimple()
+        private bool ShouldRise()
         {
             return Physics.Raycast(new Ray(_topOfHead, Vector3.down),
-                _maxRiseDist, _platformMask);
+                _startRisingDist, _platformMask);
         }
 
-        private bool CheckIfObjInsideGround()
+        private bool ShouldStopRising()
         {
-            return Physics.Raycast(new Ray(_topOfHead, Vector3.down),
-                _minRiseDist, _platformMask);
+            return !Physics.Raycast(new Ray(_topOfHead, Vector3.down),
+                _stopRisingDist, _platformMask);
         }
 
         private bool CheckIfObjAvailable()
@@ -199,6 +283,32 @@ namespace Atlanticide
             return result;
         }
 
+        public float GroundHeightDifferenceFromPos(Vector3 position)
+        {
+            // Checks half the object's height up from the given position
+            // to half the object's height down from the given position
+
+            Vector3 raisedPosition = position + Vector3.up * _objectSize.y * 0.5f;
+
+            RaycastHit hit;
+            bool touchingPlatform =
+                Physics.Raycast(new Ray(raisedPosition, Vector3.down), out hit, _objectSize.y, _platformMask);
+
+            if (touchingPlatform)
+            {
+                //Debug.Log("Hit " + hit.transform.name);
+
+                // Positive value for higher ground,
+                // negative for lower
+                return hit.point.y - position.y;
+            }
+            else
+            {
+                // The height difference is "big"
+                return -10;
+            }
+        }
+
         /// <summary>
         /// Returns the ground height difference between <paramref name="position"/>
         /// and the object's current position if the ground is tagged as slope.
@@ -209,19 +319,18 @@ namespace Atlanticide
         /// <returns>Ground height difference</returns>
         public float GroundHeightDifference(Vector3 position)
         {
-            float groundY = _obj.transform.position.y -
-                (_positionIsOnGround ? 0 : (_objectSize.y * 0.5f));
-            position.y = groundY + _objectSize.y * 0.5f;
+            position.y = _foot.y + _objectSize.y * 0.5f;
 
             RaycastHit hit;
             bool touchingPlatform =
                 Physics.Raycast(new Ray(position, Vector3.down), out hit, _objectSize.y, _platformMask);
 
+            // TODO: Remove SlopeKey!
             if (touchingPlatform && hit.transform.tag.Equals(SlopeKey))
             {
                 // Positive value for higher ground,
                 // negative for lower
-                return hit.point.y - groundY;
+                return hit.point.y - _foot.y;
             }
             else
             {
@@ -232,9 +341,7 @@ namespace Atlanticide
 
         public float GroundHeightDifference(Vector3 position, float maxDropDist)
         {
-            float groundY = _obj.transform.position.y -
-                (_positionIsOnGround ? 0 : (_objectSize.y * 0.5f));
-            position.y = groundY + _objectSize.y * 0.5f;
+            position.y = _foot.y + _objectSize.y * 0.5f;
 
             RaycastHit hit;
             bool touchingPlatform = Physics.Raycast(new Ray(position, Vector3.down),
@@ -244,7 +351,7 @@ namespace Atlanticide
             {
                 // Positive value for higher ground,
                 // negative for lower
-                return hit.point.y - groundY;
+                return hit.point.y - _foot.y;
             }
             else
             {
@@ -260,15 +367,29 @@ namespace Atlanticide
                 return;
             }
 
+            // TODO: This is a placeholder
             float fallAmount =
                 (World.Instance.gravity + 2 * DistanceFallen) * World.Instance.DeltaTime;
-            _obj.transform.position -= Vector3.up * fallAmount;
+
+            Vector3 newPosition = _rootObj.transform.position - Vector3.up * fallAmount;
+            float groundHeightDifference = GroundHeightDifferenceFromPos(newPosition);
+
+            if (groundHeightDifference < 0f)
+            {
+                _rootObj.transform.position = newPosition;
+                //Debug.Log("Falling " + fallAmount);
+            }
+            else
+            {
+                _rootObj.transform.position = newPosition +
+                    Vector3.up * groundHeightDifference;
+            }
 
             DistanceFallen += fallAmount;
             if (DistanceFallen >= _maxFallDistance)
             {
                 _fallenOffMap = true;
-                Debug.Log(_obj.name + " fell off map");
+                Debug.Log(_rootObj.name + " fell off map");
 
                 if (_character != null)
                 {
@@ -280,21 +401,22 @@ namespace Atlanticide
         public void Rise(float speed)
         {
             float riseAmount = speed * World.Instance.DeltaTime;
-            _obj.transform.position += Vector3.up * riseAmount;
+            _rootObj.transform.position += Vector3.up * riseAmount;
         }
 
         private void StartOrStopRising(bool startRising)
         {
             if (startRising)
             {
-                if (CheckIfObjInsideGround())
+                if (ShouldRise())
                 {
                     _isRising = true;
+                    _jumpDisableElapsedTime = 0f;
                 }
             }
             else
             {
-                if (!CheckIfObjOnGroundSimple())
+                if (ShouldStopRising())
                 {
                     _isRising = false;
                 }
@@ -344,7 +466,7 @@ namespace Atlanticide
                 }
 
                 //transform.position = GetPositionOffWall(transform.position, newPosition);
-                _obj.transform.position = newPosition;
+                _rootObj.transform.position = newPosition;
                 return true;
             }
 
@@ -355,6 +477,8 @@ namespace Atlanticide
         {
             DistanceFallen = 0f;
             _fallenOffMap = false;
+            onMovingPlatform = false;
+            _jumpDisableElapsedTime = 0f;
         }
 
         /// <summary>
@@ -362,10 +486,16 @@ namespace Atlanticide
         /// </summary>
         protected virtual void OnDrawGizmos()
         {
-            if (_obj != null)
+            if (_rootObj != null)
             {
+                // Testing
+                Gizmos.color = (AbleToJump ? Color.cyan : Color.red);
+                if (_player != null && _player.ID == 0)
+                {
+                    Gizmos.DrawLine(_foot, _foot + Vector3.down * 1.5f);
+                }
+
                 // Max rise distance
-                //Gizmos.color = Color.yellow;
                 //Vector3 topOfHead = _obj.transform.position +
                 //    Vector3.up * _headHeightFromPosition;
                 //Gizmos.DrawLine(topOfHead, topOfHead + Vector3.down * _maxRiseDist);

@@ -7,6 +7,7 @@ TagManager:
   - Invisible
   - NoCollision
   - Slope
+  - Moving
   layers:
   - Default
   - TransparentFX

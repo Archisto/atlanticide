@@ -19,6 +19,9 @@ namespace Atlanticide
         [SerializeField, Range(0.1f, 5f)]
         private float _bashRecoveryTime = 0.5f;
 
+        [SerializeField, Range(0.1f, 1f)]
+        private float _playerSpeedModifier = 0.5f;
+
         private PlayerCharacter _player;
         private Transparency _tp; // testing
         private Vector3 _defaultPosition; // testing
@@ -52,6 +55,11 @@ namespace Atlanticide
         public bool BashActive { get; private set; }
 
         public bool Raised { get; private set; }
+
+        public float PlayerSpeedModifier
+        {
+            get { return _playerSpeedModifier; }
+        }
 
         /// <summary>
         /// Initializes the object.
