@@ -110,6 +110,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _Dissolve: {fileID: 114217971774766396}
+  _BreakImmediately: 1
+  _Resistance: 0
+  _FallSpeed: 10
 --- !u!114 &114217971774766396
 MonoBehaviour:
   m_ObjectHideFlags: 1
