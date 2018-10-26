@@ -27,6 +27,7 @@ namespace Atlanticide
 
         #region Variables
 
+        // progress of _Dissolve
         private float Dissolving;
 
         #endregion
@@ -36,7 +37,7 @@ namespace Atlanticide
         void Start()
         {
             _defaultPosition = transform.position;
-            _State = FloorState.DOWN;
+            _State = FloorState.UNBROKEN;
             Dissolving = 0;
         }
 
@@ -84,7 +85,7 @@ namespace Atlanticide
 
         private void Dissolve()
         {
-            if (Dissolving < 0.5f)
+            if (Dissolving < 1)
             {
                 _Dissolve.SetProgress(Dissolving += World.Instance.DeltaTime / 5f);
 
