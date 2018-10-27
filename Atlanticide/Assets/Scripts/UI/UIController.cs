@@ -88,14 +88,20 @@ namespace Atlanticide.UI
             {
                 for (int i = 0; i < GameManager.Instance.PlayerCount; i++)
                 {
-                    PlayerStatus ps = Instantiate(_playerStatusPrefab, _playerStatusHandler);
-                    ps.SetToolImage(_toolImages[(int) _players[i].Tool]);
-                    ps.SetPlayerName(_players[i].name);
-                    _playerStatuses.Add(ps);
+                    CreatePlayerStatusUIElement(_players[i]);
                 }
 
                 UpdateEnergyBar(0f);
             }
+        }
+
+        private PlayerStatus CreatePlayerStatusUIElement(PlayerCharacter player)
+        {
+            PlayerStatus ps = Instantiate(_playerStatusPrefab, _playerStatusHandler);
+            ps.SetToolImage(_toolImages[(int) player.Tool]);
+            ps.SetPlayerName(player.name);
+            _playerStatuses.Add(ps);
+            return ps;
         }
 
         public void UpdateAll()
@@ -130,8 +136,13 @@ namespace Atlanticide.UI
 
         public void UpdatePlayerToolImage(int playerNum, PlayerTool tool)
         {
-            if (_playerStatuses != null && _playerStatuses[playerNum] != null)
+            if (_playerStatuses != null)
             {
+                if (playerNum >= _playerStatuses.Count)
+                {
+                    CreatePlayerStatusUIElement(_players[playerNum]);
+                }
+
                 _playerStatuses[playerNum].SetToolImage(_toolImages[(int) tool]);
             }
         }

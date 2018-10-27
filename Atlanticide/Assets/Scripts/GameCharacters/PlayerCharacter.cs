@@ -691,8 +691,11 @@ namespace Atlanticide
         /// </summary>
         public void ResetAnimatorMovementAxis()
         {
-            Animator.SetFloat("Horizontal", 0f);
-            Animator.SetFloat("Vertical", 0f);
+            if (Animator != null)
+            {
+                Animator.SetFloat("Horizontal", 0f);
+                Animator.SetFloat("Vertical", 0f);
+            }
         }
 
         #endregion Reseting

@@ -397,6 +397,15 @@ namespace Atlanticide
                 {
                     MenuPlayerInput = input;
                 }
+
+                string creationMsg = "created";
+                if (i >= PlayerCount)
+                {
+                    _players[i].gameObject.SetActive(false);
+                    creationMsg = "created but set inactive";
+                }
+
+                Debug.Log("Player " + (i + 1) + " " + creationMsg);
             }
 
             if (_freshGameStart)
@@ -648,7 +657,16 @@ namespace Atlanticide
         /// <returns>A player character or null</returns>
         public PlayerCharacter GetValidPlayer(Predicate<PlayerCharacter> requirements)
         {
-            return Array.Find(_players, requirements);
+            for (int i = 0; i < PlayerCount; i++)
+            {
+                if (requirements(_players[i]))
+                {
+                    return _players[i];
+                }
+            }
+
+            return null;
+            //return Array.Find(_players, requirements);
         }
 
         /// <summary>
@@ -706,14 +724,17 @@ namespace Atlanticide
         public PlayerTool SetPlayerTool(PlayerCharacter player, PlayerTool tool)
         {
             // Cancels actions performed with the current tool
-            if (player.Tool == PlayerTool.EnergyCollector)
+            if (player.Exists)
             {
-                player.EnergyCollector.ResetEnergyCollector();
-            }
-            else if (player.Tool == PlayerTool.Shield)
-            {
-                player.Shield.CancelBash();
-                player.Shield.ActivateInstantly(false);
+                if (player.Tool == PlayerTool.EnergyCollector)
+                {
+                    player.EnergyCollector.ResetEnergyCollector();
+                }
+                else if (player.Tool == PlayerTool.Shield)
+                {
+                    player.Shield.CancelBash();
+                    player.Shield.ActivateInstantly(false);
+                }
             }
 
             // Sets the new tool
@@ -909,7 +930,7 @@ namespace Atlanticide
 
                 if (GameState == State.Play)
                 {
-                    _players.ForEach(p => p.CancelActions());
+                    ForEachActivePlayerChar(pc => pc.CancelActions());
                     World.Instance.ResetWorld();
                 }
 
