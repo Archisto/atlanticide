@@ -136,10 +136,10 @@ namespace Atlanticide
 
                 UpdateTopOfHeadAndFootPositions();
 
-                if (_player != null && _player.ID == 1)
-                {
-                    Debug.Log("DistFallen: " + DistanceFallen);
-                }
+                //if (_player != null && _player.ID == 1)
+                //{
+                //    Debug.Log("DistFallen: " + DistanceFallen);
+                //}
             }
         }
 
