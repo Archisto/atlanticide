@@ -75,6 +75,8 @@ namespace Atlanticide
         {
             Activated = true;
             _runningRoutine = StartCoroutine(MovePlateRoutine());
+
+            SFXPlayer.Instance.Play(Sound.Pressure_Plate);
         }
 
         private void Deactivate()
