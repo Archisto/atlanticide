@@ -9,7 +9,7 @@ namespace Atlanticide
     /// </summary>
     public class PlayerInput
     {
-        private float _holdTime = 0.2f;
+        private float _holdTime = 0.3f;
 
         private string _horizontalMoveKey;
         private string _verticalMoveKey;
