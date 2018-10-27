@@ -135,6 +135,11 @@ namespace Atlanticide
                 }
 
                 UpdateTopOfHeadAndFootPositions();
+
+                //if (_player != null && _player.ID == 1)
+                //{
+                //    Debug.Log("DistFallen: " + DistanceFallen);
+                //}
             }
         }
 
@@ -148,6 +153,11 @@ namespace Atlanticide
             {
                 Rise(_riseSpeed);
                 StartOrStopRising(false);
+
+                if (DistanceFallen > 0f)
+                {
+                    DistanceFallen = 0f;
+                }
             }
             // Falling or staying on ground
             else
@@ -172,9 +182,13 @@ namespace Atlanticide
 
         private void UpdateOnGround()
         {
-            if (!_usedToBeOnGround)
+            if (DistanceFallen > 0f)
             {
                 DistanceFallen = 0f;
+            }
+
+            if (!_usedToBeOnGround)
+            {
                 _jumpDisableElapsedTime = 0f;
             }
 

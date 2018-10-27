@@ -13,6 +13,9 @@ namespace Atlanticide
         [Header("RESETTING")]
 
         [SerializeField]
+        private bool _resetEvenWithMaxCharge;
+
+        [SerializeField]
         private float _timeUntilReset;
 
         private int _oldCharges;
@@ -37,8 +40,8 @@ namespace Atlanticide
             // Resets charges if charging stops for a set duration
             if (!_resetTimer.Active)
             {
-                if (currentCharges > 0 && !MaxCharge &&
-                    !World.Instance.EmittingEnergy)
+                if (currentCharges > 0 && !World.Instance.EmittingEnergy
+                    && (!MaxCharge || _resetEvenWithMaxCharge))
                 {
                     _resetTimer.Activate();
                     _oldCharges = currentCharges;

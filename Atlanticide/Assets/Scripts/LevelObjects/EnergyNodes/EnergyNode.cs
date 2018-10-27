@@ -9,13 +9,16 @@ namespace Atlanticide
         [SerializeField]
         private bool _usable = true;
 
-        public int currentCharges;
+        [SerializeField]
+        protected bool _unlimitedCapacity;
 
         [SerializeField, Range(1, 20)]
         protected int _maxCharges = 1;
 
         [SerializeField]
         protected int _defaultCharges = 0;
+
+        public int currentCharges;
 
         [SerializeField]
         protected LineRenderer _line;
