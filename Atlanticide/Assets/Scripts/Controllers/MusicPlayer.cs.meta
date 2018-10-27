@@ -1,5 +1,8 @@
 fileFormatVersion: 2
 guid: 98a54fa4478be8e4599e2f08ee174c92
+labels:
+- Audio
+- Controller
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
