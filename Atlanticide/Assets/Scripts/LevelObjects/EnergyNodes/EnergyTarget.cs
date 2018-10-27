@@ -27,6 +27,7 @@ namespace Atlanticide
             {
                 if (Usable)
                 {
+                    Activate(true);
                     currentCharges++;
                     return true;
                 }
