@@ -475,7 +475,7 @@ namespace Atlanticide
                 Climbing = true;
                 _climbable = climbable;
 
-                SFXPlayer.Instance.Play(Sound.Climbing_Slower);
+                SFXPlayer.Instance.PlayLooped(Sound.Climbing_Slower);
             }
         }
 
@@ -487,7 +487,7 @@ namespace Atlanticide
                 Climbing = false;
                 _climbable = null;
 
-                SFXPlayer.Instance.StopIndividualSFX("Climbing Pillar");
+                SFXPlayer.Instance.StopIndividualSFX("Climbing Pillar (Shorter)");
             }
         }
 
