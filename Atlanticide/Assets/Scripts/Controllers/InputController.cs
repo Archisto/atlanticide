@@ -161,6 +161,9 @@ namespace Atlanticide
                         if (movingInput != Vector3.zero)
                         {
                             _players[i].MoveInput(movingInput);
+                        } else
+                        {
+                            _players[i].ResetAnimatorMovementAxis();
                         }
 
                         if (lookingInput != Vector3.zero)
