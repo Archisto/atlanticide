@@ -69,7 +69,7 @@ namespace Atlanticide
         protected override void UpdateObject()
         {
             // Do nothing if object is on target and lock is ON
-            if (IsAtTarget() && LockToTarget)
+            if (LockToTarget && IsAtTarget())
             {
                 return;
             }

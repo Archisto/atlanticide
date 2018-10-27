@@ -19,6 +19,9 @@ namespace Atlanticide
         [SerializeField, Range(0.1f, 5f)]
         private float _bashRecoveryTime = 0.5f;
 
+        [SerializeField, Range(0.1f, 1f)]
+        private float _playerSpeedModifier = 0.5f;
+
         private PlayerCharacter _player;
         private Transparency _tp; // testing
         private Vector3 _defaultPosition; // testing
@@ -53,6 +56,11 @@ namespace Atlanticide
 
         public bool Raised { get; private set; }
 
+        public float PlayerSpeedModifier
+        {
+            get { return _playerSpeedModifier; }
+        }
+
         /// <summary>
         /// Initializes the object.
         /// </summary>
@@ -60,12 +68,13 @@ namespace Atlanticide
         {
             _player = GetComponentInParent<PlayerCharacter>();
             _defaultPosition = transform.localPosition;
-            _raisedPosition = Vector3.up * _defaultPosition.z;
+            _raisedPosition = Vector3.up * ((_player.Size.y / 2f) + 0.2f);
             _defaultRotation = transform.localRotation;
             _raisedRotation = Quaternion.Euler(Vector3.zero);
             gameObject.layer = LayerMask.NameToLayer(DefaultKey);
 
-            // Testing shield opening with transparency
+            // Testing shield opening with transparency;
+            // by default, the shield is invisible
             _tp = GetComponent<Transparency>();
             _tp.SetAlpha(_openProgress);
         }
@@ -167,8 +176,7 @@ namespace Atlanticide
 
         public bool Bash()
         {
-            if (!BashActive &&
-                BlocksDamage)
+            if (BlocksDamage)
             {
                 BashActive = true;
                 _updateBash = true;

@@ -6,6 +6,11 @@ namespace Atlanticide
 {
     public class EnergySource : EnergyNode
     {
+        [Header("ENERGY SOURCE")]
+
+        [SerializeField]
+        private bool _unlimitedCapacity = true;
+
         /// <summary>
         /// Initializes the object.
         /// </summary>
@@ -15,9 +20,22 @@ namespace Atlanticide
             base.Start();
         }
 
+        public override bool IsValidEnergySource()
+        {
+            return _unlimitedCapacity || !ZeroCharge;
+        }
+
+        public override bool IsValidEnergyTarget()
+        {
+            return false;
+        }
+
         public override bool MaxCharge
         {
-            get { return true; }
+            get
+            {
+                return (_unlimitedCapacity ? true : base.MaxCharge);
+            }
         }
 
         public override bool GainCharge()
@@ -27,12 +45,14 @@ namespace Atlanticide
 
         public override bool LoseCharge()
         {
-            if (Active)
+            if (_unlimitedCapacity)
             {
-                return true;
+                return Usable;
             }
-
-            return false;
+            else
+            {
+                return base.LoseCharge();
+            }
         }
     }
 }

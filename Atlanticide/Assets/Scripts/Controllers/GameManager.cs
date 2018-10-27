@@ -38,6 +38,10 @@ namespace Atlanticide
         private const string MainMenuKey = "MainMenu";
         private const string LevelKey = "Level";
 
+        // Testing
+        [SerializeField]
+        private bool _useOldPlayerCharacters;
+
         public enum State
         {
             PressStart = 0,
@@ -356,11 +360,12 @@ namespace Atlanticide
         private void InitPlayers()
         {
             _players = new PlayerCharacter[MaxPlayers];
-            _playerPrefab = Resources.Load<PlayerCharacter>("PlayerCharacter");
+            string playerCharKey = (_useOldPlayerCharacters ? "" : "New_") + "PlayerCharacter"; // Testing
+            _playerPrefab = Resources.Load<PlayerCharacter>(playerCharKey);
             CreatePlayers();
             ActivatePlayers(PlayerCount);
 
-            // Test
+            // Testing
             _telegrabs = new Transform[MaxPlayers];
         }
 

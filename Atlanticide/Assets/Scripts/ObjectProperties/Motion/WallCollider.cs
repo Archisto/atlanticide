@@ -4,6 +4,7 @@ using UnityEngine;
 
 namespace Atlanticide
 {
+    [RequireComponent(typeof(Collider))]
     public class WallCollider : MonoBehaviour
     {
         private const string WallKey = "Wall";
@@ -13,11 +14,16 @@ namespace Atlanticide
         [SerializeField]
         private LayerMask _mask;
 
+        [SerializeField]
+        private bool _positionIsOnGround;
+
         private Vector3 _objectSize;
         private int _wallLayerNum;
         private Vector3[] _cardinalDirs;
-        private Vector3[] _sideMidPoints;
+        //private Vector3[] _sideMidPoints;
         private PlayerCharacter _player;
+        private GameObject _obj;
+        private Vector3 _midPosition;
 
         /// <summary>
         /// Initializes the object.
@@ -26,17 +32,32 @@ namespace Atlanticide
         {
             // TODO: Fix being able to go inside the wall by moving diagonally into a corner.
 
+            _obj = transform.root.gameObject;
             _objectSize = GetComponent<Collider>().bounds.size;
             _wallLayerNum = LayerMask.NameToLayer(WallKey);
             _cardinalDirs = Utils.Get4CardinalDirections();
-            _sideMidPoints = new Vector3[]
+            _player = _obj.GetComponent<PlayerCharacter>();
+            UpdateMidPosition();
+            //_sideMidPoints = new Vector3[]
+            //{
+            //    _midPosition + Vector3.forward * _objectSize.z * 0.5f,
+            //    _midPosition + Vector3.back * _objectSize.z * 0.5f,
+            //    _midPosition + Vector3.left * _objectSize.x * 0.5f,
+            //    _midPosition + Vector3.right * _objectSize.x * 0.5f,
+            //};
+        }
+
+        private void UpdateMidPosition()
+        {
+            if (_positionIsOnGround)
             {
-                transform.position + Vector3.forward * _objectSize.z * 0.5f,
-                transform.position + Vector3.back * _objectSize.z * 0.5f,
-                transform.position + Vector3.left * _objectSize.x * 0.5f,
-                transform.position + Vector3.right * _objectSize.x * 0.5f,
-            };
-            _player = GetComponent<PlayerCharacter>();
+                _midPosition = _obj.transform.position +
+                    Vector3.up * _objectSize.y * 0.5f;
+            }
+            else
+            {
+                _midPosition = _obj.transform.position;
+            }
         }
 
         /// <summary>
@@ -46,14 +67,15 @@ namespace Atlanticide
         {
             if (!World.Instance.GamePaused)
             {
+                UpdateMidPosition();
                 CheckWallCollisions();
             }
         }
 
         private void CheckWallCollisions()
         {
-            Vector3 movement = GetMovementOffWall(transform.position);
-            transform.position += movement;
+            Vector3 movement = GetMovementOffWall(_midPosition);
+            _obj.transform.position += movement;
         }
 
         private Vector3 GetMovementOffWall(Vector3 position)

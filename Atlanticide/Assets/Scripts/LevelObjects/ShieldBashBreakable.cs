@@ -107,7 +107,7 @@ namespace Atlanticide
         {
             if (!_broken)
             {
-                Utils.DrawHPGizmo(transform.position + Vector3.up * 1.5f,
+                Utils.DrawDotGizmos(transform.position + Vector3.up * 1.5f,
                     hitpoints, _maxHitpoints, Color.red);
             }
         }
