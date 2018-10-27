@@ -14,7 +14,7 @@ namespace Atlanticide
         {
             if (!Activated || !_permanent)
             {
-                Activated = KeyCodeOwned();
+                Activated = CheckKey();
             }
 
             base.UpdateObject();
@@ -24,8 +24,8 @@ namespace Atlanticide
         /// Iterates through each owned key code and if a
         /// matching key code is found, returns true.
         /// </summary>
-        /// <returns>Is the key code owned.</returns>
-        private bool KeyCodeOwned()
+        /// <returns>Is the key code owned</returns>
+        private bool CheckKey()
         {
             foreach (int ownedKeyCode in World.Instance.keyCodes)
             {

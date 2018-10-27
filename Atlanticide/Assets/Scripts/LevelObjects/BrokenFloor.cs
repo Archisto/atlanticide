@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Atlanticide
 {
-
+    [RequireComponent(typeof(PlayerProximitySwitch))]
     public class BrokenFloor : LevelObject
     {
         #region Public
@@ -62,8 +62,10 @@ namespace Atlanticide
         // dissolve progress when floor enters down
         private float DownDissolve = 0.5f;
 
-        #endregion
+        // Player proximity switch
+        private PlayerProximitySwitch _playerProxSwitch;
 
+        #endregion
 
         // Use this for initialization
         void Start()
@@ -72,6 +74,10 @@ namespace Atlanticide
             _State = FloorState.UNBROKEN;
             Dissolving = 0;
             TakenPressure = 0;
+
+            _playerProxSwitch = GetComponent<PlayerProximitySwitch>();
+            float sizeX = GetComponent<Renderer>().bounds.size.x;
+            _playerProxSwitch.Range = sizeX * 0.5f;
         }
 
         protected override void UpdateObject()
@@ -115,7 +121,8 @@ namespace Atlanticide
                 _State = FloorState.BROKEN;
                 Dissolving = DownDissolve;
                 _Dissolve.SetProgress(Dissolving);
-            } else
+            }
+            else if (_playerProxSwitch.Activated)
             {
                 TakenPressure += World.Instance.DeltaTime;
                 if(TakenPressure >= _Resistance)
@@ -123,7 +130,8 @@ namespace Atlanticide
                     _State = FloorState.BROKEN;
                     TakenPressure = _Resistance;
                 }
-                Dissolving = BreakingDissolve + (TakenPressure/_Resistance) * (DownDissolve - BreakingDissolve);
+                float pressureRatio = (_Resistance > 0f ? TakenPressure / _Resistance : 1f);
+                Dissolving = BreakingDissolve + pressureRatio * (DownDissolve - BreakingDissolve);
                 _Dissolve.SetProgress(Dissolving);
             }
         }

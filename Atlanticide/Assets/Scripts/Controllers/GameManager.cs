@@ -38,10 +38,6 @@ namespace Atlanticide
         private const string MainMenuKey = "MainMenu";
         private const string LevelKey = "Level";
 
-        // Testing
-        [SerializeField]
-        private bool _useOldPlayerCharacters;
-
         public enum State
         {
             PressStart = 0,
@@ -331,12 +327,12 @@ namespace Atlanticide
             _levels = new List<Level>();
             _levels.Add(new Level(0, "Debug", 1));
             _levels.Add(new Level(1, "DemoLevel1", 1));
-            _levels.Add(new Level(2, "Level2", 3));
+            _levels.Add(new Level(2, "DemoLevel2", 1));
 
             _levels[1].SetPuzzleNames(
-                "First Tutorial");
+                "Tutorial");
             _levels[2].SetPuzzleNames(
-                "Iosefka's Clinic", "Central Yharnam", "Cathedral Ward");
+                "Challenge");
 
             LevelsUnlocked = 1;
             CurrentLevel = _levels[0];
@@ -360,8 +356,8 @@ namespace Atlanticide
         private void InitPlayers()
         {
             _players = new PlayerCharacter[MaxPlayers];
-            string playerCharKey = (_useOldPlayerCharacters ? "" : "New_") + "PlayerCharacter"; // Testing
-            _playerPrefab = Resources.Load<PlayerCharacter>(playerCharKey);
+            _playerPrefab = Resources.Load<PlayerCharacter>
+                ("New_PlayerCharacter");
             CreatePlayers();
             ActivatePlayers(PlayerCount);
 

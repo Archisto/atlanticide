@@ -57,7 +57,7 @@ namespace Atlanticide
         // Use this for initialization
         void Start()
         {
-            _defaultPosition = transform.position;
+            _defaultPosition = Object.transform.position;
             TowardsTarget = false;
             if (LockToPath)
             {
@@ -208,10 +208,9 @@ namespace Atlanticide
 
         public override void ResetObject()
         {
-            base.ResetObject();
             TowardsTarget = false;
-            SetToDefaultPosition();
+            Object.transform.position = _defaultPosition;
+            base.ResetObject();
         }
-
     }
 }
