@@ -51,6 +51,21 @@ namespace Atlanticide
         }
 
         /// <summary>
+        /// Activates the timer with the given progress (0 to 1).
+        /// </summary>
+        /// <param name="progress">Progress at the start</param>
+        public void Activate(float progress)
+        {
+            if (!_locked)
+            {
+                Reset();
+                Active = true;
+                progress = Mathf.Clamp01(progress);
+                _elapsedTime = progress * targetTime;
+            }
+        }
+
+        /// <summary>
         /// Updates the timer and returns whether the time is up.
         /// </summary>
         /// <returns>Is the time up</returns>
