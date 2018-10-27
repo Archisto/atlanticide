@@ -1008,6 +1008,12 @@ Transform:
   m_Father: {fileID: 2042424003}
   m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &951698645 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 114516585589063282, guid: 1eddd6adc1333484883cadb7f2e2e935,
+    type: 2}
+  m_PrefabInternal: {fileID: 1811660435}
+  m_Script: {fileID: 11500000, guid: 786424de437029c42bc7adf741fb8098, type: 3}
 --- !u!1 &972483819
 GameObject:
   m_ObjectHideFlags: 0
@@ -1390,32 +1396,6 @@ Transform:
   m_Father: {fileID: 2042424003}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1384748323 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1905749812019484, guid: 1eddd6adc1333484883cadb7f2e2e935,
-    type: 2}
-  m_PrefabInternal: {fileID: 1811660435}
---- !u!114 &1384748324
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1384748323}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4d24e9b9f2770824e912f53d32a68eae, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _usable: 1
-  currentCharges: 0
-  _maxCharges: 1
-  _defaultCharges: 0
-  _range: 3
-  _useRangeBox: 0
-  _boxCorner1: {x: -1, y: -1, z: -1}
-  _boxCorner2: {x: 1, y: 1, z: 1}
-  _unlimitedCapacity: 0
-  _timeUntilReset: 0
 --- !u!1 &1408162179
 GameObject:
   m_ObjectHideFlags: 0
@@ -1683,6 +1663,7 @@ MonoBehaviour:
   currentCharges: 0
   _maxCharges: 1
   _defaultCharges: 0
+  _line: {fileID: 0}
   _range: 3
   _useRangeBox: 1
   _boxCorner1: {x: -2.5, y: -1, z: -2.5}
@@ -2471,7 +2452,7 @@ MonoBehaviour:
   MustFinishNormal: 0
   UsingKey: 0
   KeyCode: 0
-  Target: {fileID: 1384748324}
+  Target: {fileID: 951698645}
 --- !u!65 &1820090548
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -2579,7 +2560,7 @@ MonoBehaviour:
   MustFinishNormal: 0
   UsingKey: 1
   KeyCode: 1
-  Target: {fileID: 0}
+  Target: {fileID: 1546210731}
 --- !u!1 &1948330124
 GameObject:
   m_ObjectHideFlags: 0

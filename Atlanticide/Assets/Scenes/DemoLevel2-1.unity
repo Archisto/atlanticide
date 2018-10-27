@@ -302,7 +302,7 @@ Prefab:
         type: 2}
       propertyPath: Target
       value: 
-      objectReference: {fileID: 1149644515}
+      objectReference: {fileID: 706209430}
     - target: {fileID: 114304819925443656, guid: 38b6d52053a65d947bfcc2f83361b7c9,
         type: 2}
       propertyPath: LockToTarget
@@ -3020,6 +3020,12 @@ MeshFilter:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 684563885}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &706209430 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 114516585589063282, guid: 1eddd6adc1333484883cadb7f2e2e935,
+    type: 2}
+  m_PrefabInternal: {fileID: 1811660435}
+  m_Script: {fileID: 11500000, guid: 786424de437029c42bc7adf741fb8098, type: 3}
 --- !u!1 &706889612
 GameObject:
   m_ObjectHideFlags: 0
@@ -4119,12 +4125,6 @@ MeshFilter:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1147041048}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
---- !u!114 &1149644515 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 114648829276128456, guid: 1eddd6adc1333484883cadb7f2e2e935,
-    type: 2}
-  m_PrefabInternal: {fileID: 1811660435}
-  m_Script: {fileID: 11500000, guid: 786424de437029c42bc7adf741fb8098, type: 3}
 --- !u!1 &1161163934
 GameObject:
   m_ObjectHideFlags: 0
@@ -4540,6 +4540,7 @@ MonoBehaviour:
   currentCharges: 0
   _maxCharges: 1
   _defaultCharges: 0
+  _line: {fileID: 0}
   _range: 3
   _useRangeBox: 1
   _boxCorner1: {x: -2, y: -1, z: -2}
