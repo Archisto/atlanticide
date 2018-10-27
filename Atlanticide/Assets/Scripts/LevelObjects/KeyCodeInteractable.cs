@@ -18,7 +18,7 @@ namespace Atlanticide
 
         private bool _availableByDefault;
 
-        public bool Available
+        public override bool Available
         {
             get
             {
