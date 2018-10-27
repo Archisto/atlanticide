@@ -13,7 +13,7 @@ namespace Atlanticide
 
         public float Energy { get; private set; }
 
-        public bool Unusable { get; private set; }
+        public bool Usable { get; private set; }
 
         /// <summary>
         /// Creates the object.
@@ -34,7 +34,7 @@ namespace Atlanticide
             // Drain
             if (drain)
             {
-                Unusable = false;
+                Usable = true;
                 Energy -= _drainSpeed * World.Instance.DeltaTime;
                 if (Energy <= 0f)
                 {
@@ -46,9 +46,9 @@ namespace Atlanticide
             {
                 Energy += _rechargeSpeed * World.Instance.DeltaTime;
 
-                if (Unusable && Energy >= _minRecharge)
+                if (!Usable && Energy >= _minRecharge)
                 {
-                    Unusable = false;
+                    Usable = true;
                 }
                 if (Energy >= 1f)
                 {
@@ -60,13 +60,13 @@ namespace Atlanticide
         public void SetEnergyFull()
         {
             Energy = 1f;
-            Unusable = false;
+            Usable = true;
         }
 
         public void SetEnergyEmpty()
         {
             Energy = 0f;
-            Unusable = true;
+            Usable = false;
         }
 
         public void ResetAbilityEnergy()
