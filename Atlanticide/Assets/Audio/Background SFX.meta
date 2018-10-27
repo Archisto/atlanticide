@@ -1,5 +1,7 @@
 fileFormatVersion: 2
 guid: 54440485cfac9554ea6ab14dd8fbb17f
+labels:
+- Audio
 folderAsset: yes
 DefaultImporter:
   externalObjects: {}
