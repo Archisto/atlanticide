@@ -63,6 +63,11 @@ namespace Atlanticide
 
         public bool ShieldBashing { get; set; }
 
+        public bool EnergyCollectorIsActive
+        {
+            get { return DrainingEnergy || EmittingEnergy; }
+        }
+
         public bool EmittingEnergy { get; set; }
 
         public bool DrainingEnergy { get; set; }

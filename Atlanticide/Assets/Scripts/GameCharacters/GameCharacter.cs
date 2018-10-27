@@ -34,6 +34,15 @@ namespace Atlanticide
         public Vector3 Size { get { return _characterSize; } }
 
         /// <summary>
+        /// Testing; only needed if player count can be changed from 2.
+        /// Returns whether the player character object is active.
+        /// </summary>
+        public bool Exists
+        {
+            get { return gameObject.activeSelf; }
+        }
+
+        /// <summary>
         /// Initializes the object.
         /// </summary>
         protected virtual void Start()

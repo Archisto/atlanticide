@@ -17,6 +17,9 @@ namespace Atlanticide
         [SerializeField]
         protected int _defaultCharges = 0;
 
+        [SerializeField]
+        protected LineRenderer _line;
+
         [Header("RANGE")]
 
         [SerializeField, Range(0.1f, 10f)]
@@ -33,6 +36,7 @@ namespace Atlanticide
 
         protected KeyCodeSwitch _keyCodeSwitch;
         protected PlayerCharacter _energyCollectorPlayer;
+        protected bool _beingUsed;
         private bool _activeByDefault;
 
         public bool Usable
@@ -54,9 +58,7 @@ namespace Atlanticide
 
         public virtual bool ZeroCharge
         {
-            get {
-                Debug.Log("zeroCharge: " + currentCharges);
-                return currentCharges == 0; }
+            get { return currentCharges == 0; }
         }
 
         public bool HasJustBeenReset { get; protected set; }
@@ -79,6 +81,8 @@ namespace Atlanticide
             _activeByDefault = _usable;
             Usable = _usable;
             _keyCodeSwitch = GetComponent<KeyCodeSwitch>();
+
+            InitLine();
 
             // Gives BoxCorner1 the smaller axis values
             // and BoxCorner2 the larger ones
@@ -104,6 +108,17 @@ namespace Atlanticide
             {
                 UpdateEnergyCollectorPlayer();
                 UpdateEnergyCollectorTarget();
+
+                if (_beingUsed)
+                {
+                    UpdateLine();
+
+                    if (!World.Instance.EnergyCollectorIsActive)
+                    {
+                        _beingUsed = false;
+                        SetLineEnabled(false);
+                    }
+                }
             }
             else
             {
@@ -184,31 +199,11 @@ namespace Atlanticide
             _energyCollectorPlayer = null;
         }
 
-        //public void SetEnergyCollectorPlayer(PlayerCharacter player)
-        //{
-        //    if (player == null)
-        //    {
-        //        if (_energyCollectorPlayer != null)
-        //        {
-        //            _energyCollectorPlayer.UpdateClosestEnergyNode(null);
-        //            _energyCollectorPlayer = null;
-        //        }
-        //    }
-        //    else if (player.Tool == PlayerTool.EnergyCollector)
-        //    {
-        //        if (_energyCollectorPlayer != null)
-        //        {
-        //            _energyCollectorPlayer.UpdateClosestEnergyNode(null);
-        //        }
-
-        //        _energyCollectorPlayer = player;
-        //    }
-        //}
-
         public virtual bool GainCharge()
         {
             if (Usable && currentCharges < _maxCharges)
             {
+                Activate(true);
                 currentCharges++;
                 return true;
             }
@@ -220,6 +215,7 @@ namespace Atlanticide
         {
             if (Usable && currentCharges > 0)
             {
+                Activate(true);
                 currentCharges--;
                 return true;
             }
@@ -227,9 +223,48 @@ namespace Atlanticide
             return false;
         }
 
-        public virtual void SetActive(bool active)
+        protected virtual void Activate(bool activate)
         {
-            Usable = active;
+            _beingUsed = activate;
+            SetLineEnabled(activate);
+        }
+
+        // Testing
+        private void InitLine()
+        {
+            if (_line != null)
+            {
+                _line.SetPosition(0, _line.transform.position);
+                _line.enabled = false;
+            }
+        }
+
+        // Testing
+        protected void SetLineEnabled(bool enable)
+        {
+            if (_line != null)
+            {
+                if (enable)
+                {
+                    UpdateLine();
+                }
+
+                _line.enabled = enable;
+            }
+        }
+
+        // Testing
+        private void UpdateLine()
+        {
+            if (_line != null)
+            {
+                _line.SetPosition(1, _energyCollectorPlayer.EnergyCollector.transform.position);
+            }
+        }
+
+        public virtual void SetUsable(bool usable)
+        {
+            Usable = usable;
 
             if (!Usable)
             {
@@ -245,6 +280,7 @@ namespace Atlanticide
 
         public override void ResetObject()
         {
+            Activate(false);
             Usable = _activeByDefault;
             currentCharges = _defaultCharges;
             base.ResetObject();
@@ -304,7 +340,7 @@ namespace Atlanticide
         protected void DrawProgressBarGizmos()
         {
             Gizmos.color = (MaxCharge ? Color.green : Color.black);
-            Utils.DrawProgressBarGizmo(transform.position + Vector3.back * 1f,
+            Utils.DrawProgressBarGizmo(transform.position + new Vector3(0, 1f, -1.2f),
                 ((float) currentCharges / _maxCharges), Gizmos.color, Color.yellow);
         }
     }
