@@ -118,6 +118,7 @@ namespace Atlanticide
         protected virtual void ResetBaseValues()
         {
             IsDead = false;
+            IsImmobile = false;
             _hitpoints = _maxHitpoints;
             ResetGroundCollider();
         }

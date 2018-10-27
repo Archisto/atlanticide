@@ -1,5 +1,7 @@
 fileFormatVersion: 2
 guid: 556ee2f0f93150f49987bacecc320815
+labels:
+- Editor
 folderAsset: yes
 DefaultImporter:
   externalObjects: {}
