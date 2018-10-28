@@ -93,6 +93,8 @@ namespace Atlanticide
             if (_elapsedTime >= _respawnTime)
             {
                 RespawnPlayer();
+
+                SFXPlayer.Instance.Play(Sound.Revive);
             }
         }
 
