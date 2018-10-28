@@ -108,6 +108,9 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 43c5d55e15c8f0c43815912059bb50a2, type: 3}
   - {fileID: 8300000, guid: c15c100445d8a4d45a145c08a3315589, type: 3}
   - {fileID: 8300000, guid: e20f5bce13522034384d0fe48deca974, type: 3}
+  - {fileID: 8300000, guid: 9ab79aec7c9666b408aedab302357140, type: 3}
+  - {fileID: 8300000, guid: 6c26b92f9c3eb9f40969ffcd0d23f506, type: 3}
+  - {fileID: 8300000, guid: f79b8b03b259b724cb4552d608a9f840, type: 3}
   audioSrcPrefab: {fileID: 1660063342897128, guid: 8c0e527bb61a12441914ae58356bf2ee,
     type: 2}
   volume: 1
