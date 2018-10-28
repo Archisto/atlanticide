@@ -40,6 +40,8 @@ namespace Atlanticide
 
         public Shield Shield { get; private set; }
 
+        public Animator Animator { get; private set; }
+
         public Interactable InteractionTarget
         {
             get
@@ -163,6 +165,7 @@ namespace Atlanticide
             base.Start();
             EnergyCollector = GetComponentInChildren<EnergyCollector>();
             Shield = GetComponentInChildren<Shield>();
+            Animator = GetComponentInChildren<Animator>();
         }
 
         #region Updating
@@ -200,6 +203,10 @@ namespace Atlanticide
             Vector3 movement = new Vector3(input.x, 0, input.y) * speed * World.Instance.DeltaTime;
             Vector3 newPosition = transform.position + movement * (Pushing ? 0.3f : 1f);
             transform.position = newPosition;
+
+            Animator.SetFloat("Horizontal", input.x);
+            Animator.SetFloat("Vertical", input.y);
+            Animator.speed = input.magnitude * (speed / _speed);
 
             //if (!ShieldIsActive)
             //{
@@ -315,6 +322,9 @@ namespace Atlanticide
                 {
                     Shield.Activate(!Shield.Active);
                 }
+
+                // Starts shield opening/closing animation
+                //Animator.SetBool("Shield Active", Shield.Active);
 
                 result = !Shield.IsIdle;
             }
@@ -465,7 +475,7 @@ namespace Atlanticide
                 Climbing = true;
                 _climbable = climbable;
 
-                SFXPlayer.Instance.Play(Sound.Climbing_Slower);
+                SFXPlayer.Instance.PlayLooped(Sound.Climbing_Slower);
             }
         }
 
@@ -477,7 +487,7 @@ namespace Atlanticide
                 Climbing = false;
                 _climbable = null;
 
-                SFXPlayer.Instance.StopIndividualSFX("Climbing Pillar");
+                SFXPlayer.Instance.StopIndividualSFX("Climbing Pillar (Shorter)");
             }
         }
 
@@ -598,43 +608,6 @@ namespace Atlanticide
             Respawn();
         }
 
-        /// <summary>
-        /// Resets the player character's base values when respawning.
-        /// </summary>
-        protected override void ResetBaseValues()
-        {
-            base.ResetBaseValues();
-            Jumping = false;
-            Respawning = false;
-            _elapsedRespawnTime = 0f;
-            
-            if (EnergyCollector != null)
-            {
-                EnergyCollector.ResetEnergyCollector();
-            }
-
-            if (Shield != null)
-            {
-                Shield.ResetShield();
-            }
-        }
-
-        /// <summary>
-        /// Cancels any running actions if the player dies or the level is reset.
-        /// </summary>
-        public override void CancelActions()
-        {
-            base.CancelActions();
-            Input.ResetInput();
-            Jumping = false;
-            Respawning = false;
-            EnergyCollector.ResetEnergyCollector();
-            Shield.ResetShield();
-            EndClimb();
-            EndPush();
-            InteractionTarget = null;
-        }
-
         #region Persistence
 
         /// <summary>
@@ -672,6 +645,60 @@ namespace Atlanticide
         }
 
         #endregion Persistence
+
+        #region Reseting
+
+        /// <summary>
+        /// Resets the player character's base values when respawning.
+        /// </summary>
+        protected override void ResetBaseValues()
+        {
+            base.ResetBaseValues();
+            Jumping = false;
+            Respawning = false;
+            _elapsedRespawnTime = 0f;
+
+            if (EnergyCollector != null)
+            {
+                EnergyCollector.ResetEnergyCollector();
+            }
+
+            if (Shield != null)
+            {
+                Shield.ResetShield();
+            }
+        }
+
+        /// <summary>
+        /// Cancels any running actions if the player dies or the level is reset.
+        /// </summary>
+        public override void CancelActions()
+        {
+            base.CancelActions();
+            Input.ResetInput();
+            ResetAnimatorMovementAxis();
+            Jumping = false;
+            Respawning = false;
+            EnergyCollector.ResetEnergyCollector();
+            Shield.ResetShield();
+            EndClimb();
+            EndPush();
+            InteractionTarget = null;
+        }
+
+        /// <summary>
+        /// Resets the animator's movement axis', so the character stops walking.
+        /// </summary>
+        public void ResetAnimatorMovementAxis()
+        {
+            if (Animator != null)
+            {
+                Animator.SetFloat("Horizontal", 0f);
+                Animator.SetFloat("Vertical", 0f);
+            }
+        }
+
+        #endregion Reseting
 
         protected override void OnDrawGizmos()
         {

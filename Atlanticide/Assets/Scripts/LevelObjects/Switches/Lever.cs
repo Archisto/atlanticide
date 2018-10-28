@@ -11,10 +11,10 @@ namespace Atlanticide
         private Transform _handlePivot;
 
         [SerializeField]
-        private float _offAngle = -25;
+        private Vector3 _offRotation;
 
         [SerializeField]
-        private float _onAngle = 25;
+        private Vector3 _onRotation;
 
         [SerializeField]
         private float _moveTime = 1f;
@@ -25,9 +25,14 @@ namespace Atlanticide
         protected KeyCodeInteractable _interactable;
         protected bool _handleMoving;
         private Timer _moveTimer;
-        private Quaternion _offRotation;
-        private Quaternion _onRotation;
+        private Quaternion _offRotationQ;
+        private Quaternion _onRotationQ;
         private Coroutine _runningRoutine;
+
+        private Quaternion GetTargetRotation()
+        {
+            return (Activated ? _onRotationQ : _offRotationQ);
+        }
 
         /// <summary>
         /// Initializes the object.
@@ -37,8 +42,8 @@ namespace Atlanticide
             base.Start();
             _interactable = GetComponent<KeyCodeInteractable>();
             _moveTimer = new Timer(_moveTime, true);
-            _offRotation = Quaternion.Euler(new Vector3(0, 0, _offAngle));
-            _onRotation = Quaternion.Euler(new Vector3(0, 0, _onAngle));
+            _offRotationQ = Quaternion.Euler(_offRotation);
+            _onRotationQ = Quaternion.Euler(_onRotation);
             Init();
         }
 
@@ -48,7 +53,7 @@ namespace Atlanticide
         private void Init()
         {
             Activated = _onByDefault;
-            _handlePivot.localRotation = (Activated ? _onRotation : _offRotation);
+            _handlePivot.localRotation = GetTargetRotation();
         }
 
         /// <summary>
@@ -89,8 +94,7 @@ namespace Atlanticide
         private IEnumerator MoveLeverRoutine()
         {
             Quaternion startRot = _handlePivot.localRotation;
-            Quaternion targetRot =
-                (Activated ? _onRotation : _offRotation);
+            Quaternion targetRot = GetTargetRotation();
 
             _handleMoving = true;
             _moveTimer.Activate();

@@ -1,7 +1,7 @@
 fileFormatVersion: 2
 guid: a96a9e730a615e247adcd7d2b9a8a610
-timeCreated: 1518513714
-licenseType: Free
+labels:
+- Editor
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
