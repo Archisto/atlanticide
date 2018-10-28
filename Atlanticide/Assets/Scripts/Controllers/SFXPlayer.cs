@@ -77,7 +77,10 @@ namespace Atlanticide
         Using_Energy = 52,
         Using_Energy_On_Target = 53,
         Heavy_Falling_To_Ground = 54,
-        Revive = 55
+        Revive = 55,
+        Ground_Collapse = 56,
+        Dissolve = 57,
+        Projectile_1 = 58
     }
 
     public class SFXPlayer : MonoBehaviour
