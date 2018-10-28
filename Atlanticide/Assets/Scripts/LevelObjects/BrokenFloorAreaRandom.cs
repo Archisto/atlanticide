@@ -68,6 +68,8 @@ namespace Atlanticide
                 foreach(BrokenFloor floor in _Platforms)
                 {
                     floor.Break = true;
+
+                    //SFXPlayer.Instance.Play(Sound.Ground_Collapse);
                 }
             }
 
