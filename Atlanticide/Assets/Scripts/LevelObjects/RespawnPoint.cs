@@ -93,8 +93,6 @@ namespace Atlanticide
             if (_elapsedTime >= _respawnTime)
             {
                 RespawnPlayer();
-
-                SFXPlayer.Instance.Play(Sound.Revive);
             }
             else
             {
@@ -167,6 +165,7 @@ namespace Atlanticide
                 player.transform.position = _respawnPoint.position + Vector3.down * player.Size.y;
                 _respawningPlayer = player;
                 _elapsedTime = 0f;
+                SFXPlayer.Instance.Play(Sound.Revive);
                 return true;
             }
 
