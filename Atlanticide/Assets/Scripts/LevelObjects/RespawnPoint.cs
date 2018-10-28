@@ -96,6 +96,12 @@ namespace Atlanticide
 
                 SFXPlayer.Instance.Play(Sound.Revive);
             }
+            else
+            {
+                _respawningPlayer.transform.position =
+                    _respawnPoint.position + Vector3.down *
+                    _respawningPlayer.Size.y * (1 - RespawnProgress);
+            }
         }
 
         private void CheckForPlayerWithinRange()
@@ -158,6 +164,7 @@ namespace Atlanticide
             {
                 RespawnActive = true;
                 player.Respawning = true;
+                player.transform.position = _respawnPoint.position + Vector3.down * player.Size.y;
                 _respawningPlayer = player;
                 _elapsedTime = 0f;
                 return true;

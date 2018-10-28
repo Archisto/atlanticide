@@ -23,7 +23,6 @@ namespace Atlanticide
             _pathFollower = GetComponent<FollowPath>();
             _sbSwitch = GetComponent<ShieldBashSwitch>();
             _path = GetComponentInChildren<Path>();
-            _defaultPosition = transform.position;
         }
 
         /// <summary>
@@ -52,6 +51,7 @@ namespace Atlanticide
         private void EnterPath()
         {
             Waypoint firstWP = _path.GetFirstWaypoint();
+            _defaultPosition = transform.position;
             _pathFollower.EnterPath(_path, Direction.Forward, firstWP, false, false);
         }
 

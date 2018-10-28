@@ -71,9 +71,7 @@ namespace Atlanticide
         void Start()
         {
             _defaultPosition = transform.position;
-            _State = FloorState.UNBROKEN;
-            Dissolving = 0;
-            TakenPressure = 0;
+            ResetToDefaults();
 
             _playerProxSwitch = GetComponent<PlayerProximitySwitch>();
             float sizeX = GetComponent<Renderer>().bounds.size.x;
@@ -156,10 +154,20 @@ namespace Atlanticide
             }
         }
 
+        private void ResetToDefaults()
+        {
+            _State = FloorState.UNBROKEN;
+            Break = false;
+            Dissolving = 0;
+            TakenPressure = 0;
+            _Dissolve.SetProgress(0f);
+        }
+
         public override void ResetObject()
         {
-            base.ResetObject();
+            ResetToDefaults();
             transform.position = _defaultPosition;
+            base.ResetObject();
         }
 
     }

@@ -38,16 +38,22 @@ namespace Atlanticide
 
             // is something hit
             bool hit = false;
+            bool dontDestroy = false;
             Collider immediateCollider = collision.contacts[0].otherCollider;
 
             if (_damageCharacters)
             {
-                GameCharacter character = immediateCollider.gameObject.GetComponent<GameCharacter>();
+                GameCharacter character = immediateCollider.
+                    transform.parent.GetComponent<GameCharacter>();
+                Shield shield = immediateCollider.transform.GetComponent<Shield>();
 
-                if(character != null)
+                if (character != null && shield == null)
                 {
+                    dontDestroy = character.IsDead; // TODO: Replace with something better
                     hit = Hit(character);
                 }
+
+                //Debug.Log("immediateCollider.gameObject: " + immediateCollider.gameObject.name);
             }
 
             if (!hit && _damageDestructibleObjects)
@@ -56,7 +62,7 @@ namespace Atlanticide
                 hit = Hit(destructible);
             }
 
-            if (_deactivateOnCollision)
+            if (_deactivateOnCollision && !dontDestroy)
             {
                 gameObject.SetActive(false);
             }

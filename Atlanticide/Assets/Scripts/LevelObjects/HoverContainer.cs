@@ -9,6 +9,10 @@ namespace Atlanticide
         public float hoverHeight,
             hoverSpeed;
 
+        public Transform _rootObj;
+        private float time;
+        private float sineWave;
+
         // Use this for initialization
         void Start()
         {
@@ -18,7 +22,14 @@ namespace Atlanticide
         // Update is called once per frame
         void Update()
         {
-            this.transform.position = (Vector3.up * hoverHeight) * Mathf.Cos(Time.time * hoverSpeed);
+            if (!World.Instance.GamePaused)
+            {
+                time += World.Instance.DeltaTime;
+                Vector3 newPosition = transform.position;
+                sineWave = Mathf.Sin(time * hoverSpeed);
+                newPosition.y = _rootObj.position.y + hoverHeight * sineWave;
+                transform.position = newPosition;
+            }
         }
     }
 }
