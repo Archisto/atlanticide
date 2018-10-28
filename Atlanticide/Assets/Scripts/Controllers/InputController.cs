@@ -161,7 +161,8 @@ namespace Atlanticide
                         if (movingInput != Vector3.zero)
                         {
                             _players[i].MoveInput(movingInput);
-                        } else
+                        }
+                        else
                         {
                             _players[i].ResetAnimatorMovementAxis();
                         }
@@ -335,6 +336,8 @@ namespace Atlanticide
 
         public void TogglePause(int pausingPlayer)
         {
+            // TODO: Pause animations
+
             if (_camera.firstPersonMode)
             {
                 _camera.SetFirstPersonPlayer(null);

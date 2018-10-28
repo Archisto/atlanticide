@@ -6,11 +6,6 @@ namespace Atlanticide
 {
     public class EnergySource : EnergyNode
     {
-        [Header("ENERGY SOURCE")]
-
-        [SerializeField]
-        private bool _unlimitedCapacity = true;
-
         /// <summary>
         /// Initializes the object.
         /// </summary>
@@ -47,6 +42,11 @@ namespace Atlanticide
         {
             if (_unlimitedCapacity)
             {
+                if (Usable)
+                {
+                    Activate(true);
+                }
+
                 return Usable;
             }
             else

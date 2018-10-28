@@ -5,6 +5,7 @@ using UnityEngine;
 namespace Atlanticide
 {
     [ExecuteInEditMode]
+    [RequireComponent(typeof(Activatable))]
     public class BrokenFloorAreaRandom : LevelObject
     {
         [Header("Editor")]
@@ -47,26 +48,30 @@ namespace Atlanticide
         private Vector2 HeightBetween = new Vector2(0.25f, 0.25f);
 
         private BrokenFloor[] _Platforms;
+        private Activatable _activatable;
+        private bool _alreadyBroken;
 
         // Use this for initialization
         void Start()
         {
             CheckVariables();
             Fill();
+            _activatable = GetComponent<Activatable>();
         }
 
         protected override void UpdateObject()
         {
-            base.UpdateObject();
-
-            if (_Break)
+            if (!_alreadyBroken && (_activatable.Activated || _Break))
             {
                 _Break = false;
+                _alreadyBroken = true;
                 foreach(BrokenFloor floor in _Platforms)
                 {
                     floor.Break = true;
                 }
             }
+
+            base.UpdateObject();
         }
 
         public override void ResetObject()

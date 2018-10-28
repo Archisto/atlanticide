@@ -92,15 +92,27 @@ namespace Atlanticide
                 foreach (Vector3 dir in _cardinalDirs)
                 {
                     Vector3 directionMovement = Vector3.zero;
+
                     hit = HitObjectInPositionInDirection(position, dir, _mask);
-                    if (hit.collider != null && hit.collider.gameObject != gameObject &&
-                        !hit.collider.gameObject.tag.Equals(PlayerKey) &&
-                        !hit.collider.gameObject.tag.Equals(NoCollisionKey))
+                    GameObject hitObj = null;
+                    Shield shield = null;
+                    if (hit.collider != null)
                     {
-                        bool wallHit = (hit.collider.gameObject.layer == _wallLayerNum);
+                        hitObj = hit.collider.gameObject;
+                        shield = hitObj.GetComponent<Shield>();
+                    }
+
+                    if (hitObj != null && hitObj != this.gameObject &&
+                        !hitObj.tag.Equals(NoCollisionKey) && shield == null)
+                    {
+                        //if (hit.collider != null && hit.collider.gameObject != gameObject &&
+                        //!hit.collider.gameObject.tag.Equals(PlayerKey) &&
+                        //!hit.collider.gameObject.tag.Equals(NoCollisionKey))
+
+                        bool wallHit = (hitObj.layer == _wallLayerNum);
                         directionMovement = hit.point - dir * (_objectSize.x * 0.5f) - position;
 
-                        push = CheckPush(hit.collider.gameObject);
+                        push = CheckPush(hitObj);
 
                         if (!push || wallHit)
                         {

@@ -6,11 +6,6 @@ namespace Atlanticide
 {
     public class EnergyTarget : EnergyNode
     {
-        [Header("ENERGY TARGET")]
-
-        [SerializeField]
-        private bool _unlimitedCapacity;
-
         public override bool IsValidEnergySource()
         {
             return false;
@@ -27,6 +22,7 @@ namespace Atlanticide
             {
                 if (Usable)
                 {
+                    Activate(true);
                     currentCharges++;
                     return true;
                 }

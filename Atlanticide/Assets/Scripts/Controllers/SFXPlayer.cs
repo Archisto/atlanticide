@@ -71,7 +71,16 @@ namespace Atlanticide
         Short_Explosion = 46,
         Orichalcum_Before_Exploding = 47,
         Setting_Trap = 48,
-        Springing_Trap = 49
+        Springing_Trap = 49,
+        Elevator = 50,
+        Taking_Energy = 51,
+        Using_Energy = 52,
+        Using_Energy_On_Target = 53,
+        Heavy_Falling_To_Ground = 54,
+        Revive = 55,
+        Ground_Collapse = 56,
+        Dissolve = 57,
+        Projectile_1 = 58
     }
 
     public class SFXPlayer : MonoBehaviour
@@ -323,6 +332,69 @@ namespace Atlanticide
             return audioSrc;
         }
 
+        public AudioSource PlayLooped(Sound sound)
+        {
+            return PlayLooped((int)sound);
+        }
+
+        public AudioSource PlayLooped(Sound sound, float pitch)
+        {
+            this.pitch = pitch;
+            return PlayLooped((int)sound);
+        }
+
+        public AudioSource PlayLooped(int soundNum)
+        {
+            if (soundNum >= 0 &&
+                soundNum < sounds.Count)
+            {
+                // Plays the sound
+                return PlayLooped(sounds[soundNum]);
+            }
+            else
+            {
+                Debug.LogError("[SoundPlayer]: The requested sound " +
+                               "clip cannot be played");
+            }
+
+            return null;
+        }
+
+        private AudioSource PlayLooped(AudioClip clip)
+        {
+            AudioSource audioSrc = GetAudioSrcFromPool();
+
+            // If there are no unused AudioSources
+            // and the pool's size is flexible, a
+            // new AudioSource is created
+            if (audioSrc == null && flexiblePoolSize)
+            {
+                audioSrc = IncreasePoolSize(1);
+                audioSrc.enabled = true;
+            }
+
+            // Plays a sound
+            if (audioSrc != null)
+            {
+                audioSrc.clip = clip;
+                audioSrc.volume = volume;
+                audioSrc.pitch = pitch;
+                audioSrc.loop = true;
+                audioSrc.Play();
+                //audioSrc.PlayOneShot(clip, volume);
+
+                pitch = 1;
+            }
+            // Otherwise prints debug data
+            //else
+            //{
+            //    Debug.Log("[SoundPlayer]: All AudioSources are being used " +
+            //              "and a new one could not be created");
+            //}
+
+            return audioSrc;
+        }
+
         /// <summary>
         /// Gets an unused AudioSource from the pool.
         /// </summary>
@@ -366,6 +438,7 @@ namespace Atlanticide
             {
                 audioSrc.Stop();
                 DeactivateAudioSrc(audioSrc);
+                audioSrc.loop = false;
             }
         }
 
@@ -377,6 +450,7 @@ namespace Atlanticide
                 {
                     Debug.Log("Stopped sound effect " + audioSrc.clip.name);
                     audioSrc.Stop();
+                    audioSrc.loop = false;
                 }
             }
         }

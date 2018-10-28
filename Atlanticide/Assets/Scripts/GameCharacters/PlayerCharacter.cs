@@ -206,6 +206,7 @@ namespace Atlanticide
 
             Animator.SetFloat("Horizontal", input.x);
             Animator.SetFloat("Vertical", input.y);
+            Animator.speed = input.magnitude * (speed / _speed);
 
             //if (!ShieldIsActive)
             //{
@@ -321,6 +322,9 @@ namespace Atlanticide
                 {
                     Shield.Activate(!Shield.Active);
                 }
+
+                // Starts shield opening/closing animation
+                //Animator.SetBool("Shield Active", Shield.Active);
 
                 result = !Shield.IsIdle;
             }
@@ -471,7 +475,7 @@ namespace Atlanticide
                 Climbing = true;
                 _climbable = climbable;
 
-                SFXPlayer.Instance.Play(Sound.Climbing_Slower);
+                SFXPlayer.Instance.PlayLooped(Sound.Climbing_Slower);
             }
         }
 
@@ -483,7 +487,7 @@ namespace Atlanticide
                 Climbing = false;
                 _climbable = null;
 
-                SFXPlayer.Instance.StopIndividualSFX("Climbing Pillar");
+                SFXPlayer.Instance.StopIndividualSFX("Climbing Pillar (Shorter)");
             }
         }
 
@@ -672,6 +676,7 @@ namespace Atlanticide
         {
             base.CancelActions();
             Input.ResetInput();
+            ResetAnimatorMovementAxis();
             Jumping = false;
             Respawning = false;
             EnergyCollector.ResetEnergyCollector();
@@ -686,8 +691,11 @@ namespace Atlanticide
         /// </summary>
         public void ResetAnimatorMovementAxis()
         {
-            Animator.SetFloat("Horizontal", 0f);
-            Animator.SetFloat("Vertical", 0f);
+            if (Animator != null)
+            {
+                Animator.SetFloat("Horizontal", 0f);
+                Animator.SetFloat("Vertical", 0f);
+            }
         }
 
         #endregion Reseting
