@@ -1848,6 +1848,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3917a44144f0f9044b235442c6c55310, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _permanent: 0
   _usingKey: 0
   _keyCode: 0
   _switch: {fileID: 0}
@@ -2095,11 +2096,21 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 4979099011991776, guid: 0d6cd7dbf3d83144ba9e5312278d6ff0, type: 2}
       propertyPath: m_RootOrder
-      value: 21
+      value: 22
       objectReference: {fileID: 0}
     - target: {fileID: 114738874092192262, guid: 0d6cd7dbf3d83144ba9e5312278d6ff0,
         type: 2}
       propertyPath: _useRangeBox
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114738874092192262, guid: 0d6cd7dbf3d83144ba9e5312278d6ff0,
+        type: 2}
+      propertyPath: _maxCharges
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 114738874092192262, guid: 0d6cd7dbf3d83144ba9e5312278d6ff0,
+        type: 2}
+      propertyPath: _unlimitedCapacity
       value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
@@ -3010,11 +3021,21 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 4385257252694010, guid: de5d0084217091248980065289372b49, type: 2}
       propertyPath: m_RootOrder
-      value: 22
+      value: 21
       objectReference: {fileID: 0}
     - target: {fileID: 114244566629791474, guid: de5d0084217091248980065289372b49,
         type: 2}
       propertyPath: _useRangeBox
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114244566629791474, guid: de5d0084217091248980065289372b49,
+        type: 2}
+      propertyPath: _maxCharges
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 114244566629791474, guid: de5d0084217091248980065289372b49,
+        type: 2}
+      propertyPath: _unlimitedCapacity
       value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
@@ -3071,8 +3092,8 @@ Transform:
   - {fileID: 315094921}
   - {fileID: 814262456}
   - {fileID: 1528062124}
-  - {fileID: 1569896263}
   - {fileID: 1506848851}
+  - {fileID: 1569896263}
   m_Father: {fileID: 0}
   m_RootOrder: 11
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

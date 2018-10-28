@@ -203,15 +203,15 @@ namespace Atlanticide
         private void Drain()
         {
             World.Instance.DrainingEnergy = true;
-            ChangeCharges(1);
-            _activeTarget.LoseCharge();
+            int energyGain = _activeTarget.LoseCharge();
+            ChangeCharges(energyGain);
         }
 
         private void Emit()
         {
             World.Instance.EmittingEnergy = true;
-            ChangeCharges(-1);
             _activeTarget.GainCharge();
+            ChangeCharges(-1);
         }
 
         public void ChangeCharges(int charges)
