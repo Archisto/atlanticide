@@ -251,7 +251,15 @@ namespace Atlanticide
                 onMovingPlatform = true;
             }
 
-            //Debug.Log("Hit " + touchingPlatform);
+            //if (touchingPlatform)
+            //{
+            //    Debug.Log("Hit");
+            //    if (_player != null && _player.ID == 1)
+            //    {
+            //        Debug.Log("Hit " + hit.transform.name);
+            //    }
+            //}
+
             return touchingPlatform;
         }
 

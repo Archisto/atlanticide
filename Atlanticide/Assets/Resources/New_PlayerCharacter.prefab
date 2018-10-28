@@ -740,7 +740,7 @@ GameObject:
   - component: {fileID: 114719905542029688}
   m_Layer: 0
   m_Name: Shield
-  m_TagString: Player
+  m_TagString: Moving
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -770,7 +770,6 @@ GameObject:
   - component: {fileID: 4613988630612270}
   - component: {fileID: 95888271486658836}
   - component: {fileID: 114686667694330238}
-  - component: {fileID: 54107209420890824}
   m_Layer: 10
   m_Name: New_PlayerCharacter
   m_TagString: Untagged
@@ -1355,6 +1354,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4542109692418954}
   - component: {fileID: 136875860964504416}
+  - component: {fileID: 54574843626634108}
   - component: {fileID: 114633098126111806}
   - component: {fileID: 114279728556923020}
   m_Layer: 10
@@ -2810,12 +2810,12 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1814106930888406}
   m_Mesh: {fileID: 4300000, guid: f0f3d2ab0a569e549b335828716139a2, type: 3}
---- !u!54 &54107209420890824
+--- !u!54 &54574843626634108
 Rigidbody:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1661321770211080}
+  m_GameObject: {fileID: 1991163616816224}
   serializedVersion: 2
   m_Mass: 1
   m_Drag: 0
