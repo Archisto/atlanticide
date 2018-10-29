@@ -80,6 +80,11 @@ namespace Atlanticide
         /// </summary>
         protected virtual void OnDrawGizmos()
         {
+            SetActivationStateGizmoColor();
+        }
+
+        protected void SetActivationStateGizmoColor()
+        {
             Gizmos.color = (Activated ? Color.green : Color.black);
         }
     }

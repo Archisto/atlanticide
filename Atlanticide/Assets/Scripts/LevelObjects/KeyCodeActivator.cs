@@ -4,8 +4,7 @@ using UnityEngine;
 
 namespace Atlanticide
 {
-    [RequireComponent(typeof(Switch))]
-    public class KeyCodeActivator : LevelObjectExpansion
+    public class KeyCodeActivator : SwitchExpansion
     {
         public int keyCode;
 
@@ -15,43 +14,29 @@ namespace Atlanticide
         [SerializeField]
         private bool _allowDuplicateKeyCodes;
 
-        private Switch _switch;
-        private bool _activated;
-        private bool _keyCodeActive;
-
-        /// <summary>
-        /// Initializes the object.
-        /// </summary>
-        protected override void Start()
+        protected override bool CanCheckSwitch()
         {
-            base.Start();
-            _switch = GetComponent<Switch>();
+            return !_activated || !_permanent;
+        }
+
+        protected override void Activate()
+        {
+            _activated = World.Instance.
+                TryActivateNewKeyCode(keyCode, _allowDuplicateKeyCodes);
+        }
+
+        protected override void Deactivate()
+        {
+            World.Instance.DeactivateKeyCode(keyCode);
+            _activated = false;
         }
 
         /// <summary>
-        /// Updates the object.
+        /// Resets the object to its default state.
         /// </summary>
-        public override void OnObjectUpdated()
-        {
-            if (!_keyCodeActive || !_permanent)
-            {
-                _activated = _switch.Activated;
-                if (_activated && !_keyCodeActive)
-                {
-                    _keyCodeActive = World.Instance.
-                        TryActivateNewKeyCode(keyCode, _allowDuplicateKeyCodes);
-                }
-                else if (!_activated && _keyCodeActive)
-                {
-                    World.Instance.DeactivateKeyCode(keyCode);
-                    _keyCodeActive = false;
-                }
-            }
-        }
-
         public override void OnObjectReset()
         {
-            _keyCodeActive = false;
+            _activated = false;
         }
     }
 }

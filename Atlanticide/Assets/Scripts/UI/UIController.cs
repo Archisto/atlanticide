@@ -19,8 +19,11 @@ namespace Atlanticide.UI
         [SerializeField]
         private Slider _energyBar;
 
-        [SerializeField]
-        private Image _fade;
+        public Image fadeScreen;
+
+        public Image swapIcon;
+
+        public Text levelName;
 
         [SerializeField]
         private Image[] _targetIcons;
@@ -31,10 +34,13 @@ namespace Atlanticide.UI
         [SerializeField]
         private List<Sprite> _toolImages;
 
+        private Canvas _canvas;
         private Vector2 _canvasSize;
         private Vector2 _uiOffset;
         private Camera _camera;
+        private InputController _input;
         private PauseScreen _pauseScreen;
+        private PlayerCharacter[] _players;
         private List<PlayerStatus> _playerStatuses;
         private Vector3[] _targetPositions;
 
@@ -43,6 +49,21 @@ namespace Atlanticide.UI
         /// </summary>
         private void Start()
         {
+            _canvas = GetComponent<Canvas>();
+            UpdateCanvasSize();
+            _camera = FindObjectOfType<CameraController>().GetComponent<Camera>();
+            _input = FindObjectOfType<InputController>();
+            _pauseScreen = GetComponentInChildren<PauseScreen>(true);
+
+            if (_pauseScreen != null)
+            {
+                _pauseScreen.Input = _input;
+            }
+
+            _players = GameManager.Instance.GetPlayers();
+            _playerStatuses = new List<PlayerStatus>();
+            _targetPositions = new Vector3[_targetIcons.Length];
+
             InitUI();
             UpdateScoreCounter();
         }
@@ -61,28 +82,39 @@ namespace Atlanticide.UI
         /// <summary>
         /// Initializes the UI.
         /// </summary>
-        private void InitUI()
+        public void InitUI()
         {
-            _canvasSize = GetComponent<Canvas>().pixelRect.size;
-            _uiOffset = new Vector2(-0.5f * _canvasSize.x, -0.5f * _canvasSize.y);
-            _camera = FindObjectOfType<CameraController>().GetComponent<Camera>();
-            _pauseScreen = GetComponentInChildren<PauseScreen>(true);
-            _targetPositions = new Vector3[_targetIcons.Length];
-            PlayerCharacter[] players = GameManager.Instance.GetPlayers();
-            _playerStatuses = new List<PlayerStatus>();
-
             if (GameManager.Instance.GameState == GameManager.State.Play)
             {
                 for (int i = 0; i < GameManager.Instance.PlayerCount; i++)
                 {
-                    PlayerStatus ps = Instantiate(_playerStatusPrefab, _playerStatusHandler);
-                    ps.SetToolImage(_toolImages[(int) players[i].Tool]);
-                    ps.SetPlayerName(players[i].name);
-                    _playerStatuses.Add(ps);
+                    CreatePlayerStatusUIElement(_players[i]);
                 }
 
                 UpdateEnergyBar(0f);
             }
+        }
+
+        private PlayerStatus CreatePlayerStatusUIElement(PlayerCharacter player)
+        {
+            PlayerStatus ps = Instantiate(_playerStatusPrefab, _playerStatusHandler);
+            ps.SetToolImage(_toolImages[(int) player.Tool]);
+            ps.SetPlayerName(player.name);
+            _playerStatuses.Add(ps);
+            return ps;
+        }
+
+        public void UpdateAll()
+        {
+            UpdatePlayerToolImages();
+            UpdateEnergyBar(World.Instance.GetEnergyRatio());
+            UpdateScoreCounter();
+        }
+
+        public void UpdateCanvasSize()
+        {
+            _canvasSize = _canvas.pixelRect.size;
+            _uiOffset = new Vector2(-0.5f * _canvasSize.x, -0.5f * _canvasSize.y);
         }
 
         /// <summary>
@@ -104,21 +136,30 @@ namespace Atlanticide.UI
 
         public void UpdatePlayerToolImage(int playerNum, PlayerTool tool)
         {
-            if (_playerStatuses != null && _playerStatuses[playerNum] != null)
+            if (_playerStatuses != null)
             {
+                if (playerNum >= _playerStatuses.Count)
+                {
+                    CreatePlayerStatusUIElement(_players[playerNum]);
+                }
+
                 _playerStatuses[playerNum].SetToolImage(_toolImages[(int) tool]);
             }
         }
 
-        public Image GetFade()
+        public void UpdatePlayerToolImages()
         {
-            return _fade;
+            for (int i = 0; i < _players.Length; i++)
+            {
+                UpdatePlayerToolImage(i, _players[i].Tool);
+            }
         }
 
         public void ActivatePauseScreen(bool activate, string playerName)
         {
-            _pauseScreen.gameObject.SetActive(activate);
+            UpdateCanvasSize();
             _pauseScreen.pausingPlayerText.text = playerName;
+            _pauseScreen.Activate(activate);
         }
 
         public void MoveUIObjToWorldPoint(Image uiObj,

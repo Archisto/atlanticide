@@ -39,6 +39,8 @@ namespace Atlanticide
             }
         }
 
+        public virtual bool Available { get; set; }
+
         public int EnergyCost { get; protected set; }
 
         public virtual bool ShowTargetIcon { get { return _showTargetIcon; } }
@@ -104,10 +106,12 @@ namespace Atlanticide
                     Interactor = null;
                 }
             }
-            else
-            {
-                Debug.LogWarning("The interactor is already null.");
-            }
+            // TODO: Should this method ever be called without
+            // checking if an interactor exists first?
+            //else
+            //{
+            //    Debug.LogWarning("The interactor is already null.");
+            //}
         }
 
         /// <summary>

@@ -1588,26 +1588,6 @@ Prefab:
       propertyPath: m_RootOrder
       value: 2
       objectReference: {fileID: 0}
-    - target: {fileID: 4525349788122696, guid: b321307b1658fb1428ad3f189be73bcb, type: 2}
-      propertyPath: m_LocalPosition.x
-      value: -1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4525349788122696, guid: b321307b1658fb1428ad3f189be73bcb, type: 2}
-      propertyPath: m_LocalPosition.y
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4525349788122696, guid: b321307b1658fb1428ad3f189be73bcb, type: 2}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4787080142380638, guid: b321307b1658fb1428ad3f189be73bcb, type: 2}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4787080142380638, guid: b321307b1658fb1428ad3f189be73bcb, type: 2}
-      propertyPath: m_LocalPosition.x
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 114666515403901816, guid: b321307b1658fb1428ad3f189be73bcb,
         type: 2}
       propertyPath: _swapIcon

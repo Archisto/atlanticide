@@ -49,7 +49,38 @@ namespace Atlanticide
         Shield_Bash = 24,
         Shield_Deflect_1 = 25,
         Shield_Deflect_2 = 26,
-        Lifting_Shield = 27
+        Lifting_Shield = 27,
+        Success = 28,
+        Failure = 29,
+        Spaceship_Passing = 30,
+        Mining_Orichalcum = 31,
+        People_Screaming = 32,
+        Cyclops_Exploding = 33,
+        Cyclops_Hovering = 34,
+        Cyclops_Laser_Start = 35,
+        Cyclops_Laser_Beam = 36,
+        Cyclops_Shortcircuit = 37,
+        Cyclops_Waking_Up = 38,
+        Distant_Explosions_1 = 39,
+        Distant_Explosions_2 = 40,
+        Explosion = 41,
+        Explosion_With_Rubble_1 = 42,
+        Explosion_With_Rubble_2 = 43,
+        Rubble = 44,
+        Rubble_And_Debris = 45,
+        Short_Explosion = 46,
+        Orichalcum_Before_Exploding = 47,
+        Setting_Trap = 48,
+        Springing_Trap = 49,
+        Elevator = 50,
+        Taking_Energy = 51,
+        Using_Energy = 52,
+        Using_Energy_On_Target = 53,
+        Heavy_Falling_To_Ground = 54,
+        Revive = 55,
+        Ground_Collapse = 56,
+        Dissolve = 57,
+        Projectile_1 = 58
     }
 
     public class SFXPlayer : MonoBehaviour
@@ -74,6 +105,7 @@ namespace Atlanticide
 
                     instance =
                         Instantiate(Resources.Load<SFXPlayer>("SFXPlayer"));
+                    instance.Init();
                 }
 
                 return instance;
@@ -300,6 +332,69 @@ namespace Atlanticide
             return audioSrc;
         }
 
+        public AudioSource PlayLooped(Sound sound)
+        {
+            return PlayLooped((int)sound);
+        }
+
+        public AudioSource PlayLooped(Sound sound, float pitch)
+        {
+            this.pitch = pitch;
+            return PlayLooped((int)sound);
+        }
+
+        public AudioSource PlayLooped(int soundNum)
+        {
+            if (soundNum >= 0 &&
+                soundNum < sounds.Count)
+            {
+                // Plays the sound
+                return PlayLooped(sounds[soundNum]);
+            }
+            else
+            {
+                Debug.LogError("[SoundPlayer]: The requested sound " +
+                               "clip cannot be played");
+            }
+
+            return null;
+        }
+
+        private AudioSource PlayLooped(AudioClip clip)
+        {
+            AudioSource audioSrc = GetAudioSrcFromPool();
+
+            // If there are no unused AudioSources
+            // and the pool's size is flexible, a
+            // new AudioSource is created
+            if (audioSrc == null && flexiblePoolSize)
+            {
+                audioSrc = IncreasePoolSize(1);
+                audioSrc.enabled = true;
+            }
+
+            // Plays a sound
+            if (audioSrc != null)
+            {
+                audioSrc.clip = clip;
+                audioSrc.volume = volume;
+                audioSrc.pitch = pitch;
+                audioSrc.loop = true;
+                audioSrc.Play();
+                //audioSrc.PlayOneShot(clip, volume);
+
+                pitch = 1;
+            }
+            // Otherwise prints debug data
+            //else
+            //{
+            //    Debug.Log("[SoundPlayer]: All AudioSources are being used " +
+            //              "and a new one could not be created");
+            //}
+
+            return audioSrc;
+        }
+
         /// <summary>
         /// Gets an unused AudioSource from the pool.
         /// </summary>
@@ -343,6 +438,20 @@ namespace Atlanticide
             {
                 audioSrc.Stop();
                 DeactivateAudioSrc(audioSrc);
+                audioSrc.loop = false;
+            }
+        }
+
+        public void StopIndividualSFX(string clipName)
+        {
+            foreach (AudioSource audioSrc in audioSrcPool)
+            {
+                if (audioSrc.enabled && audioSrc.clip.name == clipName)
+                {
+                    Debug.Log("Stopped sound effect " + audioSrc.clip.name);
+                    audioSrc.Stop();
+                    audioSrc.loop = false;
+                }
             }
         }
 

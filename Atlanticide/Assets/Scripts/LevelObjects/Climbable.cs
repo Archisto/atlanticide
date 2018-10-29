@@ -43,15 +43,16 @@ namespace Atlanticide
         }
 
         /// <summary>
-        /// Handles colliding with the player characters.
+        /// Handles colliding with a player character.
         /// </summary>
         /// <param name="collision">The collision</param>
         protected virtual void OnCollisionEnter(Collision collision)
         {
             foreach (ContactPoint cp in collision.contacts)
             {
-                PlayerCharacter pc = cp.otherCollider.gameObject.GetComponent<PlayerCharacter>();
-                if (pc != null && !pc.Climbing)
+                PlayerCharacter pc = cp.otherCollider.gameObject.
+                    GetComponentInParent<PlayerCharacter>();
+                if (pc != null)
                 {
                     pc.StartClimb(this);
                     break;

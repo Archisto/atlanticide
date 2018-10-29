@@ -10,6 +10,12 @@ namespace Atlanticide
         [SerializeField]
         private bool _allPlayersNeeded;
 
+        public float Range
+        {
+            get { return _range; }
+            set { _range = value; }
+        }
+
         /// <summary>
         /// Updates the object.
         /// </summary>

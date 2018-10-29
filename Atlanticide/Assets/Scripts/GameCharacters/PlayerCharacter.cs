@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Atlanticide.Persistence;
+using System;
 
 namespace Atlanticide
 {
@@ -11,11 +13,8 @@ namespace Atlanticide
         Shield = 2
     }
 
-    public class PlayerCharacter : GameCharacter
+    public class PlayerCharacter : GameCharacter, ISavable
     {
-        [SerializeField]
-        private Shield _shield;
-
         [SerializeField, Range(0.2f, 20f)]
         private float _jumpHeight = 1f;
 
@@ -25,8 +24,7 @@ namespace Atlanticide
         [SerializeField]
         private float _respawnTime = 1f;
 
-        private Weapon _weapon;
-        private EnergyCollector _energyCollector;
+        private Vector3 _size;
         private Climbable _climbable;
         private Interactable _interactionTarget;
         private float _jumpForce;
@@ -38,9 +36,11 @@ namespace Atlanticide
 
         public PlayerTool Tool { get; set; }
 
-        public EnergyCollector EnergyCollector { get { return _energyCollector; } }
+        public EnergyCollector EnergyCollector { get; private set; }
 
-        public Shield Shield { get { return _shield; } }
+        public Shield Shield { get; private set; }
+
+        public Animator Animator { get; private set; }
 
         public Interactable InteractionTarget
         {
@@ -62,20 +62,99 @@ namespace Atlanticide
 
         public bool Pushing { get; private set; }
 
+        public bool Respawning { get; set; }
+
+        #region Tool States
+
+        public bool ToolIsIdle
+        {
+            get
+            {
+                return EnergyCollectorIsIdle || ShieldIsIdle; 
+            }
+        }
+
+        public bool EnergyCollectorIsIdle
+        {
+            get
+            {
+                return (Tool == PlayerTool.EnergyCollector && EnergyCollector.IsIdle);
+            }
+        }
+
+        public bool EnergyCollectorIsEmitting
+        {
+            get
+            {
+                return (Tool == PlayerTool.EnergyCollector && EnergyCollector.IsEmitting);
+            }
+        }
+
+        public bool EnergyCollectorIsDraining
+        {
+            get
+            {
+                return (Tool == PlayerTool.EnergyCollector && EnergyCollector.IsDraining);
+            }
+        }
+
+        public bool ShieldIsIdle
+        {
+            get
+            {
+                return (Tool == PlayerTool.Shield && Shield.IsIdle);
+            }
+        }
+
         public bool ShieldIsActive
         {
             get
             {
-                return (Tool == PlayerTool.Shield && _shield.Active);
+                return (Tool == PlayerTool.Shield && Shield.Active);
             }
         }
 
-        public bool Respawning { get; set; }
+        public bool ShieldBlocksDamage
+        {
+            get
+            {
+                return (Tool == PlayerTool.Shield && Shield.BlocksDamage);
+            }
+        }
+
+        #endregion Tool States
 
         public bool IsAvailableForActions()
         {
             return (!IsDead && !IsImmobile && 
-                    !Climbing && !Pushing);
+                    !Climbing && !Pushing && ToolIsIdle);
+        }
+
+        private bool CanJump()
+        {
+            bool restrictions = Jumping || !_groundCollider.AbleToJump ||
+                !Shield.IsIdle;
+            bool permissions = Climbing;
+            return !restrictions || permissions;
+        }
+
+        private bool CanClimb()
+        {
+            bool restrictions = Climbing || !EnergyCollector.IsIdle ||
+                !Shield.IsIdle;
+            return !restrictions;
+        }
+
+        private bool CanUseEnergyCollector()
+        {
+            bool restrictions = Climbing;
+            return !restrictions;
+        }
+
+        private bool CanActivateShield()
+        {
+            bool restrictions = Climbing || Shield.Active;
+            return !restrictions;
         }
 
         /// <summary>
@@ -84,9 +163,12 @@ namespace Atlanticide
         protected override void Start()
         {
             base.Start();
-            _weapon = GetComponentInChildren<Weapon>();
-            _energyCollector = GetComponentInChildren<EnergyCollector>();
+            EnergyCollector = GetComponentInChildren<EnergyCollector>();
+            Shield = GetComponentInChildren<Shield>();
+            Animator = GetComponentInChildren<Animator>();
         }
+
+        #region Updating
 
         /// <summary>
         /// Updates the object once per frame.
@@ -104,71 +186,44 @@ namespace Atlanticide
         /// <summary>
         /// Moves the player character.
         /// </summary>
-        /// <param name="direction">The moving direction</param>
-        public void MoveInput(Vector3 direction)
+        /// <param name="input">Movement input</param>
+        private void Move(Vector3 input)
         {
-            if (!IsImmobile)
-            {
-                if (Climbing)
-                {
-                    Climb(direction);
-                }
-                else
-                {
-                    Move(direction);
-                }
-            }
-        }
+            float speed = _speed;
 
-        private void Move(Vector3 direction)
-        {
-            Vector3 movement = new Vector3(direction.x, 0, direction.y) * _speed * World.Instance.DeltaTime;
+            if (!Shield.IsIdle)
+            {
+                speed = _speed * Shield.PlayerSpeedModifier;
+            }
+            else
+            {
+                RotateTowards(input);
+            }
+
+            Vector3 movement = new Vector3(input.x, 0, input.y) * speed * World.Instance.DeltaTime;
             Vector3 newPosition = transform.position + movement * (Pushing ? 0.3f : 1f);
             transform.position = newPosition;
 
-            if (!ShieldIsActive)
-            {
-                RotateTowards(direction);
-            }
+            Animator.SetFloat("Horizontal", input.x);
+            Animator.SetFloat("Vertical", input.y);
+            Animator.speed = input.magnitude * (speed / _speed);
+
+            //if (!ShieldIsActive)
+            //{
+            //    RotateTowards(input);
+            //}
         }
 
         /// <summary>
-        /// Rotates the player character.
+        /// Updates the respawn timer.
         /// </summary>
-        /// <param name="direction">The looking direction</param>
-        public void LookInput(Vector3 direction)
+        private void UpdateRespawnTimer()
         {
-            if (ShieldIsActive)
+            _elapsedRespawnTime += World.Instance.DeltaTime;
+            if (_elapsedRespawnTime >= _respawnTime)
             {
-                RotateTowards(direction);
+                Respawn();
             }
-        }
-
-        /// <summary>
-        /// Makes the player character jump.
-        /// </summary>
-        /// <returns>Does the character jump</returns>
-        public bool Jump()
-        {
-            if ((!Jumping && _groundCollider.onGround) || Climbing)
-            {
-                if (Climbing)
-                {
-                    EndClimb();
-                }
-                if (Pushing)
-                {
-                    EndPush();
-                }
-
-                Jumping = true;
-                _jumpForce = _jumpHeight * 4;
-                _groundCollider.onGround = false;
-                SFXPlayer.Instance.Play(Sound.Jump_1);
-                return true;
-            }
-
-            return false;
         }
 
         /// <summary>
@@ -192,15 +247,38 @@ namespace Atlanticide
             }
         }
 
+        #endregion Updating
+
+        #region Input
+
         /// <summary>
-        /// Updates the respawn timer.
+        /// Moves the player character.
         /// </summary>
-        private void UpdateRespawnTimer()
+        /// <param name="input">The moving input</param>
+        public void MoveInput(Vector3 input)
         {
-            _elapsedRespawnTime += World.Instance.DeltaTime;
-            if (_elapsedRespawnTime >= _respawnTime)
+            if (!IsImmobile)
             {
-                Respawn();
+                if (Climbing)
+                {
+                    Climb(input);
+                }
+                else
+                {
+                    Move(input);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Rotates the player character.
+        /// </summary>
+        /// <param name="input">The looking direction</param>
+        public void LookInput(Vector3 input)
+        {
+            if (!ShieldIsIdle)
+            {
+                RotateTowards(input);
             }
         }
 
@@ -216,18 +294,39 @@ namespace Atlanticide
 
         public bool HandleActionInput()
         {
-            bool active = Input.GetActionInput();
+            bool inputHeld = false;
+            bool inputjustReleased = false;
+            bool active = Input.GetActionInput(out inputHeld, out inputjustReleased);
             bool result = false;
 
-            if (Tool == PlayerTool.EnergyCollector && active)
+            if (Tool == PlayerTool.EnergyCollector &&
+                CanUseEnergyCollector())
             {
                 // Drain
-                result = UseEnergyCollector(drain: true);
+                if (active)
+                {
+                    result = UseEnergyCollector(drain: true);
+                }
             }
-            else if (Tool == PlayerTool.Shield)
+            else if (Tool == PlayerTool.Shield &&
+                (Shield.Active || CanActivateShield()))
             {
-                UseShield(active);
-                result = active;
+                // Open the shield if the action button is held down
+                if (inputHeld && !Shield.Active)
+                {
+                    Shield.Activate(true);
+                }
+                // Open or close the shield if pressed once,
+                // close if released after holding
+                else if (inputjustReleased)
+                {
+                    Shield.Activate(!Shield.Active);
+                }
+
+                // Starts shield opening/closing animation
+                //Animator.SetBool("Shield Active", Shield.Active);
+
+                result = !Shield.IsIdle;
             }
 
             return result;
@@ -240,7 +339,8 @@ namespace Atlanticide
 
             if (active)
             {
-                if (Tool == PlayerTool.EnergyCollector)
+                if (Tool == PlayerTool.EnergyCollector &&
+                    CanUseEnergyCollector())
                 {
                     // Emit
                     result = UseEnergyCollector(drain: false);
@@ -252,6 +352,28 @@ namespace Atlanticide
             }
 
             return result;
+        }
+
+        /// <summary>
+        /// Handles changing the player character's stance.
+        /// Only the player with shield can change stance
+        /// by raising the shield above his/her head.
+        /// </summary>
+        /// <returns>Does the stance change</returns>
+        public bool HandleStanceInput()
+        {
+            if (Tool == PlayerTool.Shield &&
+                (Shield.BlocksDamage || Shield.Raised))
+            {
+                bool input = Input.GetStanceInput();
+                if (input)
+                {
+                    Shield.RaiseAboveHead(!Shield.Raised);
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         /// <summary>
@@ -289,18 +411,10 @@ namespace Atlanticide
         public bool CheckToolSwapInput()
         {
             bool input = Input.GetToolSwapInput();
-            return (input && _energyCollector.IsIdle && _shield.IsIdle);
+            return (input && ToolIsIdle);
         }
 
-        /// <summary>
-        /// Opens or closes the shield.
-        /// </summary>
-        /// <param name="activate">Should the shield be activated</param>
-        /// <returns></returns>
-        private bool UseShield(bool activate)
-        {
-            return _shield.Activate(activate);
-        }
+        #endregion Input
 
         /// <summary>
         /// Uses the energy collector for draining or emitting energy.
@@ -311,15 +425,15 @@ namespace Atlanticide
         public bool UseEnergyCollector(bool drain)
         {
             bool result = false;
-            if (_energyCollector != null)
+            if (EnergyCollector != null && EnergyCollector.IsIdle)
             {
                 if (drain)
                 {
-                    result = _energyCollector.TryDraining();
+                    result = EnergyCollector.TryDraining();
                 }
                 else
                 {
-                    result = _energyCollector.TryEmitting();
+                    result = EnergyCollector.TryEmitting();
                 }
             }
 
@@ -327,25 +441,41 @@ namespace Atlanticide
         }
 
         /// <summary>
-        /// Fires the player character's weapon.
+        /// Makes the player character jump.
         /// </summary>
-        public void FireWeapon()
+        /// <returns>Does the character jump</returns>
+        public bool Jump()
         {
-            if (_weapon != null)
+            if (CanJump())
             {
-                _weapon.Fire();
+                if (Climbing)
+                {
+                    EndClimb();
+                }
+                if (Pushing)
+                {
+                    EndPush();
+                }
+
+                Jumping = true;
+                _jumpForce = _jumpHeight * 4;
+                _groundCollider.JumpOffGround();
+                SFXPlayer.Instance.Play(Sound.Jump_1);
+                return true;
             }
+
+            return false;
         }
 
         public void StartClimb(Climbable climbable)
         {
-            if (!Climbing)
+            if (CanClimb())
             {
                 Debug.Log(name + " started climbing " + climbable.name);
                 Climbing = true;
                 _climbable = climbable;
 
-                SFXPlayer.Instance.Play(Sound.Climbing_Slower);
+                SFXPlayer.Instance.PlayLooped(Sound.Climbing_Slower);
             }
         }
 
@@ -357,19 +487,19 @@ namespace Atlanticide
                 Climbing = false;
                 _climbable = null;
 
-                SFXPlayer.Instance.StopAllSFXPlayback();
+                SFXPlayer.Instance.StopIndividualSFX("Climbing Pillar (Shorter)");
             }
         }
 
-        private void Climb(Vector3 direction)
+        private void Climb(Vector3 input)
         {
             Vector3 movement = Vector3.zero;
-            movement.y = direction.y * _climbSpeed * World.Instance.DeltaTime;
+            movement.y = input.y * _climbSpeed * World.Instance.DeltaTime;
             float climbProgress = _climbable.GetClimbProgress(transform.position + movement);
 
             transform.position = _climbable.GetPositionOnClimbable(climbProgress);
 
-            if ((climbProgress >= 1 && direction.y > 0) || (climbProgress <= 0 && direction.y < 0))
+            if ((climbProgress >= 1 && input.y > 0) || (climbProgress <= 0 && input.y < 0))
             {
                 EndClimb();
             }
@@ -478,6 +608,46 @@ namespace Atlanticide
             Respawn();
         }
 
+        #region Persistence
+
+        /// <summary>
+        /// Returns the object's save data.
+        /// </summary>
+        public ISaveData GetSaveData()
+        {
+            return new PlayerData
+            {
+                ID = ID,
+                Tool = Tool
+            };
+        }
+
+        /// <summary>
+        /// Sets the object's values from the save data.
+        /// </summary>
+        /// <param name="data">Save data</param>
+        public void SetData(ISaveData data)
+        {
+            PlayerData playerData = (PlayerData) data;
+            if (playerData != null)
+            {
+                Tool = playerData.Tool;
+            }
+        }
+
+        /// <summary>
+        /// Returns the correct save data type.
+        /// </summary>
+        /// <returns>The save data type</returns>
+        public Type GetSaveDataType()
+        {
+            return typeof(PlayerData);
+        }
+
+        #endregion Persistence
+
+        #region Reseting
+
         /// <summary>
         /// Resets the player character's base values when respawning.
         /// </summary>
@@ -487,11 +657,15 @@ namespace Atlanticide
             Jumping = false;
             Respawning = false;
             _elapsedRespawnTime = 0f;
-            UseShield(false);
-            
-            if (_energyCollector != null)
+
+            if (EnergyCollector != null)
             {
-                _energyCollector.ResetEnergyCollector();
+                EnergyCollector.ResetEnergyCollector();
+            }
+
+            if (Shield != null)
+            {
+                Shield.ResetShield();
             }
         }
 
@@ -501,14 +675,30 @@ namespace Atlanticide
         public override void CancelActions()
         {
             base.CancelActions();
+            Input.ResetInput();
+            ResetAnimatorMovementAxis();
             Jumping = false;
             Respawning = false;
-            _shield.ResetShield();
-            _energyCollector.ResetEnergyCollector();
+            EnergyCollector.ResetEnergyCollector();
+            Shield.ResetShield();
             EndClimb();
             EndPush();
             InteractionTarget = null;
         }
+
+        /// <summary>
+        /// Resets the animator's movement axis', so the character stops walking.
+        /// </summary>
+        public void ResetAnimatorMovementAxis()
+        {
+            if (Animator != null)
+            {
+                Animator.SetFloat("Horizontal", 0f);
+                Animator.SetFloat("Vertical", 0f);
+            }
+        }
+
+        #endregion Reseting
 
         protected override void OnDrawGizmos()
         {

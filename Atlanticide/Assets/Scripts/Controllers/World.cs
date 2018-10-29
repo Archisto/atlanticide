@@ -31,11 +31,11 @@ namespace Atlanticide
         public float gravity = 1f;
         public float pushSpeed = 1f;
 
-        [SerializeField, Range(0.1f, 5f)]
-        public float telegrabRadius = 1f;
+        [Range(0f, 1f)]
+        public float minWalkingSpeedPercentage = 0.2f;
 
         [SerializeField, Range(0.1f, 5f)]
-        public float energyCollectRadius = 1f;
+        public float telegrabRadius = 1f;
 
         [SerializeField, Range(1, 20)]
         private int _maxEnergyCharges = 5;
@@ -62,6 +62,16 @@ namespace Atlanticide
         }
 
         public bool ShieldBashing { get; set; }
+
+        public bool EnergyCollectorIsActive
+        {
+            get { return DrainingEnergy || EmittingEnergy; }
+        }
+
+        public bool EmittingEnergy { get; set; }
+
+        public bool DrainingEnergy { get; set; }
+
 
         /// <summary>
         /// Initializes the singleton instance.
@@ -152,10 +162,15 @@ namespace Atlanticide
         public void SetEnergyChargesAndUpdateUI(int charges)
         {
             CurrentEnergyCharges = Utils.Clamp(charges, 0, MaxEnergyCharges);
-            float ratio = (float) CurrentEnergyCharges / MaxEnergyCharges;
+            float ratio = GetEnergyRatio();
             _ui.UpdateEnergyBar(ratio);
-            Debug.Log(string.Format("Energy charges: {0} ({1} %)",
-                CurrentEnergyCharges, ratio * 100));
+            //Debug.Log(string.Format("Energy charges: {0} ({1} %)",
+            //    CurrentEnergyCharges, ratio * 100));
+        }
+
+        public float GetEnergyRatio()
+        {
+            return (float) CurrentEnergyCharges / MaxEnergyCharges;
         }
 
         /// <summary>
@@ -163,8 +178,11 @@ namespace Atlanticide
         /// </summary>
         public void ResetWorld()
         {
-            CurrentEnergyCharges = 0;
+            SetEnergyChargesAndUpdateUI(0);
             keyCodes.Clear();
+            EmittingEnergy = false;
+            ShieldBashing = false;
+            DrainingEnergy = false;
         }
     }
 }

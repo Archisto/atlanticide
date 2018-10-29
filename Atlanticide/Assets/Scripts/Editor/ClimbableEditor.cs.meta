@@ -1,5 +1,8 @@
 fileFormatVersion: 2
 guid: 8caebba8ec3479d46a6e1e9939b54d8e
+labels:
+- Editor
+- LevelObject
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2

@@ -6,6 +6,8 @@ TagManager:
   tags:
   - Invisible
   - NoCollision
+  - Slope
+  - Moving
   layers:
   - Default
   - TransparentFX
@@ -21,7 +23,7 @@ TagManager:
   - Projectile
   - Pickup
   - Interactable
-  - 
+  - Hitbox
   - 
   - 
   - 

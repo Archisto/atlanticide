@@ -1,7 +1,8 @@
 ﻿using System;
-using System.Collections;
+using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
+using Atlanticide.Persistence;
 
 namespace Atlanticide
 {
@@ -14,16 +15,33 @@ namespace Atlanticide
             Z
         }
 
+        /// <summary>
+        /// Returns string "{objectName} is not set."
+        /// </summary>
+        /// <param name="obj">An object</param>
+        /// <returns>A string</returns>
         public static string GetFieldNullString(string obj)
         {
             return string.Format("{0} is not set.", obj);
         }
 
+        /// <summary>
+        /// Returns string
+        /// "An instance of {objectName} could not be found in the scene."
+        /// </summary>
+        /// <param name="obj">An object</param>
+        /// <returns>A string</returns>
         public static string GetObjectMissingString(string obj)
         {
             return string.Format("An instance of {0} could not be found in the scene.", obj);
         }
 
+        /// <summary>
+        /// Returns string
+        /// "Component {componentName} could not be found in the object."
+        /// </summary>
+        /// <param name="comp">A component</param>
+        /// <returns>A string</returns>
         public static string GetComponentMissingString(string comp)
         {
             return string.Format("Component {0} could not be found in the object.", comp);
@@ -90,20 +108,6 @@ namespace Atlanticide
         }
 
         /// <summary>
-        /// Invokes an action on each item of the array.
-        /// </summary>
-        /// <param name="array">An array</param>
-        /// <param name="action">An action</param>
-        /// <typeparam name="T">A type</typeparam>
-        public static void ForEach<T>(this T[] array, Action<T> action)
-        {
-            foreach (T obj in array)
-            {
-                action(obj);
-            }
-        }
-
-        /// <summary>
         /// Sets the value of the preference identified by key.
         /// </summary>
         /// <param name="key">The key</param>
@@ -124,6 +128,20 @@ namespace Atlanticide
             return (value == 1);
         }
 
+        /// <summary>
+        /// Invokes an action on each item of the array.
+        /// </summary>
+        /// <param name="array">An array</param>
+        /// <param name="action">An action</param>
+        /// <typeparam name="T">A type</typeparam>
+        public static void ForEach<T>(this T[] array, Action<T> action)
+        {
+            foreach (T obj in array)
+            {
+                action(obj);
+            }
+        }
+
         public static bool AddIfNew<T>(this List<T> list, T itemToAdd)
         {
             foreach (T item in list)
@@ -136,6 +154,52 @@ namespace Atlanticide
 
             list.Add(itemToAdd);
             return true;
+        }
+
+        public static void TrySetData<TSavable, TSaveData>(TSavable[] savables,
+                                                           List<TSaveData> dataList,
+                                                           bool checkID)
+            where TSavable : ISavable
+            where TSaveData : ISaveData
+        {
+            if (savables.Length == 0 || dataList.Count == 0 ||
+                savables.Length != dataList.Count)
+            {
+                Debug.LogWarning(string.Format
+                    ("Savables: {0}. Data list count: {1}.",
+                    savables.Length,
+                    dataList.Count));
+                return;
+            }
+            else if (savables[0].GetSaveDataType() != typeof(TSaveData))
+            {
+                Debug.LogError(string.Format
+                    ("Incompatible save data types: {0} and {1}",
+                    savables[0].GetSaveDataType(),
+                    typeof(TSaveData)));
+                return;
+            }
+
+            for (int i = 0; i < dataList.Count; i++)
+            {
+                TSavable savable = savables[i];
+                ISaveData data = dataList[i];
+
+                if (checkID)
+                {
+                    savable = savables.FirstOrDefault
+                        (sav => sav.ID == data.ID);
+
+                    if (savable != null)
+                    {
+                        savable.SetData(data);
+                    }
+                }
+                else
+                {
+                    savable.SetData(data);
+                }
+            }
         }
 
         public static Vector3 GetRotationOnAxis(Axis axis, float angle)
@@ -245,11 +309,47 @@ namespace Atlanticide
             }
         }
 
+        public static bool Between(float value, float min, float max)
+        {
+            return value >= min && value <= max;
+        }
+
         public static float DistanceTo(this MonoBehaviour obj,
                                        MonoBehaviour target)
         {
             return Vector3.Distance
                 (obj.transform.position, target.transform.position);
+        }
+
+        public static bool WithinRangeBox(Vector3 position,
+                                          Vector3 boxCorner1,
+                                          Vector3 boxCorner2)
+        {
+            return Between(position.x, boxCorner1.x, boxCorner2.x) &&
+                   Between(position.y, boxCorner1.y, boxCorner2.y) &&
+                   Between(position.z, boxCorner1.z, boxCorner2.z);
+        }
+
+        public static void DrawBoxGizmo(Vector3 boxCorner1, Vector3 boxCorner2)
+        {
+            Vector3 p1 = new Vector3(boxCorner2.x, boxCorner1.y, boxCorner1.z);
+            Vector3 p2 = new Vector3(boxCorner1.x, boxCorner2.y, boxCorner1.z);
+            Vector3 p3 = new Vector3(boxCorner1.x, boxCorner1.y, boxCorner2.z);
+            Vector3 p4 = new Vector3(boxCorner2.x, boxCorner2.y, boxCorner1.z);
+            Vector3 p5 = new Vector3(boxCorner2.x, boxCorner1.y, boxCorner2.z);
+            Vector3 p6 = new Vector3(boxCorner1.x, boxCorner2.y, boxCorner2.z);
+            Gizmos.DrawLine(boxCorner1, p1);
+            Gizmos.DrawLine(boxCorner1, p2);
+            Gizmos.DrawLine(boxCorner1, p3);
+            Gizmos.DrawLine(p1, p4);
+            Gizmos.DrawLine(p1, p5);
+            Gizmos.DrawLine(p2, p4);
+            Gizmos.DrawLine(p2, p6);
+            Gizmos.DrawLine(p3, p5);
+            Gizmos.DrawLine(p3, p6);
+            Gizmos.DrawLine(p4, boxCorner2);
+            Gizmos.DrawLine(p5, boxCorner2);
+            Gizmos.DrawLine(p6, boxCorner2);
         }
 
         public static void DrawProgressBarGizmo(Vector3 position, float progress, Color barColor, Color indicatorColor)
@@ -267,7 +367,7 @@ namespace Atlanticide
             Gizmos.DrawLine(pos3, pos4);
         }
 
-        public static void DrawHPGizmo(Vector3 position, int hitpoints, int maxHitpoints, Color color)
+        public static void DrawDotGizmos(Vector3 position, int dots, int maxDots, Color color)
         {
             Gizmos.color = color;
             float spacing = 0.8f;
@@ -277,12 +377,24 @@ namespace Atlanticide
                 new Vector3(-0.5f * lineLength * spacing, -0.4f * spacing, 0); 
             Gizmos.DrawLine(lineStart, lineStart + Vector3.right * lineLength * spacing);
         
-            position.x -= 0.5f * (maxHitpoints - 1) * spacing;
-            for (int i = 0; i < hitpoints; i++)
+            position.x -= 0.5f * (maxDots - 1) * spacing;
+            for (int i = 0; i < dots; i++)
             {
                 Gizmos.DrawSphere(position, 0.2f);
                 position.x += spacing;
             }
         }
+
+        [Serializable]
+        public struct IntVector2
+        {
+            public IntVector2(int x, int y)
+            {
+                this.x = x;
+                this.y = y;
+            }
+            public int x, y;
+        }
+
     }
 }

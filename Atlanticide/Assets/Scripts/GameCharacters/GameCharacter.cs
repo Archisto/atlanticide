@@ -16,6 +16,9 @@ namespace Atlanticide
         [SerializeField]
         protected int _maxHitpoints = 3;
 
+        [SerializeField]
+        protected GameObject _characterBody;
+
         protected int _hitpoints;
         protected Vector3 _characterSize;
         protected GroundCollider _groundCollider;
@@ -31,14 +34,23 @@ namespace Atlanticide
         public Vector3 Size { get { return _characterSize; } }
 
         /// <summary>
+        /// Testing; only needed if player count can be changed from 2.
+        /// Returns whether the player character object is active.
+        /// </summary>
+        public bool Exists
+        {
+            get { return gameObject.activeSelf; }
+        }
+
+        /// <summary>
         /// Initializes the object.
         /// </summary>
         protected virtual void Start()
         {
             ResetBaseValues();
             RespawnPosition = transform.position;
-            _characterSize = GetComponent<Collider>().bounds.size;
-            _groundCollider = GetComponent<GroundCollider>();
+            _characterSize = _characterBody.GetComponent<Collider>().bounds.size;
+            _groundCollider = _characterBody.GetComponent<GroundCollider>();
         }
 
         /// <summary>
@@ -52,15 +64,15 @@ namespace Atlanticide
             }
         }
 
-        protected virtual void LookTowards(Vector3 direction)
+        protected virtual void LookTowards(Vector3 input)
         {
-            direction = new Vector3(direction.x, 0, direction.y);
+            Vector3 direction = new Vector3(input.x, 0, input.y);
             transform.rotation = Quaternion.LookRotation(direction, Vector3.up);
         }
 
-        protected virtual void RotateTowards(Vector3 direction)
+        protected virtual void RotateTowards(Vector3 input)
         {
-            direction = new Vector3(direction.x, 0, direction.y);
+            Vector3 direction = new Vector3(input.x, 0, input.y);
             transform.rotation = Utils.RotateTowards(transform.rotation, direction, _turningSpeed);
         }
 
@@ -71,13 +83,16 @@ namespace Atlanticide
         /// <returns>Does the character die.</returns>
         public virtual bool TakeDamage(int damage)
         {
-            _hitpoints -= damage;
-
-            if (_hitpoints <= 0)
+            if (!IsInvulnerable)
             {
-                _hitpoints = 0;
-                Kill();
-                return true;
+                _hitpoints -= damage;
+
+                if (_hitpoints <= 0)
+                {
+                    _hitpoints = 0;
+                    Kill();
+                    return true;
+                }
             }
 
             return false;
@@ -112,6 +127,7 @@ namespace Atlanticide
         protected virtual void ResetBaseValues()
         {
             IsDead = false;
+            IsImmobile = false;
             _hitpoints = _maxHitpoints;
             ResetGroundCollider();
         }
@@ -142,16 +158,6 @@ namespace Atlanticide
         /// </summary>
         protected virtual void OnDrawGizmos()
         {
-            // Character dimensions
-            Gizmos.color = Color.blue;
-            Vector3 p1 = transform.position + -0.5f * _characterSize;
-            Vector3 p2 = transform.position + new Vector3(-0.5f * _characterSize.x, -0.5f * _characterSize.y, 0.5f * _characterSize.z);
-            Vector3 p3 = transform.position + new Vector3(0.5f * _characterSize.x, -0.5f * _characterSize.y, 0.5f * _characterSize.z);
-            Vector3 p4 = transform.position + new Vector3(0.5f * _characterSize.x, -0.5f * _characterSize.y, -0.5f * _characterSize.z);
-            Gizmos.DrawLine(p1, p2);
-            Gizmos.DrawLine(p2, p3);
-            Gizmos.DrawLine(p3, p4);
-            Gizmos.DrawLine(p4, p1);
         }
     }
 }

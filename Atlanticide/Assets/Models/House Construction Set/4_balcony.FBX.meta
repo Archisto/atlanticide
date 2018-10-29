@@ -1,0 +1,167 @@
+fileFormatVersion: 2
+guid: 833fee564694be746a5c22c526d48c09
+ModelImporter:
+  serializedVersion: 23
+  fileIDToRecycleName:
+    100000: //RootNode
+    100002: balcony_floor
+    100004: balcony_railing
+    100006: balcony_railing_support
+    100008: balcony_railing_support001
+    100010: balcony_railing_support002
+    100012: balcony_railing_support003
+    100014: balcony_railing_support004
+    100016: balcony_railing_support005
+    100018: balcony_railing_support006
+    100020: balcony_railing_support007
+    100022: balcony_railing_support008
+    100024: pillar
+    100026: pillar_base
+    100028: pillar_support
+    100030: pillar_cap
+    400000: //RootNode
+    400002: balcony_floor
+    400004: balcony_railing
+    400006: balcony_railing_support
+    400008: balcony_railing_support001
+    400010: balcony_railing_support002
+    400012: balcony_railing_support003
+    400014: balcony_railing_support004
+    400016: balcony_railing_support005
+    400018: balcony_railing_support006
+    400020: balcony_railing_support007
+    400022: balcony_railing_support008
+    400024: pillar
+    400026: pillar_base
+    400028: pillar_support
+    400030: pillar_cap
+    2100000: stucco
+    2100002: 07 - Default
+    2300000: balcony_floor
+    2300002: balcony_railing
+    2300004: balcony_railing_support
+    2300006: balcony_railing_support001
+    2300008: balcony_railing_support002
+    2300010: balcony_railing_support003
+    2300012: balcony_railing_support004
+    2300014: balcony_railing_support005
+    2300016: balcony_railing_support006
+    2300018: balcony_railing_support007
+    2300020: balcony_railing_support008
+    2300022: pillar
+    2300024: pillar_base
+    2300026: pillar_support
+    2300028: pillar_cap
+    3300000: balcony_floor
+    3300002: balcony_railing
+    3300004: balcony_railing_support
+    3300006: balcony_railing_support001
+    3300008: balcony_railing_support002
+    3300010: balcony_railing_support003
+    3300012: balcony_railing_support004
+    3300014: balcony_railing_support005
+    3300016: balcony_railing_support006
+    3300018: balcony_railing_support007
+    3300020: balcony_railing_support008
+    3300022: pillar
+    3300024: pillar_base
+    3300026: pillar_support
+    3300028: pillar_cap
+    4300000: pillar_base
+    4300002: pillar
+    4300004: pillar_support
+    4300006: balcony_floor
+    4300008: balcony_railing_support002
+    4300010: balcony_railing_support
+    4300012: balcony_railing_support001
+    4300014: balcony_railing_support006
+    4300016: balcony_railing_support007
+    4300018: balcony_railing_support008
+    4300020: balcony_railing_support003
+    4300022: balcony_railing_support004
+    4300024: balcony_railing_support005
+    4300026: balcony_railing
+    4300028: pillar_cap
+  externalObjects: {}
+  materials:
+    importMaterials: 0
+    materialName: 0
+    materialSearch: 1
+    materialLocation: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    motionNodeName: 
+    rigImportErrors: 
+    rigImportWarnings: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    importAnimatedCustomProperties: 0
+    importConstraints: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    extraUserProperties: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    importVisibility: 1
+    importBlendShapes: 1
+    importCameras: 1
+    importLights: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    preserveHierarchy: 0
+    indexFormat: 0
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+    previousCalculatedGlobalScale: 1
+    hasPreviousCalculatedGlobalScale: 0
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+    normalCalculationMode: 4
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    serializedVersion: 2
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    rootMotionBoneName: 
+    rootMotionBoneRotation: {x: 0, y: 0, z: 0, w: 1}
+    hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 0
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

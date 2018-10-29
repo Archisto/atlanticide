@@ -17,9 +17,6 @@ namespace Atlanticide
         [SerializeField, Range(1f, 50f)]
         private float _swapRange = 5f;
 
-        [SerializeField]
-        private Image _swapIcon;
-
         [SerializeField, Range(0f, 10f)]
         private float _iconDistFromPlayerHead = 1f;
 
@@ -32,6 +29,7 @@ namespace Atlanticide
         private PlayerCharacter[] _players;
         private PlayerCharacter _requestingPlayer;
         private UIController _ui;
+        private Image _swapIcon;
         private float _elapsedTime;
 
         /// <summary>
@@ -69,7 +67,7 @@ namespace Atlanticide
         {
             _players = GameManager.Instance.GetPlayers();
             _ui = FindObjectOfType<UIController>();
-
+            _swapIcon = _ui.swapIcon;
             if (_swapIcon != null)
             {
                 _swapIcon.gameObject.SetActive(false);
@@ -222,7 +220,7 @@ namespace Atlanticide
             Debug.Log(string.Format("Swapped tools - {0} gets {2} and {1} gets {3}",
                 _players[0].name, _players[1].name, pt2, pt1));
 
-            GameManager.Instance.SetPlayerTools(saveCurrent: true);
+            GameManager.Instance.SavePlayerTools();
         }
 
         /// <summary>

@@ -1,7 +1,7 @@
 fileFormatVersion: 2
 guid: 7a63f9564a5e45e46bbffb9e780c9ea5
-timeCreated: 1536316014
-licenseType: Free
+labels:
+- Controller
 NativeFormatImporter:
   externalObjects: {}
   mainObjectFileID: 100100000

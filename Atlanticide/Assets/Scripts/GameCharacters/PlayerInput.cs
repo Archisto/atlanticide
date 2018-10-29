@@ -5,31 +5,28 @@ using UnityEngine;
 namespace Atlanticide
 {
     /// <summary>
-    /// The input device: the keyboard or a gamepad.
-    /// </summary>
-    public enum InputDevice
-    {
-        Keyboard = 0,
-        Gamepad1 = 1,
-        Gamepad2 = 2,
-        Gamepad3 = 3
-    }
-
-    /// <summary>
     /// Handles player input.
     /// </summary>
     public class PlayerInput
     {
+        private float _holdTime = 0.3f;
+
         private string _horizontalMoveKey;
         private string _verticalMoveKey;
         private string _horizontalLookKey;
         private string _verticalLookKey;
         private string _actionKey;
         private string _altActionKey;
+        private string _stanceKey;
         private string _interactKey;
         private string _jumpKey;
         private string _toolSwapKey;
         private string _pauseKey;
+
+        private HoldInput _holdActionInput;
+
+        public string HorizontalMenuKey { get; private set; }
+        public string VerticalMenuKey { get; private set; }
 
         private InputDevice _inputDevice;
         public InputDevice InputDevice
@@ -53,8 +50,31 @@ namespace Atlanticide
         {
             if (playerNum >= 0 && playerNum <= 3)
             {
+                // Testing PS controller
+                //if (playerNum != 0)
+                //{
+                //    playerNum = 2;
+                //}
                 InputDevice = (InputDevice) playerNum;
             }
+
+            InitHoldInput(_holdTime);
+        }
+
+        /// <summary>
+        /// Creates the player input.
+        /// </summary>
+        /// <param name="inputDevice">An input device</param>
+        public PlayerInput(InputDevice inputDevice)
+        {
+            InputDevice = inputDevice;
+            InitHoldInput(_holdTime);
+        }
+
+        public void InitHoldInput(float holdTime)
+        {
+            _holdTime = holdTime;
+            _holdActionInput = new HoldInput(holdTime);
         }
 
         /// <summary>
@@ -68,10 +88,14 @@ namespace Atlanticide
             _verticalLookKey = "VerticalLook" + InputDevice.ToString();
             _actionKey = "Action" + InputDevice.ToString();
             _altActionKey = "AltAction" + InputDevice.ToString();
+            _stanceKey = "Stance" + InputDevice.ToString();
             _interactKey = "Interact" + InputDevice.ToString();
             _jumpKey = "Jump" + InputDevice.ToString();
             _toolSwapKey = "ToolSwap" + InputDevice.ToString();
             _pauseKey = "Pause" + InputDevice.ToString();
+
+            HorizontalMenuKey = "HorizontalMenu" + InputDevice.ToString();
+            VerticalMenuKey = "VerticalMenu" + InputDevice.ToString();
         }
 
         /// <summary>
@@ -100,9 +124,12 @@ namespace Atlanticide
         /// Gets the player's action input.
         /// </summary>
         /// <returns>Is the action input pressed</returns>
-        public bool GetActionInput()
+        public bool GetActionInput(out bool inputHeld, out bool inputjustReleased)
         {
-            return Input.GetButton(_actionKey) || Input.GetAxis(_actionKey) == 1;
+            bool input = Input.GetButton(_actionKey) || Input.GetAxis(_actionKey) == 1;
+            inputHeld = _holdActionInput.InputIsHeld(input);
+            inputjustReleased = _holdActionInput.InputJustReleased;
+            return input;
         }
 
         /// <summary>
@@ -112,6 +139,15 @@ namespace Atlanticide
         public bool GetAltActionInput()
         {
             return Input.GetButton(_altActionKey) || Input.GetAxis(_altActionKey) == 1;
+        }
+
+        /// <summary>
+        /// Gets the player's stance input.
+        /// </summary>
+        /// <returns>Is the stance input pressed</returns>
+        public bool GetStanceInput()
+        {
+            return Input.GetButtonDown(_stanceKey);
         }
 
         /// <summary>
@@ -148,6 +184,26 @@ namespace Atlanticide
         public bool GetPauseInput()
         {
             return Input.GetButtonDown(_pauseKey);
+        }
+
+        public bool GetPressStartInput()
+        {
+            bool pressedEnterKey = false;
+
+            if (InputDevice == InputDevice.Keyboard)
+            {
+                if (Input.GetKeyDown(KeyCode.Return))
+                {
+                    pressedEnterKey = true;
+                }
+            }
+
+            return Input.GetButtonDown(_jumpKey) || Input.GetButtonDown(_pauseKey) || pressedEnterKey;
+        }
+
+        public void ResetInput()
+        {
+            _holdActionInput.ResetHold();
         }
     }
 }
