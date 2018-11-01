@@ -120,8 +120,8 @@ namespace Atlanticide
 
         private float GetMinSpeedTo1MovementFactor(float moveMagnitude)
         {
-            float minSpeed = World.Instance.minWalkingSpeedPercentage;
-            float result = minSpeed + (1 - minSpeed) *
+            float minSpeedRatio = World.Instance.minWalkingSpeedRatio;
+            float result = minSpeedRatio + (1 - minSpeedRatio) *
                 ((moveMagnitude - _inputDeadZone) / (1 - _inputDeadZone));
             return (result > 1f ? 1f : result);
         }
@@ -274,8 +274,8 @@ namespace Atlanticide
                     bool noclip = false;
                     foreach (PlayerCharacter player in _players)
                     {
-                        WallCollider wc = player.GetComponent<WallCollider>();
-                        GroundCollider gc = player.GetComponent<GroundCollider>();
+                        WallCollider wc = player.GetComponentInChildren<WallCollider>();
+                        GroundCollider gc = player.GetComponentInChildren<GroundCollider>();
                         noclip = wc.enabled;
                         wc.enabled = !noclip;
                         gc.enabled = !noclip;

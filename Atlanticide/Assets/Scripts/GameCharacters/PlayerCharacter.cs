@@ -24,6 +24,7 @@ namespace Atlanticide
         [SerializeField]
         private float _respawnTime = 1f;
 
+        PlayerCharacter _otherPlayer;
         private Vector3 _size;
         private Climbable _climbable;
         private Interactable _interactionTarget;
@@ -39,6 +40,8 @@ namespace Atlanticide
         public EnergyCollector EnergyCollector { get; private set; }
 
         public Shield Shield { get; private set; }
+
+        public LinkBeam LinkBeam { get; private set; }
 
         public Animator Animator { get; private set; }
 
@@ -157,6 +160,12 @@ namespace Atlanticide
             return !restrictions;
         }
 
+        private bool CanActivateLink()
+        {
+            bool restrictions = Climbing || LinkBeam.Active;
+            return !restrictions;
+        }
+
         /// <summary>
         /// Initializes the object.
         /// </summary>
@@ -165,7 +174,10 @@ namespace Atlanticide
             base.Start();
             EnergyCollector = GetComponentInChildren<EnergyCollector>();
             Shield = GetComponentInChildren<Shield>();
+            LinkBeam = GetComponentInChildren<LinkBeam>();
+            LinkBeam.Init(this);
             Animator = GetComponentInChildren<Animator>();
+            _otherPlayer = GameManager.Instance.GetAnyOtherPlayer(this, true);
         }
 
         #region Updating
@@ -299,7 +311,20 @@ namespace Atlanticide
             bool active = Input.GetActionInput(out inputHeld, out inputjustReleased);
             bool result = false;
 
-            if (Tool == PlayerTool.EnergyCollector &&
+            if (LinkBeam != null)
+            {
+                if (inputjustReleased)
+                {
+                    // TODO: Can the link beam link also to certain level objects?
+                    LinkBeam.Activate(!LinkBeam.Active, _otherPlayer.LinkBeam.gameObject);
+                }
+
+                // Starts link start-up/shutdown animation
+                //Animator.SetBool("Link Active", Link.Active);
+
+                result = LinkBeam.Active;
+            }
+            else if (Tool == PlayerTool.EnergyCollector &&
                 CanUseEnergyCollector())
             {
                 // Drain
@@ -666,6 +691,11 @@ namespace Atlanticide
             if (Shield != null)
             {
                 Shield.ResetShield();
+            }
+
+            if (LinkBeam != null)
+            {
+                LinkBeam.ResetLink();
             }
         }
 
