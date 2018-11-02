@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 
 /// <summary>
-/// An interface for scripts that expand level objects.
+/// Interface for scripts that expand level objects.
 /// </summary>
 public interface ILevelObjectExpansion
 {

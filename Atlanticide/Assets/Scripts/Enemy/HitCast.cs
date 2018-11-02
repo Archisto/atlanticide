@@ -104,7 +104,8 @@ namespace Atlanticide
                 }
                 else
                 {
-                    character = hit.collider.gameObject.GetComponent<PlayerCharacter>();
+                    character = hit.collider.gameObject.
+                        GetComponentInParent<PlayerCharacter>();
                     if (character != null && !character.IsDead)
                     {
                         HitCharacter(character);

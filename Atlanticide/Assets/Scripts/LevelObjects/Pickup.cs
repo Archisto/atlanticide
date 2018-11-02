@@ -14,15 +14,17 @@ namespace Atlanticide
         private int _score = 100;
 
         protected PickupExpansion _expansion;
+        private int _charLayer;
 
         public bool IsCollected { get; protected set; }
 
         /// <summary>
         /// Initializes the object.
         /// </summary>
-        private void Start()
+        protected virtual void Start()
         {
             _expansion = GetComponent<PickupExpansion>();
+            _charLayer = LayerMask.NameToLayer("GameCharacter");
             _defaultPosition = transform.position;
             ResetObject();
         }
@@ -38,9 +40,10 @@ namespace Atlanticide
         /// <param name="collision">The collision</param>
         protected virtual void OnCollisionEnter(Collision collision)
         {
-            if (!IsCollected)
+            if (!IsCollected && collision.gameObject.layer == _charLayer)
             {
-                PlayerCharacter pc = collision.gameObject.GetComponent<PlayerCharacter>();
+                PlayerCharacter pc = collision.gameObject.
+                    GetComponentInParent<PlayerCharacter>();
                 if (pc != null)
                 {
                     Collect(pc);
@@ -54,7 +57,7 @@ namespace Atlanticide
         /// <param name="character">A player character</param>
         public virtual void Collect(PlayerCharacter character)
         {
-            GameManager.Instance.ChangeScore(_score);
+            GameManager.Instance.CollectScorePickup(_score);
             IsCollected = true;
 
             if (_expansion != null)

@@ -227,7 +227,7 @@ namespace Atlanticide
             }
             else if (rotate)
             {
-                RotateTowards(target);
+                RotateTowards(target, true);
             }
 
             // move

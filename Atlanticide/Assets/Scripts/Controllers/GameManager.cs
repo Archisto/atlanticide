@@ -94,8 +94,6 @@ namespace Atlanticide
                 {
                     _deadPlayerCount = value;
                     CheckLevelFailure();
-
-                    SetScore(_deadPlayerCount);
                 }
             }
         }
@@ -1023,6 +1021,12 @@ namespace Atlanticide
             {
                 _levelResultAudioSrc.Stop();
             }
+        }
+
+        public void CollectScorePickup(int score)
+        {
+            ChangeScore(score);
+            World.Instance.PlayCollectSound();
         }
 
         public void ChangeScore(int score)
