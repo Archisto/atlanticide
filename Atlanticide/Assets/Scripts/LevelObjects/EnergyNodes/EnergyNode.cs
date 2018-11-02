@@ -214,16 +214,38 @@ namespace Atlanticide
             return false;
         }
 
-        public virtual bool LoseCharge()
+        public virtual int LoseCharge()
         {
             if (Usable && currentCharges > 0)
             {
                 Activate(true);
                 currentCharges--;
-                return true;
+                return 1;
             }
 
-            return false;
+            return 0;
+        }
+
+        public virtual int LoseAllCharges()
+        {
+            int result = 0;
+
+            if (Usable)
+            {
+                if (_unlimitedCapacity)
+                {
+                    Activate(true);
+                    result = World.Instance.MaxEnergyCharges;
+                }
+                else if (currentCharges > 0)
+                {
+                    Activate(true);
+                    result = currentCharges;
+                    currentCharges = 0;
+                }
+            }
+
+            return result;
         }
 
         protected virtual void Activate(bool activate)

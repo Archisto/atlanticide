@@ -6,6 +6,9 @@ namespace Atlanticide
 {
     public class Activatable : LevelObject
     {
+        [SerializeField]
+        private bool _permanent;
+
         [Header("ACTIVATION TYPE")]
 
         [SerializeField]
@@ -30,24 +33,27 @@ namespace Atlanticide
         /// </summary>
         protected override void UpdateObject() 
         {
-            if (_usingKey)
+            if (!Activated || !_permanent)
             {
-                Activated = CheckKey();
-            }
-            else if (_switch != null)
-            {
-                Activated = _switch.Activated;
-            }
-            else if (_energyTarget != null)
-            {
-                if (_energyTarget.Usable)
+                if (_usingKey)
                 {
-                    Activated = (_needsMaxCharge ?
-                        _energyTarget.MaxCharge : _energyTarget.ZeroCharge);
+                    Activated = CheckKey();
                 }
-            }
+                else if (_switch != null)
+                {
+                    Activated = _switch.Activated;
+                }
+                else if (_energyTarget != null)
+                {
+                    if (_energyTarget.Usable)
+                    {
+                        Activated = (_needsMaxCharge ?
+                            _energyTarget.MaxCharge : _energyTarget.ZeroCharge);
+                    }
+                }
 
-            base.UpdateObject();
+                base.UpdateObject();
+            }
         }
 
         /// <summary>

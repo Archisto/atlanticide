@@ -38,21 +38,9 @@ namespace Atlanticide
             return false;
         }
 
-        public override bool LoseCharge()
+        public override int LoseCharge()
         {
-            if (_unlimitedCapacity)
-            {
-                if (Usable)
-                {
-                    Activate(true);
-                }
-
-                return Usable;
-            }
-            else
-            {
-                return base.LoseCharge();
-            }
+            return LoseAllCharges();
         }
     }
 }

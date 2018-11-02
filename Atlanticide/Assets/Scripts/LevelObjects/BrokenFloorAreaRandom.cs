@@ -63,20 +63,19 @@ namespace Atlanticide
         {
             if (!_alreadyBroken && (_activatable.Activated || _Break))
             {
+                Debug.Log("_activatable.Activated: " + _activatable.Activated);
+                Debug.Log("_Break: " + _Break);
                 _Break = false;
                 _alreadyBroken = true;
                 foreach(BrokenFloor floor in _Platforms)
                 {
                     floor.Break = true;
+
+                    //SFXPlayer.Instance.Play(Sound.Ground_Collapse);
                 }
             }
 
             base.UpdateObject();
-        }
-
-        public override void ResetObject()
-        {
-            base.ResetObject();
         }
 
         private void Fill()
@@ -206,6 +205,12 @@ namespace Atlanticide
                 _MaxPlatformSize.y = _Density.y;
                 Debug.LogWarning("MaxPlatformSize.y should be below or equal to Density.y. Set to " + _MaxPlatformSize.y);
             }
+        }
+
+        public override void ResetObject()
+        {
+            _alreadyBroken = false;
+            base.ResetObject();
         }
 
         private void OnDrawGizmos()

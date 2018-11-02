@@ -55,7 +55,9 @@ namespace Atlanticide
         private Vector3 _oldPosition;
         private float _jumpDisableElapsedTime;
 
+        private GameObject _movingPlatform;
         private Vector3 _oldMovingPlatformPos;
+        private Vector3 _movingPlatformPosChange;
 
         // Testing
         //private float _groundHeightDiff;
@@ -103,20 +105,14 @@ namespace Atlanticide
             {
                 // NOTE:
                 // If the object is the child of a game object
-                // just for keeping the scene hierarchy tidy
-                // (e.g. Environment object), this may break the game!
+                // that is keeping the scene hierarchy tidy
+                // (e.g. Environment object), setting _rootObj
+                // like this may break the game!
                 // Please always set _levelObj or _character.
                 _rootObj = transform.root.gameObject;
                 Debug.LogWarning("Object type unknown. The root object is now "
                     + _rootObj.name + ".");
             }
-        }
-
-        private void UpdateTopOfHeadAndFootPositions()
-        {
-            _topOfHead = _rootObj.transform.position +
-                Vector3.up * _headHeightFromPosition;
-            _foot = _topOfHead + Vector3.down * _objectSize.y;
         }
 
         /// <summary>
@@ -127,23 +123,63 @@ namespace Atlanticide
             if (!World.Instance.GamePaused)
             {
                 UpdateTopOfHeadAndFootPositions();
+                UpdateMovingPlatform();
 
                 if (CheckIfObjAvailable())
                 {
-                    UpdateFallingAndRising();
+                    UpdateFallingAndRising(true);
                     _oldPosition = transform.position;
                 }
 
                 UpdateTopOfHeadAndFootPositions();
-
-                //if (_player != null && _player.ID == 1)
-                //{
-                //    Debug.Log("DistFallen: " + DistanceFallen);
-                //}
             }
         }
 
-        private void UpdateFallingAndRising()
+        private void UpdateTopOfHeadAndFootPositions()
+        {
+            _topOfHead = _rootObj.transform.position +
+                Vector3.up * _headHeightFromPosition;
+            _foot = _topOfHead + Vector3.down * _objectSize.y;
+        }
+
+        private void UpdateMovingPlatform()
+        {
+            if (onMovingPlatform)
+            {
+                _movingPlatformPosChange =
+                    _movingPlatform.transform.position - _oldMovingPlatformPos;
+                _oldMovingPlatformPos = _movingPlatform.transform.position;
+            }
+        }
+
+        private void PlaceObjectOnMovingPlatform()
+        {
+            _rootObj.transform.position += _movingPlatformPosChange;
+            _movingPlatformPosChange = Vector3.zero;
+            UpdateTopOfHeadAndFootPositions();
+        }
+
+        private void SetMovingPlatform(GameObject movingPlatform)
+        {
+            //Debug.Log("Moving platform: " + movingPlatform.name);
+            onMovingPlatform = (movingPlatform != null);
+            _movingPlatform = movingPlatform;
+            _movingPlatformPosChange = Vector3.zero;
+
+            if (onMovingPlatform)
+            {
+                _oldMovingPlatformPos = _movingPlatform.transform.position;
+            }
+        }
+
+        /// <summary>
+        /// Updates the object's falling and rising.
+        /// If the object has fallen onto a platform in this frame,
+        /// this method is called again.
+        /// </summary>
+        /// <param name="firstInFrame">Is this the first time in
+        /// the frame this method has been called</param>
+        private void UpdateFallingAndRising(bool firstInFrame)
         {
             // TODO: Fix being lowered into the ground if the character's right side
             // hangs off a ledge while colliding with a wall in front. 
@@ -162,15 +198,20 @@ namespace Atlanticide
             // Falling or staying on ground
             else
             {
+                if (onMovingPlatform && _movingPlatformPosChange != Vector3.zero)
+                {
+                    PlaceObjectOnMovingPlatform();
+                }
+
                 onGround = CheckIfObjOnGround();
+
                 StartOrStopRising(true);
-                //if (!onGround) Debug.Log(name + " onGround: " + onGround);
                 if (onGround)
                 {
                     //Debug.Log("On ground");
                     UpdateOnGround();
                 }
-                else
+                else if (firstInFrame)
                 {
                     //Debug.Log("Off ground");
                     UpdateOffGround();
@@ -219,12 +260,13 @@ namespace Atlanticide
         public void JumpOffGround()
         {
             onGround = false;
-            onMovingPlatform = false;
             _jumpDisableElapsedTime = _jumpDisableTime;
+            SetMovingPlatform(null);
         }
 
         private bool CheckIfObjOnGround()
         {
+            float rayLength = _groundHitDist + _hoverOffset;
             Vector3 p0 = _foot + Vector3.up * _groundHitDist;
             Vector3 p1 = _foot + new Vector3(-0.5f * _objectSize.x, _groundHitDist, 0.5f * _objectSize.z);
             Vector3 p2 = _foot + new Vector3(-0.5f * _objectSize.x, _groundHitDist, 0.5f * _objectSize.z);
@@ -232,32 +274,39 @@ namespace Atlanticide
             Vector3 p4 = _foot + new Vector3(0.5f * _objectSize.x, _groundHitDist, -0.5f * _objectSize.z);
             RaycastHit hit;
             bool touchingPlatform =
-                Physics.Raycast(new Ray(p0, Vector3.down), out hit, _groundHitDist + _hoverOffset, _platformMask) ||
-                Physics.Raycast(new Ray(p1, Vector3.down), out hit, _groundHitDist + _hoverOffset, _platformMask) ||
-                Physics.Raycast(new Ray(p2, Vector3.down), out hit, _groundHitDist + _hoverOffset, _platformMask) ||
-                Physics.Raycast(new Ray(p3, Vector3.down), out hit, _groundHitDist + _hoverOffset, _platformMask) ||
-                Physics.Raycast(new Ray(p4, Vector3.down), out hit, _groundHitDist + _hoverOffset, _platformMask);
+                Physics.Raycast(new Ray(p0, Vector3.down), out hit, rayLength, _platformMask) ||
+                Physics.Raycast(new Ray(p1, Vector3.down), out hit, rayLength, _platformMask) ||
+                Physics.Raycast(new Ray(p2, Vector3.down), out hit, rayLength, _platformMask) ||
+                Physics.Raycast(new Ray(p3, Vector3.down), out hit, rayLength, _platformMask) ||
+                Physics.Raycast(new Ray(p4, Vector3.down), out hit, rayLength, _platformMask);
 
-            if (touchingPlatform && hit.transform.tag.Equals("Moving"))
+            if (touchingPlatform)
             {
-                Vector3 newMovingPlatformPos = hit.transform.position;
+                //Debug.Log("Hit");
 
-                if (onMovingPlatform)
+                if (hit.transform.tag.Equals("Moving") != onMovingPlatform)
                 {
-                    _rootObj.transform.position += (newMovingPlatformPos - _oldMovingPlatformPos);
+                    if (onMovingPlatform)
+                    {
+                        SetMovingPlatform(null);
+                    }
+                    else
+                    {
+                        SetMovingPlatform(hit.transform.gameObject);
+                    }
                 }
 
-                _oldMovingPlatformPos = hit.transform.position;
-                onMovingPlatform = true;
+                // Prints what's hit
+                //if (_player != null && _player.ID == 1)
+                //{
+                //    Debug.Log("Hit " + hit.transform.name);
+                //}
             }
-
-            //if (touchingPlatform)
+            // Prints how far down (or up) the ground is
+            //else
             //{
-            //    Debug.Log("Hit");
-            //    if (_player != null && _player.ID == 1)
-            //    {
-            //        Debug.Log("Hit " + hit.transform.name);
-            //    }
+            //    float distToGround = GroundHeightDifferenceFromPos(_foot);
+            //    Debug.Log("Ground height diff: " + distToGround);
             //}
 
             return touchingPlatform;
@@ -399,15 +448,25 @@ namespace Atlanticide
             if (groundHeightDifference < 0f)
             {
                 _rootObj.transform.position = newPosition;
+                DistanceFallen += fallAmount;
                 //Debug.Log("Falling " + fallAmount);
             }
             else
             {
                 _rootObj.transform.position = newPosition +
                     Vector3.up * groundHeightDifference;
+                UpdateTopOfHeadAndFootPositions();
+                UpdateFallingAndRising(false);
+                //onGround = true;
+                //_usedToBeOnGround = false;
             }
 
-            DistanceFallen += fallAmount;
+            if (_player != null)
+            {
+                //Debug.Log(_player.name + " distance fallen: " + DistanceFallen);
+                GameManager.Instance.SetScore((int)DistanceFallen);
+            }
+
             if (DistanceFallen >= _maxFallDistance)
             {
                 _fallenOffMap = true;
@@ -499,8 +558,8 @@ namespace Atlanticide
         {
             DistanceFallen = 0f;
             _fallenOffMap = false;
-            onMovingPlatform = false;
             _jumpDisableElapsedTime = 0f;
+            SetMovingPlatform(null);
         }
 
         /// <summary>
@@ -511,8 +570,8 @@ namespace Atlanticide
             if (_rootObj != null)
             {
                 // Testing
-                Gizmos.color = (AbleToJump ? Color.cyan : Color.red);
-                if (_player != null && _player.ID == 0)
+                Gizmos.color = (AbleToJump ? Color.green : Color.red);
+                if (_player != null)
                 {
                     Gizmos.DrawLine(_foot, _foot + Vector3.down * 1.5f);
                 }

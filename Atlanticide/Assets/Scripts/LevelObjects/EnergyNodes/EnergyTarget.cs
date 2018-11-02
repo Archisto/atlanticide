@@ -37,9 +37,9 @@ namespace Atlanticide
             }
         }
 
-        public override bool LoseCharge()
+        public override int LoseCharge()
         {
-            return false;
+            return 0;
         }
 
         protected override void OnDrawGizmos()

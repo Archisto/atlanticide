@@ -73,6 +73,8 @@ namespace Atlanticide
                     projectileMover.TopSpeed = transform.forward * _projectileSpeed;
                     projectileMover.DecayDistance = _range;
                     projectileMover.StartMoving(true);
+
+                    //SFXPlayer.Instance.Play(Sound.Projectile_1);
                 }
             }
         }

@@ -57,14 +57,30 @@ namespace Atlanticide
         {
             if (!Activated || !_permanent)
             {
+                // TODO: Replace with a better way to prevent
+                // a dead player from activating the switch
+                bool noCollision = false;
+
                 if (_hitbox.Collision != null)
                 {
-                    if (!Activated && !_plateMoving)
+                    PlayerCharacter player = _hitbox.Collision.transform.
+                        GetComponentInParent<PlayerCharacter>();
+                    if (player != null && player.IsDead)
+                    {
+                        noCollision = true;
+                    }
+
+                    if (!Activated && !_plateMoving && !noCollision)
                     {
                         Activate();
                     }
                 }
-                else if (Activated && !_plateMoving)
+                else
+                {
+                    noCollision = true;
+                }
+
+                if (noCollision && Activated && !_plateMoving)
                 {
                     Deactivate();
                 }
