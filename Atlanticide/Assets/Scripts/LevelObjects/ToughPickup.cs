@@ -82,7 +82,7 @@ namespace Atlanticide
         {
             if (!IsCollected && !_hitTimer.Active)
             {
-                Debug.Log("collectStrength: " + collectStrength);
+                //Debug.Log("collectStrength: " + collectStrength);
                 _toughnessLeft -= collectStrength;
                 if (_toughnessLeft <= 0f)
                 {
