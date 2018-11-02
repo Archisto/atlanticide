@@ -64,15 +64,24 @@ namespace Atlanticide
             }
         }
 
-        protected virtual void LookTowards(Vector3 input)
+        protected virtual void LookTowards(Vector3 direction, bool inputDirection, bool modifyOnlyY)
         {
-            Vector3 direction = new Vector3(input.x, 0, input.y);
-            transform.rotation = Quaternion.LookRotation(direction, Vector3.up);
+            if (inputDirection)
+            {
+                direction = new Vector3(direction.x, 0, direction.y);
+            }
+
+            Vector3 lookDir = Quaternion.LookRotation(direction, Vector3.up).eulerAngles;
+            lookDir = new Vector3(transform.rotation.x, lookDir.y, transform.rotation.z);
+            transform.rotation = Quaternion.Euler(lookDir);
         }
 
-        protected virtual void RotateTowards(Vector3 input)
+        protected virtual void RotateTowards(Vector3 direction, bool inputDirection)
         {
-            Vector3 direction = new Vector3(input.x, 0, input.y);
+            if (inputDirection)
+            {
+                direction = new Vector3(direction.x, 0, direction.y);
+            }
             transform.rotation = Utils.RotateTowards(transform.rotation, direction, _turningSpeed);
         }
 

@@ -32,6 +32,8 @@ namespace Atlanticide
         {
             // TODO: Fix being able to go inside the wall by moving diagonally into a corner.
 
+            // TODO: Breaks the game if the root transform is LevelObjects or other wrong object.
+
             _obj = transform.root.gameObject;
             _objectSize = GetComponent<Collider>().bounds.size;
             _wallLayerNum = LayerMask.NameToLayer(WallKey);

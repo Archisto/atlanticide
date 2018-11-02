@@ -57,7 +57,8 @@ namespace Atlanticide
         {
             if (!IsBeingPushed)
             {
-                PlayerCharacter pc = collision.gameObject.GetComponent<PlayerCharacter>();
+                PlayerCharacter pc = collision.gameObject.
+                    GetComponentInParent<PlayerCharacter>();
                 if (pc != null && pc.IsAvailableForActions())
                 {
                     _pc = pc;

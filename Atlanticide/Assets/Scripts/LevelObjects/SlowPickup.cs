@@ -41,7 +41,8 @@ namespace Atlanticide
         {
             if (!_beingPickedUp)
             {
-                PlayerCharacter pc = collision.gameObject.GetComponent<PlayerCharacter>();
+                PlayerCharacter pc = collision.gameObject.
+                    GetComponentInParent<PlayerCharacter>();
                 if (pc != null)
                 {
                     _beingPickedUp = true;

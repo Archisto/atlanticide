@@ -179,7 +179,7 @@ namespace Atlanticide
                         _players[i].HandleInteractionInput();
 
                         // Jumping
-                        _players[i].HandleJumpInput();
+                        //_players[i].HandleJumpInput();
 
                         // Using the player's primary action
                         if (_players[i].HandleActionInput())

@@ -67,6 +67,7 @@ namespace Atlanticide
                 if (projectile != null)
                 {
                     _fired = true;
+                    ResetProjectile(projectile);
                     projectile.SetActive(true);
                     projectile.transform.position = transform.position;
                     Move projectileMover = projectile.GetComponent<Move>();
@@ -76,6 +77,24 @@ namespace Atlanticide
 
                     //SFXPlayer.Instance.Play(Sound.Projectile_1);
                 }
+            }
+        }
+
+        public void ResetWeapon()
+        {
+            foreach (GameObject projectile in _projectiles)
+            {
+                ResetProjectile(projectile);
+                projectile.SetActive(false);
+            }
+        }
+
+        public void ResetProjectile(GameObject projectile)
+        {
+            LevelObject lo = projectile.GetComponent<LevelObject>();
+            if (lo != null)
+            {
+                lo.ResetObject();
             }
         }
     }

@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 
 /// <summary>
-/// An interface for objects that can receive player input.
+/// Interface for objects that can receive player input.
 /// </summary>
 public interface IInputReceiver
 {
