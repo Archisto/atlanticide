@@ -8,7 +8,7 @@ PhysicsManager:
   m_DefaultMaterial: {fileID: 0}
   m_BounceThreshold: 2
   m_SleepThreshold: 0.005
-  m_DefaultContactOffset: 0.01
+  m_DefaultContactOffset: 0.001
   m_DefaultSolverIterations: 6
   m_DefaultSolverVelocityIterations: 1
   m_QueriesHitBackfaces: 0
@@ -17,7 +17,7 @@ PhysicsManager:
   m_ClothInterCollisionDistance: 0
   m_ClothInterCollisionStiffness: 0
   m_ContactsGeneration: 1
-  m_LayerCollisionMatrix: c800ffffc800ffffc800ffffffffffffc800ffffc800ffffffffffffffffffffc808ffffc888ffffc8fcffffc8e7ffffc884ffffc8ecffffc8ecffffc87effffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+  m_LayerCollisionMatrix: c800feffc800feffc800feffffffffffc800feffc800feffffffffffffffffffc88affffc88bffffc87cfeffc867feffc804feffc86cfeffc86cfeffc803feffc803feffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
   m_AutoSimulation: 1
   m_AutoSyncTransforms: 1
   m_ClothInterCollisionSettingsToggle: 0

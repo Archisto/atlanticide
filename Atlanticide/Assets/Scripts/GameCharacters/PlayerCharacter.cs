@@ -13,7 +13,7 @@ namespace Atlanticide
         Shield = 2
     }
 
-    public class PlayerCharacter : GameCharacter, ILinkTarget, ISavable
+    public class PlayerCharacter : GameCharacter, ISavable
     {
         [SerializeField, Range(0.2f, 20f)]
         private float _jumpHeight = 1f;
@@ -24,7 +24,6 @@ namespace Atlanticide
         [SerializeField]
         private float _respawnTime = 1f;
 
-        PlayerCharacter _otherPlayer;
         private Vector3 _size;
         private Climbable _climbable;
         private Interactable _interactionTarget;
@@ -41,9 +40,11 @@ namespace Atlanticide
 
         public Shield Shield { get; private set; }
 
-        public LinkBeam LinkBeam { get; private set; }
-
         public Animator Animator { get; private set; }
+
+        public GameObject ShieldModel;
+
+        public Animator ShieldAnimator { get; private set; }
 
         public Interactable InteractionTarget
         {
@@ -58,12 +59,6 @@ namespace Atlanticide
                     ActivateTargetIcon(_interactionTarget != null, ID, _interactionTarget);
             }
         }
-
-        public GameObject LinkObject { get; set; }
-
-        public LinkBeam LinkedLinkBeam { get; set; }
-
-        public bool IsLinkTarget { get; set; }
 
         public bool Jumping { get; private set; }
 
@@ -166,12 +161,6 @@ namespace Atlanticide
             return !restrictions;
         }
 
-        private bool CanActivateLink()
-        {
-            bool restrictions = Climbing || LinkBeam.Active;
-            return !restrictions;
-        }
-
         /// <summary>
         /// Initializes the object.
         /// </summary>
@@ -180,11 +169,8 @@ namespace Atlanticide
             base.Start();
             EnergyCollector = GetComponentInChildren<EnergyCollector>();
             Shield = GetComponentInChildren<Shield>();
-            LinkBeam = GetComponentInChildren<LinkBeam>();
-            LinkBeam.Init(this);
-            LinkObject = LinkBeam.gameObject;
             Animator = GetComponentInChildren<Animator>();
-            _otherPlayer = GameManager.Instance.GetAnyOtherPlayer(this, true);
+            ShieldAnimator = ShieldModel.GetComponent<Animator>();
         }
 
         #region Updating
@@ -199,7 +185,7 @@ namespace Atlanticide
             if (!IsDead)
             {
                 UpdateJump();
-                UpdateRotation();
+                UpdateShield();
             }
         }
 
@@ -215,33 +201,23 @@ namespace Atlanticide
             {
                 speed = _speed * Shield.PlayerSpeedModifier;
             }
-            else if (!LinkBeam.Active && !IsLinkTarget)
+            else
             {
-                RotateTowards(input, true);
+                RotateTowards(input);
             }
 
             Vector3 movement = new Vector3(input.x, 0, input.y) * speed * World.Instance.DeltaTime;
             Vector3 newPosition = transform.position + movement * (Pushing ? 0.3f : 1f);
             transform.position = newPosition;
 
-            Vector3 inputDirection = input.normalized;
-            Animator.SetFloat("Horizontal", inputDirection.x);
-            Animator.SetFloat("Vertical", inputDirection.y);
+            Animator.SetFloat("Horizontal", input.x);
+            Animator.SetFloat("Vertical", input.y);
             Animator.speed = input.magnitude * (speed / _speed);
-        }
 
-        private void UpdateRotation()
-        {
-            if (LinkBeam.Active)
-            {
-                LookTowards(LinkBeam.TargetPosition - transform.position,
-                    false, true);
-            }
-            else if (IsLinkTarget)
-            {
-                LookTowards(LinkedLinkBeam.transform.position - transform.position,
-                    false, true);
-            }
+            //if (!ShieldIsActive)
+            //{
+            //    RotateTowards(input);
+            //}
         }
 
         /// <summary>
@@ -277,6 +253,19 @@ namespace Atlanticide
             }
         }
 
+        private void UpdateShield()
+        {
+            if (ShieldIsActive)
+            {
+                Animator.SetBool("Shield Active", true);
+                ShieldAnimator.SetBool("Shield Active", true);
+            } else
+            {
+                Animator.SetBool("Shield Active", false);
+                ShieldAnimator.SetBool("Shield Active", false);
+            }
+        }
+
         #endregion Updating
 
         #region Input
@@ -308,7 +297,7 @@ namespace Atlanticide
         {
             if (!ShieldIsIdle)
             {
-                RotateTowards(input, true);
+                RotateTowards(input);
             }
         }
 
@@ -323,37 +312,6 @@ namespace Atlanticide
         }
 
         public bool HandleActionInput()
-        {
-            bool inputHeld = false;
-            bool inputjustReleased = false;
-            bool active = Input.GetActionInput(out inputHeld, out inputjustReleased);
-            bool result = false;
-
-            if (LinkBeam != null)
-            {
-                if (inputjustReleased)
-                {
-                    if (!IsLinkTarget)
-                    {
-                        // TODO: Can the link beam link also to certain level objects?
-                        LinkBeam.Activate(!LinkBeam.Active, _otherPlayer);
-                    }
-                    else
-                    {
-                        LinkedLinkBeam.Activate(false);
-                    }
-                }
-
-                // Starts link start-up/shutdown animation
-                //Animator.SetBool("Link Active", Link.Active);
-
-                result = LinkBeam.Active;
-            }
-
-            return result;
-        }
-
-        public bool Old_HandleActionInput()
         {
             bool inputHeld = false;
             bool inputjustReleased = false;
@@ -715,38 +673,9 @@ namespace Atlanticide
         protected override void ResetBaseValues()
         {
             base.ResetBaseValues();
-            _elapsedRespawnTime = 0f;
-            ResetCommon();
-        }
-
-        /// <summary>
-        /// Cancels any running actions if the player dies or the level is reset.
-        /// </summary>
-        public override void CancelActions()
-        {
-            base.CancelActions();
-            ResetCommon();
-            Input.ResetInput();
-            ResetAnimatorMovementAxis();
-            EndClimb();
-            EndPush();
-            InteractionTarget = null;
-        }
-
-        /// <summary>
-        /// Resets things common to both ResetBaseValues() and CancelActions().
-        /// </summary>
-        private void ResetCommon()
-        {
-            IsLinkTarget = false;
-            LinkedLinkBeam = null;
             Jumping = false;
             Respawning = false;
-
-            if (LinkBeam != null)
-            {
-                LinkBeam.ResetLinkBeam();
-            }
+            _elapsedRespawnTime = 0f;
 
             if (EnergyCollector != null)
             {
@@ -757,6 +686,23 @@ namespace Atlanticide
             {
                 Shield.ResetShield();
             }
+        }
+
+        /// <summary>
+        /// Cancels any running actions if the player dies or the level is reset.
+        /// </summary>
+        public override void CancelActions()
+        {
+            base.CancelActions();
+            Input.ResetInput();
+            ResetAnimatorMovementAxis();
+            Jumping = false;
+            Respawning = false;
+            EnergyCollector.ResetEnergyCollector();
+            Shield.ResetShield();
+            EndClimb();
+            EndPush();
+            InteractionTarget = null;
         }
 
         /// <summary>
