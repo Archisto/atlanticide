@@ -42,6 +42,10 @@ namespace Atlanticide
 
         public Animator Animator { get; private set; }
 
+        public GameObject ShieldModel;
+
+        public Animator ShieldAnimator { get; private set; }
+
         public Interactable InteractionTarget
         {
             get
@@ -166,6 +170,7 @@ namespace Atlanticide
             EnergyCollector = GetComponentInChildren<EnergyCollector>();
             Shield = GetComponentInChildren<Shield>();
             Animator = GetComponentInChildren<Animator>();
+            ShieldAnimator = ShieldModel.GetComponent<Animator>();
         }
 
         #region Updating
@@ -180,6 +185,7 @@ namespace Atlanticide
             if (!IsDead)
             {
                 UpdateJump();
+                UpdateShield();
             }
         }
 
@@ -244,6 +250,19 @@ namespace Atlanticide
                     _jumpForce = 0;
                     Jumping = false;
                 }
+            }
+        }
+
+        private void UpdateShield()
+        {
+            if (ShieldIsActive)
+            {
+                Animator.SetBool("Shield Active", true);
+                ShieldAnimator.SetBool("Shield Active", true);
+            } else
+            {
+                Animator.SetBool("Shield Active", false);
+                ShieldAnimator.SetBool("Shield Active", false);
             }
         }
 
