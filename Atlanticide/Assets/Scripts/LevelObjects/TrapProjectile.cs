@@ -41,6 +41,7 @@ namespace Atlanticide
         public override void ResetObject()
         {
             Activated = _activatedOnStart;
+            Weapon.ResetWeapon();
             base.ResetObject();
         }
     }

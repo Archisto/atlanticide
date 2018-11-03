@@ -32,7 +32,7 @@ namespace Atlanticide
         public float pushSpeed = 1f;
 
         [Range(0f, 1f)]
-        public float minWalkingSpeedPercentage = 0.2f;
+        public float minWalkingSpeedRatio = 0.2f;
 
         [SerializeField, Range(0.1f, 5f)]
         public float telegrabRadius = 1f;
@@ -43,16 +43,37 @@ namespace Atlanticide
         [SerializeField, Range(1f, 10f)]
         private float _interactRange = 3f;
 
+        [SerializeField, Range(0f, 5f)]
+        private float _playerCollectStrength = 1f;
+
+        [Header("SOUND EFFECTS")]
+
+        [SerializeField]
+        private float _pitchResetTime = 1f;
+
+        [SerializeField]
+        private float _minPitch = 0.3f;
+
+        [SerializeField]
+        private float _maxPitch = 2f;
+
+        [SerializeField]
+        private float _pitchRise = 0.1f;
+
         public List<int> keyCodes = new List<int>();
 
         private UIController _ui;
         private bool _gamePaused;
+        private Timer _pitchResetTimer;
+        private float _pitch;
 
         public int MaxEnergyCharges { get { return _maxEnergyCharges; } }
 
         public int CurrentEnergyCharges { get; set; }
 
         public float InteractRange { get { return _interactRange; } }
+
+        public float PlayerCollectStrength { get { return _playerCollectStrength; } }
 
         public bool GamePaused { get { return _gamePaused; } }
 
@@ -88,6 +109,9 @@ namespace Atlanticide
             }
 
             DontDestroyOnLoad(gameObject);
+
+            _pitchResetTimer = new Timer(_pitchResetTime, true);
+            ResetPickupSFX();
         }
 
         /// <summary>
@@ -103,6 +127,16 @@ namespace Atlanticide
         /// </summary>
         private void Update()
         {
+            if (GameManager.Instance.GameState ==
+                GameManager.State.Play &&
+                !GamePaused)
+            {
+                if (_pitch > _minPitch &&
+                    _pitchResetTimer.Check())
+                {
+                    ResetPickupSFX();
+                }
+            }
         }
 
         public bool TryActivateNewKeyCode(int keyCode, bool allowDuplicates)
@@ -173,6 +207,26 @@ namespace Atlanticide
             return (float) CurrentEnergyCharges / MaxEnergyCharges;
         }
 
+        public void PlayCollectSound()
+        {
+            SFXPlayer.Instance.Play(Sound.Clink, _pitch);
+            _pitch += _pitchRise;
+            if (_pitch > _maxPitch)
+            {
+                ResetPickupSFX();
+            }
+            else
+            {
+                _pitchResetTimer.Activate();
+            }
+        }
+
+        private void ResetPickupSFX()
+        {
+            _pitch = _minPitch;
+            _pitchResetTimer.Reset();
+        }
+
         /// <summary>
         /// Resets the world to its default state.
         /// </summary>
@@ -180,6 +234,7 @@ namespace Atlanticide
         {
             SetEnergyChargesAndUpdateUI(0);
             keyCodes.Clear();
+            ResetPickupSFX();
             EmittingEnergy = false;
             ShieldBashing = false;
             DrainingEnergy = false;

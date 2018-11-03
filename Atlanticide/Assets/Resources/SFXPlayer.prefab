@@ -111,6 +111,7 @@ MonoBehaviour:
   - {fileID: 8300000, guid: f58eb8e4e27197b4085f8b257e5799c6, type: 3}
   - {fileID: 8300000, guid: 6c26b92f9c3eb9f40969ffcd0d23f506, type: 3}
   - {fileID: 8300000, guid: f79b8b03b259b724cb4552d608a9f840, type: 3}
+  - {fileID: 8300000, guid: f896e6f2b2f64de418c017d0d3e45514, type: 3}
   audioSrcPrefab: {fileID: 1660063342897128, guid: 8c0e527bb61a12441914ae58356bf2ee,
     type: 2}
   volume: 1

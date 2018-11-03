@@ -80,7 +80,8 @@ namespace Atlanticide
         Revive = 55,
         Ground_Collapse = 56,
         Dissolve = 57,
-        Projectile_1 = 58
+        Projectile_1 = 58,
+        Clink = 59
     }
 
     public class SFXPlayer : MonoBehaviour

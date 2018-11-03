@@ -66,7 +66,7 @@ namespace Atlanticide
 
         public bool AbleToJump
         {
-            get { return _jumpDisableElapsedTime < _jumpDisableTime; }
+            get { return onGround || _jumpDisableElapsedTime < _jumpDisableTime; }
         }
 
         /// <summary>
@@ -459,12 +459,6 @@ namespace Atlanticide
                 UpdateFallingAndRising(false);
                 //onGround = true;
                 //_usedToBeOnGround = false;
-            }
-
-            if (_player != null)
-            {
-                //Debug.Log(_player.name + " distance fallen: " + DistanceFallen);
-                GameManager.Instance.SetScore((int)DistanceFallen);
             }
 
             if (DistanceFallen >= _maxFallDistance)
