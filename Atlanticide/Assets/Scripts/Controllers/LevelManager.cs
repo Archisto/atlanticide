@@ -8,10 +8,10 @@ namespace Atlanticide
     public class LevelManager : MonoBehaviour
     {
         [SerializeField]
-        private Transform _energyCollPlayerSpawnPoint;
+        private Transform _player1SpawnPoint;
 
         [SerializeField]
-        private Transform _shieldPlayerSpawnPoint;
+        private Transform _player2SpawnPoint;
 
         private UIController _ui;
         private Level _currentLevel;
@@ -21,11 +21,11 @@ namespace Atlanticide
         /// </summary>
         private void Start()
         {
-            if (_energyCollPlayerSpawnPoint == null)
+            if (_player1SpawnPoint == null)
             {
                 Debug.LogError(Utils.GetFieldNullString("Player 1 spawn point"));
             }
-            if (_shieldPlayerSpawnPoint == null)
+            if (_player2SpawnPoint == null)
             {
                 Debug.LogError(Utils.GetFieldNullString("Player 2 spawn point"));
             }
@@ -44,23 +44,39 @@ namespace Atlanticide
         {
         }
 
-        public Vector3 GetSpawnPoint(PlayerTool tool)
+        public Vector3 GetSpawnPoint(int playerNum)
         {
-            switch (tool)
+            switch (playerNum)
             {
-                case PlayerTool.EnergyCollector:
+                case 0:
                 {
-                    return _energyCollPlayerSpawnPoint.position;
+                    return _player1SpawnPoint.position;
                 }
-                case PlayerTool.Shield:
+                case 1:
                 {
-                    return _shieldPlayerSpawnPoint.position;
+                    return _player2SpawnPoint.position;
                 }
                 default:
                 {
                     return Vector3.zero;
                 }
             }
+
+            //switch (tool)
+            //{
+            //    case PlayerTool.EnergyCollector:
+            //    {
+            //        return _energyCollPlayerSpawnPoint.position;
+            //    }
+            //    case PlayerTool.Shield:
+            //    {
+            //        return _shieldPlayerSpawnPoint.position;
+            //    }
+            //    default:
+            //    {
+            //        return Vector3.zero;
+            //    }
+            //}
         }
 
         public void ResetLevel()

@@ -264,14 +264,22 @@ namespace Atlanticide
 
         /// <summary>
         /// Plays a sound clip which corresponds with the given name
-        /// and has the given pitch.
+        /// and has the given volume and pitch.
         /// </summary>
         /// <param name="sound">a sound's name</param>
-        /// <param name="pitch">sound's pitch</param>
-        public AudioSource Play(Sound sound, float pitch)
+        /// <param name="pitch">sound's volume (optional)</param>
+        /// <param name="pitch">sound's pitch (optional)</param>
+        public AudioSource Play(Sound sound, float volumeFactor = 1f, float pitch = 1f)
         {
+            float oldVolume = volume;
+            if (volumeFactor != 1f)
+            {
+                volume = volume * volumeFactor;
+            }
             this.pitch = pitch;
-            return Play((int) sound);
+            AudioSource result = Play((int) sound);
+            this.volume = oldVolume;
+            return result;
         }
 
         /// <summary>

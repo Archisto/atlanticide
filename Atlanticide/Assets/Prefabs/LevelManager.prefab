@@ -38,9 +38,9 @@ GameObject:
   m_Component:
   - component: {fileID: 4787080142380638}
   m_Layer: 0
-  m_Name: ShieldPlayerSpawnPoint
+  m_Name: Player2SpawnPoint
   m_TagString: Untagged
-  m_Icon: {fileID: -5487077368411116049, guid: 0000000000000000d000000000000000, type: 0}
+  m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
@@ -53,9 +53,9 @@ GameObject:
   m_Component:
   - component: {fileID: 4525349788122696}
   m_Layer: 0
-  m_Name: EnergyCollPlayerSpawnPoint
+  m_Name: Player1SpawnPoint
   m_TagString: Untagged
-  m_Icon: {fileID: -5397416234189338067, guid: 0000000000000000d000000000000000, type: 0}
+  m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
@@ -66,7 +66,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1247031363536192}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: -6.65, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4525349788122696}
@@ -127,8 +127,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cceadf668f3be40429f0e6b97fa16f36, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _energyCollPlayerSpawnPoint: {fileID: 4525349788122696}
-  _shieldPlayerSpawnPoint: {fileID: 4787080142380638}
+  _player1SpawnPoint: {fileID: 4525349788122696}
+  _player2SpawnPoint: {fileID: 4787080142380638}
 --- !u!114 &114949632137208592
 MonoBehaviour:
   m_ObjectHideFlags: 1

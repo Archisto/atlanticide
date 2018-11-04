@@ -355,7 +355,7 @@ namespace Atlanticide
         {
             _players = new PlayerCharacter[MaxPlayers];
             _playerPrefab = Resources.Load<PlayerCharacter>
-                ("New_PlayerCharacter");
+                ("New2_PlayerCharacter");
             CreatePlayers();
             ActivatePlayers(PlayerCount);
 
@@ -382,7 +382,7 @@ namespace Atlanticide
                 _players[i].Input = input;
                 PlayerTool tool = GetPlayerTool(i);
                 _players[i].Tool = tool;
-                _players[i].transform.position = _levelManager.GetSpawnPoint(tool);
+                _players[i].transform.position = _levelManager.GetSpawnPoint(i);
                 //Debug.Log("Player " + (i + 1) + " input device: " + _players[i].Input.InputDevice);
 
                 // TODO: Needs to be removed because player 1 already
@@ -687,7 +687,8 @@ namespace Atlanticide
 
             if (_playerTools[playerID] == PlayerTool.None)
             {
-                result = (PlayerTool) (playerID + 1);
+                result = PlayerTool.Shield;
+                //result = (PlayerTool) (playerID + 1);
             }
             else
             {
@@ -803,7 +804,7 @@ namespace Atlanticide
             _input.ResetInput();
             _players.ForEach(pc => pc.CancelActions());
             _players.ForEach
-                (pc => pc.RespawnPosition =_levelManager.GetSpawnPoint(pc.Tool));
+                (pc => pc.RespawnPosition =_levelManager.GetSpawnPoint(pc.ID));
             ForEachActivePlayerChar(pc => pc.Respawn());
             _npcs.ForEach(npc => npc.Respawn());
             _levelObjects.ForEach(obj => obj.ResetObject());

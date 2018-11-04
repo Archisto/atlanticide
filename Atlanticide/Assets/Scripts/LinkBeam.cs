@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -12,6 +13,8 @@ namespace Atlanticide
     {
         private const string WallKey = "Wall";
 
+        [Header("STRENGTH PROPERTIES")]
+
         [SerializeField]
         private float _zeroRatioStrength = 0.5f;
 
@@ -19,36 +22,38 @@ namespace Atlanticide
         private float _oneRatioStrength = 2f;
 
         [SerializeField]
-        private float _minLength = 0.5f;
-
-        [SerializeField]
         private float _maxStrengthLength = 5f;
 
         [SerializeField]
         private float _strengthScaleLength = 5f;
 
-        [SerializeField]
-        private float _wallHitShutdownTime = 1f;
-
         [Header("BEAM PROPERTIES")]
 
         [SerializeField]
-        private Vector3 _beamStartPoint;
+        private float _minLength = 0.5f;
 
         [SerializeField]
-        private Vector3 _beamExtents = new Vector3(0.1f, 0.3f, 0f);
+        private float _wallHitShutdownTime = 1f;
+
+        [SerializeField]
+        private Vector3 _hitboxStartPoint;
+
+        [SerializeField]
+        private Vector3 _hitboxExtents = new Vector3(0.1f, 0.3f, 0f);
 
         [SerializeField]
         private LayerMask _layerMask;
 
         [Header("DEBUG")]
 
+        public bool _useLineRenderer;
         public ILinkTarget _target;
         public float _strengthRatio;
 
         private PlayerCharacter _player;
         private LineRenderer _lr;
         private Timer _shutdownTimer;
+        private Color _color;
         private Color _strongColor = Color.blue;
         private Color _weakColor = Color.red;
         private Color _shutdownWarningColor = Color.yellow;
@@ -62,6 +67,8 @@ namespace Atlanticide
         public Vector3 TargetPosition { get; private set; }
 
         public Vector3 BeamCenter { get; private set; }
+
+        public Vector3 BeamDirection { get; private set; }
 
         public float StrengthRatio
         {
@@ -77,15 +84,19 @@ namespace Atlanticide
             }
         }
 
+        public delegate bool Activation(bool activate);
+        private Activation stateChangeCallback;
+
         /// <summary>
         /// Initializes the object.
         /// </summary>
-        public void Init(PlayerCharacter player)
+        public void Init(PlayerCharacter player, Activation shieldActivation)
         {
             _player = player;
             _lr = GetComponent<LineRenderer>();
+            _lr.enabled = false;
             _shutdownTimer = new Timer(_wallHitShutdownTime, true);
-            Activate(false);
+            stateChangeCallback = shieldActivation;
         }
 
         /// <summary>
@@ -106,7 +117,13 @@ namespace Atlanticide
                     _target = target;
                     _target.IsLinkTarget = true;
                     _target.LinkedLinkBeam = this;
-                    _lr.SetPosition(1, _target.LinkObject.transform.position);
+                    _lr.SetPosition(1, TargetPosition);
+                    SFXPlayer.Instance.Play(Sound.Cyclops_Laser_Start);
+
+                    if (_target.LinkBeam != null)
+                    {
+                        _target.LinkBeam.ActivatePlayerShield(true);
+                    }
                 }
             }
             else
@@ -117,13 +134,39 @@ namespace Atlanticide
 
                 if (_target != null)
                 {
+                    if (_target.LinkBeam != null)
+                    {
+                        _target.LinkBeam.ActivatePlayerShield(false);
+                    }
+
                     _target.IsLinkTarget = false;
                     _target.LinkedLinkBeam = null;
                     _target = null;
                 }
+
+                SFXPlayer.Instance.Play(Sound.Cyclops_Shortcircuit);
             }
 
-            _lr.enabled = Active;
+            ActivatePlayerShield(Active);
+
+            if (_useLineRenderer)
+            {
+                _lr.enabled = Active;
+            }
+        }
+
+        /// <summary>
+        /// Activates or deactivates the shield of
+        /// the player who owns this link beam.
+        /// </summary>
+        /// <param name="activate">Should the player's
+        /// shield be activated</param>
+        public void ActivatePlayerShield(bool activate)
+        {
+            if (stateChangeCallback != null)
+            {
+                stateChangeCallback.Invoke(activate);
+            }
         }
 
         #region Updating
@@ -159,20 +202,20 @@ namespace Atlanticide
 
         private void UpdateStrength()
         {
-            Color color = _strongColor;
+            _color = _strongColor;
             if (BeamLength > _maxStrengthLength)
             {
                 if (BeamLength < _maxStrengthLength + _strengthScaleLength)
                 {
                     _strengthRatio = 1 - ((BeamLength - _maxStrengthLength) / _strengthScaleLength);
                     _strengthRatio = Mathf.Clamp01(_strengthRatio);
-                    color = _strengthRatio * _strongColor + (1 - _strengthRatio) * _weakColor;
-                    color.a = 1f;
+                    _color = _strengthRatio * _strongColor + (1 - _strengthRatio) * _weakColor;
+                    _color.a = 1f;
                 }
                 else
                 {
                     _strengthRatio = 0f;
-                    color = _weakColor;
+                    _color = _weakColor;
                 }
             }
             else
@@ -183,12 +226,12 @@ namespace Atlanticide
             if (_shutdownTimer.Active)
             {
                 float shutdownRatio = _shutdownTimer.GetRatio();
-                color = shutdownRatio * _shutdownWarningColor +
-                    (1 - shutdownRatio) * color;
+                _color = shutdownRatio * _shutdownWarningColor +
+                    (1 - shutdownRatio) * _color;
             }
 
-            _lr.startColor = color;
-            _lr.endColor = color;
+            _lr.startColor = _color;
+            _lr.endColor = _color;
         }
 
         #endregion Updating
@@ -215,11 +258,11 @@ namespace Atlanticide
 
         private RaycastHit[] GetRaycastHits()
         {
-            Vector3 direction = (TargetPosition - StartPosition).normalized;
+            BeamDirection = (TargetPosition - StartPosition).normalized;
             Quaternion orientation = Quaternion.
                 LookRotation(TargetPosition - StartPosition, Vector3.up);
-            RaycastHit[] hits = Physics.BoxCastAll(transform.position + _beamStartPoint,
-                 _beamExtents, direction, orientation, BeamLength, _layerMask);
+            RaycastHit[] hits = Physics.BoxCastAll(transform.position + _hitboxStartPoint,
+                 _hitboxExtents, BeamDirection, orientation, BeamLength, _layerMask);
             return hits;
         }
 
@@ -330,9 +373,24 @@ namespace Atlanticide
         {
             if (Active)
             {
-                Gizmos.color = Color.blue;
+                // Simple beam and beam center lines
+                Gizmos.color = _color;
                 Gizmos.DrawLine(BeamCenter, BeamCenter + Vector3.up * 1f);
+                Gizmos.DrawLine(StartPosition, TargetPosition);
+
+                // Hitbox
+                DrawHitboxGizmo();
             }
+        }
+
+        private void DrawHitboxGizmo()
+        {
+            Gizmos.color = Color.green;
+            Vector3 trueHitboxStartPoint = transform.position + _hitboxStartPoint;
+            Vector3 hitboxTargetPoint =
+                trueHitboxStartPoint + BeamDirection * BeamLength;
+            Utils.DrawRotatedBoxGizmo(trueHitboxStartPoint, hitboxTargetPoint,
+                _hitboxExtents, transform);
         }
     }
 }

@@ -352,6 +352,21 @@ namespace Atlanticide
             Gizmos.DrawLine(p6, boxCorner2);
         }
 
+        public static void DrawRotatedBoxGizmo(Vector3 face1MidPoint,
+                                               Vector3 face2MidPoint,
+                                               Vector3 boxExtents,
+                                               Transform objTransform)
+        {
+            Gizmos.DrawLine(face1MidPoint + objTransform.right * boxExtents.x + objTransform.up * boxExtents.y,
+                            face2MidPoint + objTransform.right * boxExtents.x + objTransform.up * boxExtents.y);
+            Gizmos.DrawLine(face1MidPoint - objTransform.right * boxExtents.x + objTransform.up * boxExtents.y,
+                            face2MidPoint - objTransform.right * boxExtents.x + objTransform.up * boxExtents.y);
+            Gizmos.DrawLine(face1MidPoint + objTransform.right * boxExtents.x - objTransform.up * boxExtents.y,
+                            face2MidPoint + objTransform.right * boxExtents.x - objTransform.up * boxExtents.y);
+            Gizmos.DrawLine(face1MidPoint - objTransform.right * boxExtents.x - objTransform.up * boxExtents.y,
+                            face2MidPoint - objTransform.right * boxExtents.x - objTransform.up * boxExtents.y);
+        }
+
         public static void DrawProgressBarGizmo(Vector3 position, float progress, Color barColor, Color indicatorColor)
         {
             Gizmos.color = barColor;

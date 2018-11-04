@@ -55,7 +55,7 @@ namespace Atlanticide
         {
             if (!_isDestroyed && !_hitTimer.Active)
             {
-                Debug.Log("collectStrength: " + collectStrength);
+                //Debug.Log("collectStrength: " + collectStrength);
                 _toughnessLeft -= collectStrength;
                 if (_toughnessLeft <= 0f)
                 {
@@ -81,6 +81,7 @@ namespace Atlanticide
         public void Destroy()
         {
             gameObject.SetActive(false);
+            SFXPlayer.Instance.Play(Sound.Cyclops_Exploding, volumeFactor: 0.3f);
         }
 
         /// <summary>
