@@ -8,6 +8,7 @@ namespace Atlanticide
     public interface ILinkTarget
     {
         GameObject LinkObject { get; set; }
+        LinkBeam LinkBeam { get; set; }
         LinkBeam LinkedLinkBeam { get; set; }
         bool IsLinkTarget { get; set; }
     }

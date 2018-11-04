@@ -28,6 +28,8 @@ namespace Atlanticide
         }
         #endregion Statics
 
+        [Header("WORLD CONFIG")]
+
         public float gravity = 1f;
         public float pushSpeed = 1f;
 
@@ -59,6 +61,8 @@ namespace Atlanticide
 
         [SerializeField]
         private float _pitchRise = 0.1f;
+
+        [Header("INVENTORY")]
 
         public List<int> keyCodes = new List<int>();
 
@@ -209,7 +213,7 @@ namespace Atlanticide
 
         public void PlayCollectSound()
         {
-            SFXPlayer.Instance.Play(Sound.Clink, _pitch);
+            SFXPlayer.Instance.Play(Sound.Clink, pitch: _pitch);
             _pitch += _pitchRise;
             if (_pitch > _maxPitch)
             {

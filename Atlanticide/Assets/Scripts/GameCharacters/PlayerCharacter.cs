@@ -41,9 +41,33 @@ namespace Atlanticide
 
         public Shield Shield { get; private set; }
 
-        public LinkBeam LinkBeam { get; private set; }
+        /// <summary>
+        /// The player's link beam.
+        /// </summary>
+        public LinkBeam LinkBeam { get; set; }
+
+        /// <summary>
+        /// The link beam's game object, the object
+        /// with which a link can be established.
+        /// </summary>
+        public GameObject LinkObject { get; set; }
+
+        /// <summary>
+        /// The link beam which is currently
+        /// linked to the player's link beam.
+        /// </summary>
+        public LinkBeam LinkedLinkBeam { get; set; }
+
+        /// <summary>
+        /// Is the player currently a link target.
+        /// </summary>
+        public bool IsLinkTarget { get; set; }
 
         public Animator Animator { get; private set; }
+
+        public GameObject ShieldModel;
+
+        public Animator ShieldAnimator { get; private set; }
 
         public Interactable InteractionTarget
         {
@@ -58,12 +82,6 @@ namespace Atlanticide
                     ActivateTargetIcon(_interactionTarget != null, ID, _interactionTarget);
             }
         }
-
-        public GameObject LinkObject { get; set; }
-
-        public LinkBeam LinkedLinkBeam { get; set; }
-
-        public bool IsLinkTarget { get; set; }
 
         public bool Jumping { get; private set; }
 
@@ -181,9 +199,10 @@ namespace Atlanticide
             EnergyCollector = GetComponentInChildren<EnergyCollector>();
             Shield = GetComponentInChildren<Shield>();
             LinkBeam = GetComponentInChildren<LinkBeam>();
-            LinkBeam.Init(this);
+            LinkBeam.Init(this, Shield.Activate);
             LinkObject = LinkBeam.gameObject;
             Animator = GetComponentInChildren<Animator>();
+            ShieldAnimator = ShieldModel.GetComponent<Animator>();
             _otherPlayer = GameManager.Instance.GetAnyOtherPlayer(this, true);
         }
 
@@ -200,6 +219,7 @@ namespace Atlanticide
             {
                 UpdateJump();
                 UpdateRotation();
+                UpdateShield();
             }
         }
 
@@ -225,10 +245,36 @@ namespace Atlanticide
             transform.position = newPosition;
 
             Vector3 inputDirection = input.normalized;
+            inputDir = new Vector3(inputDirection.x, 0, inputDirection.y);
+            forwardDir = transform.forward;
+            if (!Shield.IsIdle)
+            {
+                float angle = 0;
+                if (transform.forward.x >= 0)
+                {
+                    angle = Vector3.Angle(transform.forward, Vector3.forward);
+                }
+                else
+                {
+                    angle = 360 - Vector3.Angle(transform.forward, Vector3.forward);
+                }
+                //Debug.Log("angle: " + angle);
+                inputDirection = Quaternion.AngleAxis(angle, Vector3.forward) * inputDirection;
+                newInputDir = new Vector3(inputDirection.x, 0, inputDirection.y);
+            }
+            else
+            {
+                newInputDir = Vector3.zero;
+            }
+
             Animator.SetFloat("Horizontal", inputDirection.x);
             Animator.SetFloat("Vertical", inputDirection.y);
             Animator.speed = input.magnitude * (speed / _speed);
         }
+
+        Vector3 inputDir;
+        Vector3 forwardDir;
+        Vector3 newInputDir;
 
         private void UpdateRotation()
         {
@@ -274,6 +320,20 @@ namespace Atlanticide
                     _jumpForce = 0;
                     Jumping = false;
                 }
+            }
+        }
+
+        private void UpdateShield()
+        {
+            if (ShieldIsActive)
+            {
+                Animator.SetBool("Shield Active", true);
+                ShieldAnimator.SetBool("Shield Active", true);
+            }
+            else
+            {
+                Animator.SetBool("Shield Active", false);
+                ShieldAnimator.SetBool("Shield Active", false);
             }
         }
 
@@ -782,6 +842,20 @@ namespace Atlanticide
                 Gizmos.color = Color.red;
                 Gizmos.DrawWireSphere(transform.position, 1);
             }
+
+            //DrawWalkingDirAndRotGizmos()
+        }
+
+        private void DrawWalkingDirAndRotGizmos()
+        {
+            float dist = 3;
+            Vector3 startPos = transform.position + Vector3.up * 0.2f;
+            Gizmos.color = Color.green;
+            Gizmos.DrawLine(startPos, startPos + inputDir * dist);
+            Gizmos.color = Color.blue;
+            Gizmos.DrawLine(startPos, startPos + forwardDir * dist);
+            Gizmos.color = Color.red;
+            Gizmos.DrawLine(startPos, startPos + newInputDir * dist);
         }
     }
 }

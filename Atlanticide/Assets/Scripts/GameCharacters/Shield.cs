@@ -10,6 +10,9 @@ namespace Atlanticide
         private const string InteractableKey = "Interactable";
         private const string PlatformKey = "Platform";
 
+        [SerializeField]
+        private bool _stayInvisible = true;
+
         [SerializeField, Range(0.1f, 5f)]
         private float _openTime = 0.5f;
 
@@ -91,7 +94,11 @@ namespace Atlanticide
             else if (_updateOpen)
             {
                 UpdateOpenProgress();
-                _tp.SetAlpha(_openProgress);
+
+                if (!_stayInvisible)
+                {
+                    _tp.SetAlpha(_openProgress);
+                }
             }
         }
 
@@ -160,7 +167,12 @@ namespace Atlanticide
             Active = activate;
             _updateOpen = false;
             _openProgress = (Active ? 1f : 0f);
-            _tp.SetAlpha(_openProgress);
+
+            if (!_stayInvisible)
+            {
+                _tp.SetAlpha(_openProgress);
+            }
+
             gameObject.layer = LayerMask.NameToLayer
                 (activate ? InteractableKey : DefaultKey);
         }

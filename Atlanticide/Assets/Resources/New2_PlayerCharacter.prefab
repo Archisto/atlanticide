@@ -613,7 +613,7 @@ GameObject:
   - component: {fileID: 4885187327144534}
   - component: {fileID: 114174789739289614}
   - component: {fileID: 120837103595317824}
-  m_Layer: 15
+  m_Layer: 16
   m_Name: LinkBeam
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -788,7 +788,7 @@ GameObject:
   - component: {fileID: 95888271486658836}
   - component: {fileID: 114686667694330238}
   m_Layer: 10
-  m_Name: New_PlayerCharacter
+  m_Name: New2_PlayerCharacter
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1392,6 +1392,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4409506957584660}
+  - {fileID: 4658635419219192}
   m_Father: {fileID: 4461664369445750}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1916,7 +1917,6 @@ Transform:
   m_LocalScale: {x: 0.9999998, y: 0.9999998, z: 1}
   m_Children:
   - {fileID: 4008415816417876}
-  - {fileID: 4658635419219192}
   m_Father: {fileID: 4662101125544054}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -2022,7 +2022,7 @@ Transform:
   - {fileID: 4376486146801330}
   - {fileID: 4423803816610118}
   m_Father: {fileID: 4613988630612270}
-  m_RootOrder: 2
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &4544781150675942
 Transform:
@@ -2065,7 +2065,7 @@ Transform:
   m_Children:
   - {fileID: 4476268798072404}
   m_Father: {fileID: 4613988630612270}
-  m_RootOrder: 0
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &4571399897642076
 Transform:
@@ -2141,12 +2141,12 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1661321770211080}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 21.12, y: 0, z: -2.26}
+  m_LocalPosition: {x: -9.48, y: 0.19, z: -2.41}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
+  - {fileID: 4542109692418954}
   - {fileID: 4564044744072230}
   - {fileID: 4863394655525554}
-  - {fileID: 4542109692418954}
   - {fileID: 4885187327144534}
   m_Father: {fileID: 0}
   m_RootOrder: 0
@@ -2199,12 +2199,12 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1896533574571186}
-  m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: -0.12, y: 0, z: 0}
+  m_LocalRotation: {x: 0.707094, y: -0.0016445853, z: -0.0016445497, w: 0.7071157}
+  m_LocalPosition: {x: 0.14851236, y: -0.0006908664, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4554107959422662}
-  m_Father: {fileID: 4461664369445750}
+  m_Father: {fileID: 4008415816417876}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
 --- !u!4 &4660164444026310
@@ -2493,7 +2493,7 @@ Transform:
   m_LocalScale: {x: 0.60475, y: 0.04953503, z: 0.8454155}
   m_Children: []
   m_Father: {fileID: 4613988630612270}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
 --- !u!4 &4885187327144534
 Transform:
@@ -2915,19 +2915,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a252ad03b7fe8694cad17fcdf50095d3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _minLength: 0.5
+  _zeroRatioStrength: 0.5
+  _oneRatioStrength: 2
   _maxStrengthLength: 5
   _strengthScaleLength: 5
+  _minLength: 0.5
   _wallHitShutdownTime: 0.5
-  _pitchResetTime: 1
-  _minPitch: 0.5
-  _maxPitch: 1
-  _pitchRise: 0.04
-  _beamStartPoint: {x: 0, y: -0.25, z: 0}
-  _beamExtents: {x: 0.05, y: 0.3, z: 0}
+  _hitboxStartPoint: {x: 0, y: -0.1, z: 0}
+  _hitboxExtents: {x: 0.1, y: 0.55, z: 0}
   _layerMask:
     serializedVersion: 2
     m_Bits: 14848
+  _useLineRenderer: 1
   _strengthRatio: 0
 --- !u!114 &114183816673013010
 MonoBehaviour:
@@ -2940,10 +2939,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 64c6c2f4644766d40b31752c42ab3e8f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _stayInvisible: 1
   _openTime: 0.5
   _bashTime: 0.1
   _bashRecoveryTime: 0.5
-  _playerSpeedModifier: 0.5
+  _playerSpeedModifier: 1
   _openProgress: 0
   _bashProgress: 0
 --- !u!114 &114279728556923020
@@ -3016,6 +3016,7 @@ MonoBehaviour:
   _jumpHeight: 1.8
   _climbSpeed: 4
   _respawnTime: 1
+  ShieldModel: {fileID: 1814106930888406}
 --- !u!114 &114719905542029688
 MonoBehaviour:
   m_ObjectHideFlags: 1

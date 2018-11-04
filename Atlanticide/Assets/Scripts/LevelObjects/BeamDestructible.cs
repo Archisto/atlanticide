@@ -81,6 +81,7 @@ namespace Atlanticide
         public void Destroy()
         {
             gameObject.SetActive(false);
+            SFXPlayer.Instance.Play(Sound.Cyclops_Exploding, volumeFactor: 0.3f);
         }
 
         /// <summary>
