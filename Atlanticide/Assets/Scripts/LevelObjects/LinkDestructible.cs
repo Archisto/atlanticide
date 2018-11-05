@@ -7,7 +7,7 @@ namespace Atlanticide
     /// <summary>
     /// An object that can be destroyed with the link beam.
     /// </summary>
-    public class BeamDestructible : LevelObject
+    public class LinkDestructible : LevelObject, ILinkInteractable
     {
         [SerializeField, Range(1f, 30f)]
         private float _toughness = 10f;
@@ -51,31 +51,42 @@ namespace Atlanticide
             base.UpdateObject();
         }
 
-        public void TryDestroy(float collectStrength)
+        public bool TryInteract(LinkBeam linkBeam)
         {
             if (!_isDestroyed && !_hitTimer.Active)
             {
                 //Debug.Log("collectStrength: " + collectStrength);
-                _toughnessLeft -= collectStrength;
+                _toughnessLeft -= linkBeam.Strength;
                 if (_toughnessLeft <= 0f)
                 {
                     _toughnessLeft = 0f;
                     Destroy();
+                    return true;
                 }
                 else
                 {
                     _hitTimer.Activate();
                 }
             }
+
+            return false;
         }
 
-        public void TryDestroyInstant(float collectStrength)
+        public bool TryInteractInstant(LinkBeam linkBeam)
         {
-            if (collectStrength >= _toughness)
+            if (linkBeam.Strength >= _toughness)
             {
                 _toughnessLeft = 0f;
                 Destroy();
+                return true;
             }
+
+            return false;
+        }
+
+        public bool GivePulse(LinkBeam linkBeam, float speedModifier)
+        {
+            return false;
         }
 
         public void Destroy()

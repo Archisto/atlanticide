@@ -33,6 +33,12 @@ namespace Atlanticide
         private float _minLength = 0.5f;
 
         [SerializeField]
+        private float _pulseStrength = 1.5f;
+
+        [SerializeField]
+        private float _pulseCooldownTime = 1f;
+
+        [SerializeField]
         private float _wallHitShutdownTime = 1f;
 
         [SerializeField]
@@ -47,11 +53,13 @@ namespace Atlanticide
         [Header("DEBUG")]
 
         public bool _useLineRenderer;
-        public ILinkTarget _target;
         public float _strengthRatio;
 
-        private PlayerCharacter _player;
+        public ILinkTarget _target;
+        public List<ILinkInteractable> linkInteractables;
+
         private LineRenderer _lr;
+        private Timer _pulseCooldownTimer;
         private Timer _shutdownTimer;
         private Color _color;
         private Color _strongColor = Color.blue;
@@ -59,6 +67,8 @@ namespace Atlanticide
         private Color _shutdownWarningColor = Color.yellow;
 
         public bool Active { get; private set; }
+
+        public PlayerCharacter Player { get; private set; }
 
         public float BeamLength { get; private set; }
 
@@ -92,9 +102,11 @@ namespace Atlanticide
         /// </summary>
         public void Init(PlayerCharacter player, Activation shieldActivation)
         {
-            _player = player;
+            Player = player;
+            linkInteractables = new List<ILinkInteractable>();
             _lr = GetComponent<LineRenderer>();
             _lr.enabled = false;
+            _pulseCooldownTimer = new Timer(_pulseCooldownTime, true);
             _shutdownTimer = new Timer(_wallHitShutdownTime, true);
             stateChangeCallback = shieldActivation;
         }
@@ -114,6 +126,7 @@ namespace Atlanticide
                     (hits.Length == 0 || !CheckIfWallHit(hits)))
                 {
                     Active = true;
+                    //Player.IsLinkTarget = false;
                     _target = target;
                     _target.IsLinkTarget = true;
                     _target.LinkedLinkBeam = this;
@@ -130,7 +143,9 @@ namespace Atlanticide
             {
                 Active = false;
                 BeamLength = 0f;
+                _pulseCooldownTimer.Reset();
                 _shutdownTimer.Reset();
+                linkInteractables.Clear();
 
                 if (_target != null)
                 {
@@ -169,6 +184,37 @@ namespace Atlanticide
             }
         }
 
+        public bool Pulse()
+        {
+            if (!_pulseCooldownTimer.Active)
+            {
+                SFXPlayer.Instance.Play(Sound.Shield_Bash);
+                _pulseCooldownTimer.Activate();
+                if (Active)
+                {
+                    GivePulseToLinkInteractables(true);
+                }
+                else if (Player.IsLinkTarget)
+                {
+                    Player.LinkedLinkBeam.
+                        GivePulseToLinkInteractables(false);
+                }
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public void GivePulseToLinkInteractables(bool towardsTarget)
+        {
+            foreach (ILinkInteractable li in linkInteractables)
+            {
+                li.GivePulse(this, (towardsTarget ? 1f : -1f) * _pulseStrength);
+            }
+        }
+
         #region Updating
 
         /// <summary>
@@ -186,6 +232,14 @@ namespace Atlanticide
                     _shutdownTimer.Check())
                 {
                     Activate(false);
+                }
+            }
+
+            if (Player.BeamOn)
+            {
+                if (_pulseCooldownTimer.Check())
+                {
+                    _pulseCooldownTimer.Reset();
                 }
             }
         }
@@ -276,21 +330,21 @@ namespace Atlanticide
                 {
                     //Debug.Log("hit.collider: " + hit.collider.transform.name);
                     Pickup pickup = collider.transform.GetComponent<Pickup>();
-                    BeamDestructible destructible = null;
+                    ILinkInteractable linkInteractable = null;
                     if (pickup != null)
                     {
                         HandlePickupHit(pickup);
                     }
                     else
                     {
-                        destructible = collider.transform.GetComponent<BeamDestructible>();
-                        if (destructible != null)
+                        linkInteractable = collider.transform.GetComponent<ILinkInteractable>();
+                        if (linkInteractable != null)
                         {
-                            HandleDestructibleHit(destructible);
+                            HandleLinkInteractableHit(linkInteractable);
                         }
                     }
 
-                    if (pickup == null && destructible == null && !wallHit)
+                    if (pickup == null && linkInteractable == null && !wallHit)
                     {
                         if (CheckIfWallHit(collider))
                         {
@@ -316,24 +370,24 @@ namespace Atlanticide
             ToughPickup tp = pickup as ToughPickup;
             if (tp != null)
             {
-                tp.TryCollect(_player, Strength);
+                tp.TryInteract(this);
                 //tp.TryCollectInstant(_player, CollectStrength);
             }
             else
             {
-                pickup.Collect(_player);
+                pickup.Collect(Player);
             }
         }
 
-        private void HandleDestructibleHit(BeamDestructible destructible)
+        private void HandleLinkInteractableHit(ILinkInteractable linkInteractable)
         {
-            destructible.TryDestroy(Strength);
+            linkInteractable.TryInteract(this);
         }
 
         private bool CheckIfWallHit(Collider collider)
         {
-            BeamDestructible bd = collider.transform.
-                GetComponent<BeamDestructible>();
+            LinkDestructible bd = collider.transform.
+                GetComponent<LinkDestructible>();
             return bd == null && WallKey.Equals
                 (LayerMask.LayerToName(collider.gameObject.layer));
         }
@@ -345,8 +399,8 @@ namespace Atlanticide
                 Collider collider = hit.collider;
                 if (collider != null)
                 {
-                    BeamDestructible bd = collider.transform.
-                        GetComponent<BeamDestructible>();
+                    LinkDestructible bd = collider.transform.
+                        GetComponent<LinkDestructible>();
                     if (bd == null && WallKey.Equals
                         (LayerMask.LayerToName(collider.gameObject.layer)))
                     {
@@ -366,7 +420,9 @@ namespace Atlanticide
         public void ResetLinkBeam()
         {
             Activate(false);
+            _pulseCooldownTimer.Reset();
             _shutdownTimer.Reset();
+            linkInteractables.Clear();
         }
 
         private void OnDrawGizmos()
