@@ -46,7 +46,7 @@ namespace Atlanticide
         private float _interactRange = 3f;
 
         [SerializeField, Range(0f, 5f)]
-        private float _playerCollectStrength = 1f;
+        private float _playerInteractStrength = 1f;
 
         [Header("SOUND EFFECTS")]
 
@@ -77,7 +77,7 @@ namespace Atlanticide
 
         public float InteractRange { get { return _interactRange; } }
 
-        public float PlayerCollectStrength { get { return _playerCollectStrength; } }
+        public float PlayerInteractStrength { get { return _playerInteractStrength; } }
 
         public bool GamePaused { get { return _gamePaused; } }
 

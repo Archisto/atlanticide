@@ -6,6 +6,12 @@ namespace Atlanticide
 {
     public class AnEmptyScript : MonoBehaviour
     {
+        [SerializeField]
+        private float _floatVar;
+
+        [SerializeField]
+        private bool _boolVar;
+
         /// <summary>
         /// Initializes the object.
         /// </summary>

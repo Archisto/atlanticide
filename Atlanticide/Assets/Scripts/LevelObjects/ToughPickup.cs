@@ -7,8 +7,9 @@ namespace Atlanticide
     /// <summary>
     /// A pickup that takes some time or
     /// high enough collect strength to collect.
+    /// Can be collected with the link beam.
     /// </summary>
-    public class ToughPickup : Pickup
+    public class ToughPickup : Pickup, ILinkInteractable
     {
         [SerializeField, Range(1f, 30f)]
         private float _toughness = 1f;
@@ -67,18 +68,28 @@ namespace Atlanticide
         protected void OnCollisionStay(Collision collision)
         {
             if (!IsCollected && !_hitTimer.Active &&
-                World.Instance.PlayerCollectStrength > 0f)
+                World.Instance.PlayerInteractStrength > 0f)
             {
                 PlayerCharacter pc = collision.gameObject.
                     GetComponentInParent<PlayerCharacter>();
                 if (pc != null)
                 {
-                    TryCollect(pc, World.Instance.PlayerCollectStrength);
+                    TryInteractPlayer(pc);
                 }
             }
         }
 
-        public void TryCollect(PlayerCharacter player, float collectStrength)
+        public bool TryInteractPlayer(PlayerCharacter player)
+        {
+            return TryInteract(player, World.Instance.PlayerInteractStrength);
+        }
+
+        public bool TryInteract(LinkBeam linkBeam)
+        {
+            return TryInteract(linkBeam.Player, linkBeam.Strength);
+        }
+
+        public bool TryInteract(PlayerCharacter player, float collectStrength)
         {
             if (!IsCollected && !_hitTimer.Active)
             {
@@ -88,21 +99,32 @@ namespace Atlanticide
                 {
                     _toughnessLeft = 0f;
                     Collect(player);
+                    return true;
                 }
                 else
                 {
                     _hitTimer.Activate();
                 }
             }
+
+            return false;
         }
 
-        public void TryCollectInstant(PlayerCharacter player, float collectStrength)
+        public bool TryInteractInstant(LinkBeam linkBeam)
         {
-            if (collectStrength >= _toughness)
+            if (linkBeam.Strength >= _toughness)
             {
                 _toughnessLeft = 0f;
-                Collect(player);
+                Collect(linkBeam.Player);
+                return true;
             }
+
+            return false;
+        }
+
+        public bool GivePulse(LinkBeam linkBeam, float speedModifier)
+        {
+            return false;
         }
 
         /// <summary>

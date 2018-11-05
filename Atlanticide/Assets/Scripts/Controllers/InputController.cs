@@ -172,32 +172,11 @@ namespace Atlanticide
                             _players[i].LookInput(lookingInput);
                         }
 
-                        // Changing stance
-                        _players[i].HandleStanceInput();
-
-                        // Interacting with certain level objects
-                        _players[i].HandleInteractionInput();
-
-                        // Jumping
-                        //_players[i].HandleJumpInput();
-
                         // Using the player's primary action
-                        if (_players[i].HandleActionInput())
-                        {
-                            CancelToolSwap(_players[i]);
-                        }
+                        _players[i].HandleActionInput();
 
-                        // Using the player's alternate action
-                        if (_players[i].HandleAltActionInput())
-                        {
-                            CancelToolSwap(_players[i]);
-                        }
-
-                        // Tool swapping
-                        if (_players[i].CheckToolSwapInput())
-                        {
-                            _toolSwap.InitiateSwapRequest(_players[i]);
-                        }
+                        // Using the player's secondary action
+                        _players[i].HandleAltActionInput();
                     }
                 }
                 // If the player has initiated a tool swap request
@@ -206,6 +185,36 @@ namespace Atlanticide
                 {
                     CancelToolSwap(_players[i]);
                 }
+            }
+        }
+
+        private void LegacyPlayerInput(int i)
+        {
+            // Changing stance
+            _players[i].HandleStanceInput();
+
+            // Interacting with certain level objects
+            _players[i].HandleInteractionInput();
+
+            // Jumping
+            _players[i].HandleJumpInput();
+
+            // Using the player's primary action
+            if (_players[i].HandleActionInput())
+            {
+                CancelToolSwap(_players[i]);
+            }
+
+            // Using the player's secondary action
+            if (_players[i].HandleAltActionInput())
+            {
+                CancelToolSwap(_players[i]);
+            }
+
+            // Tool swapping
+            if (_players[i].CheckToolSwapInput())
+            {
+                _toolSwap.InitiateSwapRequest(_players[i]);
             }
         }
         

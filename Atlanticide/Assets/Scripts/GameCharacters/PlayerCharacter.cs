@@ -63,6 +63,15 @@ namespace Atlanticide
         /// </summary>
         public bool IsLinkTarget { get; set; }
 
+        /// <summary>
+        /// Is either the player's link beam
+        /// activated or the player a link target.
+        /// </summary>
+        public bool BeamOn
+        {
+            get { return LinkBeam.Active || IsLinkTarget; }
+        }
+
         public Animator Animator { get; private set; }
 
         public GameObject ShieldModel;
@@ -413,6 +422,21 @@ namespace Atlanticide
             return result;
         }
 
+        public bool HandleAltActionInput()
+        {
+            bool active = Input.GetAltActionInput();
+            bool result = false;
+            if (active && BeamOn)
+            {
+                if (LinkBeam != null)
+                {
+                    LinkBeam.Pulse();
+                }
+            }
+
+            return result;
+        }
+
         public bool Old_HandleActionInput()
         {
             bool inputHeld = false;
@@ -453,7 +477,7 @@ namespace Atlanticide
             return result;
         }
 
-        public bool HandleAltActionInput()
+        public bool Old_HandleAltActionInput()
         {
             bool active = Input.GetAltActionInput();
             bool result = false;
