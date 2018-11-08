@@ -94,7 +94,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1340101263505736}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 1, y: 1, z: 0}
+  m_LocalPosition: {x: 8.84, y: 1, z: 2.11}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 4414935867648102}
@@ -129,6 +129,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _player1SpawnPoint: {fileID: 4525349788122696}
   _player2SpawnPoint: {fileID: 4787080142380638}
+  orichalcumPickupPrefab: {fileID: 114472806107964208, guid: 42ac1592a09300442817e26528986661,
+    type: 2}
+  stoneDebrisPrefabArray:
+  - {fileID: 114115138799096122, guid: d22b72fa12454f848ab850797d5aa52d, type: 2}
+  - {fileID: 114856581131740268, guid: 7bec7679adf2ee346933c598a3cb4634, type: 2}
+  - {fileID: 114806078737504126, guid: bd70ea8a3abbbba4693006279fd787b8, type: 2}
+  - {fileID: 114520726976687920, guid: 58e79c518d118e74ba883bde2ebd64d9, type: 2}
+  woodDebrisPrefabArray:
+  - {fileID: 114248194978923306, guid: 6073c43bb18e5bd44888c848e754a365, type: 2}
+  - {fileID: 114074689312514572, guid: b2866f70e1442c34d8abb40b18b34065, type: 2}
+  terracottaDebrisPrefabArray:
+  - {fileID: 114717635662397190, guid: 6ef88818e981f4a4891cafee731a830b, type: 2}
+  - {fileID: 114948375165442382, guid: 0c0060b507e8b07438ad8e86e251546a, type: 2}
+  - {fileID: 114814381505255854, guid: a33933d5cb6a5cc41809bd9057ebcd72, type: 2}
 --- !u!114 &114949632137208592
 MonoBehaviour:
   m_ObjectHideFlags: 1

@@ -37,6 +37,28 @@ namespace Atlanticide
             }
         }
 
+        public Pool(int poolSize, bool shouldGrow, T[] prefabArray)
+        {
+            _poolSize = poolSize;
+            _shouldGrow = shouldGrow;
+            // Initialize the pool by adding '_poolSize' amount of objects to the pool.
+            _pool = new List<T>(_poolSize);
+
+            int i = 0;
+            while (i < _poolSize)
+            {
+                foreach(T t in prefabArray)
+                {
+                    _objectPrefab = t;
+                    if (i < _poolSize)
+                    {
+                        AddObject();
+                        i++;
+                    }
+                }
+            }
+        }
+
         public Pool( int poolSize, bool shouldGrow, T prefab, Action<T> initMethod )
             : this(poolSize, shouldGrow, prefab)
         {
