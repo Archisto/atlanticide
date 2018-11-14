@@ -13,8 +13,20 @@ namespace Atlanticide
         [SerializeField]
         private Transform _player2SpawnPoint;
 
+        [SerializeField]
+        private float _levelTime = 120f;
+
+        public int requiredScore = 1000;
+
         private UIController _ui;
         private Level _currentLevel;
+        private Timer _levelTimer;
+        private float levelTimeElapsedRatio;
+
+        public bool LevelActive
+        {
+            get { return _levelTimer.Active; }
+        }
 
         /// <summary>
         /// Initializes the object.
@@ -35,6 +47,8 @@ namespace Atlanticide
             string puzzleName = _currentLevel.GetCurrentPuzzleName();
             _ui.levelName.text = _currentLevel.LevelSceneName + (puzzleName != null ?
                 " - " + _currentLevel.GetCurrentPuzzleName() : "");
+
+            _levelTimer = new Timer(_levelTime, true);
         }
 
         /// <summary>
@@ -42,6 +56,22 @@ namespace Atlanticide
         /// </summary>
         private void Update()
         {
+            if (!World.Instance.GamePaused)
+            {
+                if (LevelActive)
+                {
+                    if (_levelTimer.Check())
+                    {
+                        EndLevel();
+                    }
+                    else
+                    {
+                        levelTimeElapsedRatio = _levelTimer.GetRatio();
+                    }
+
+                    GameManager.Instance.UpdateUITimer(levelTimeElapsedRatio);
+                }
+            }
         }
 
         public Vector3 GetSpawnPoint(int playerNum)
@@ -79,8 +109,23 @@ namespace Atlanticide
             //}
         }
 
+        public void StartLevel()
+        {
+            _levelTimer.Activate();
+            levelTimeElapsedRatio = 0f;
+        }
+
+        public void EndLevel()
+        {
+            _levelTimer.Reset();
+            levelTimeElapsedRatio = 1f;
+            GameManager.Instance.EndLevel(false);
+        }
+
         public void ResetLevel()
         {
+            _levelTimer.Reset();
+            levelTimeElapsedRatio = 0f;
         }
     }
 }

@@ -36,9 +36,6 @@ namespace Atlanticide
         [Range(0f, 1f)]
         public float minWalkingSpeedRatio = 0.2f;
 
-        [SerializeField, Range(0.1f, 5f)]
-        public float telegrabRadius = 1f;
-
         [SerializeField, Range(1, 20)]
         private int _maxEnergyCharges = 5;
 
@@ -194,14 +191,18 @@ namespace Atlanticide
         public void PauseGame(bool pause, string playerName = "")
         {
             _gamePaused = pause;
-            GameManager.Instance.ActivatePauseScreen(GamePaused, playerName);
+
+            if (!pause || playerName.Length > 0)
+            {
+                GameManager.Instance.ActivatePauseScreen(GamePaused, playerName);
+            }
         }
 
         public void SetEnergyChargesAndUpdateUI(int charges)
         {
             CurrentEnergyCharges = Utils.Clamp(charges, 0, MaxEnergyCharges);
-            float ratio = GetEnergyRatio();
-            _ui.UpdateEnergyBar(ratio);
+            //float ratio = GetEnergyRatio();
+            //_ui.UpdateEnergyBar(ratio);
             //Debug.Log(string.Format("Energy charges: {0} ({1} %)",
             //    CurrentEnergyCharges, ratio * 100));
         }
@@ -236,7 +237,6 @@ namespace Atlanticide
         /// </summary>
         public void ResetWorld()
         {
-            SetEnergyChargesAndUpdateUI(0);
             keyCodes.Clear();
             ResetPickupSFX();
             EmittingEnergy = false;
