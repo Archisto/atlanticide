@@ -42,19 +42,16 @@ namespace Atlanticide.UI
         public void RestartPuzzle()
         {
             GameManager.Instance.StartSceneReset();
-            ResumeGame();
         }
 
         public void RestartLevel()
         {
             GameManager.Instance.LoadPuzzle(1);
-            ResumeGame();
         }
 
         public void ReturnToMainMenu()
         {
             GameManager.Instance.LoadMainMenu();
-            ResumeGame();
         }
 
         public void QuitGame()

@@ -65,7 +65,6 @@ namespace Atlanticide
         private UIController _ui;
         private List<Level> _levels;
         private LevelObject[] _levelObjects;
-        private Transform[] _telegrabs;
         private InputController _input;
         private SettingsManager _settings;
         private SaveSystem _saveSystem;
@@ -103,6 +102,8 @@ namespace Atlanticide
         public Level CurrentLevel { get; private set; }
 
         public int CurrentScore { get; private set; }
+
+        public int RequiredScore { get; private set; }
 
         public SettingsManager Settings
         {
@@ -184,13 +185,17 @@ namespace Atlanticide
                      && _fade.FadedOut)
             {
                 SceneTransition = TransitionPhase.None;
-                ActivatePauseScreen(false, "");
+                World.Instance.PauseGame(false);
                 ResetScene();
+            }
+            else if (GameState == State.Play && !_levelManager.LevelActive)
+            {
+                StartLevel();
             }
 
             if (_updateAtSceneStart)
             {
-                LevelStartInit();
+                SceneStartInit();
             }
         }
 
@@ -217,7 +222,6 @@ namespace Atlanticide
             {
                 GameState = State.Play;
             }
-            
 
             InitLevels();
             PlayerCount = 2;
@@ -228,16 +232,17 @@ namespace Atlanticide
             MenuPlayerInput = new PlayerInput(InputDevice.Keyboard);
         }
 
-        private void LevelStartInit()
+        private void SceneStartInit()
         {
             if (GameState == State.Play)
             {
                 _freshGameStart = false;
-                Debug.Log("Level starts");
+                World.Instance.PauseGame(false);
+                Debug.Log("Level scene init");
             }
             else
             {
-                Debug.Log("Menu starts");
+                Debug.Log("Menu scene init");
             }
 
             _updateAtSceneStart = false;
@@ -358,9 +363,6 @@ namespace Atlanticide
                 ("New2_PlayerCharacter");
             CreatePlayers();
             ActivatePlayers(PlayerCount);
-
-            // Testing
-            _telegrabs = new Transform[MaxPlayers];
         }
 
         /// <summary>
@@ -448,23 +450,6 @@ namespace Atlanticide
         public NonPlayerCharacter[] GetNPCs()
         {
             return _npcs;
-        }
-
-        public Transform[] GetTelegrabs()
-        {
-            return _telegrabs;
-        }
-
-        public void UpdateTelegrab(int playerNum, Transform telegrab, bool active)
-        {
-            if (active)
-            {
-                _telegrabs[playerNum] = telegrab;
-            }
-            else
-            {
-                _telegrabs[playerNum] = null;
-            }
         }
 
         #region Player Methods
@@ -799,6 +784,7 @@ namespace Atlanticide
         public void ResetScene()
         {
             SetScore(0);
+            _ui.ActivateLevelEndScreen(false);
             World.Instance.ResetWorld();
             _levelManager.ResetLevel();
             _input.ResetInput();
@@ -812,6 +798,11 @@ namespace Atlanticide
             LevelFailed = false;
             DeadPlayerCount = 0;
             _fade.StartFadeIn(true);
+
+            if (GameState == State.Play || GameState == State.LevelEnd)
+            {
+                StartLevel();
+            }
         }
 
         /// <summary>
@@ -900,7 +891,7 @@ namespace Atlanticide
         /// </summary>
         public void LoadDebugLevel()
         {
-            LoadDebugLevel("Lauri's Colosseum");
+            LoadDebugLevel("LinkProto");
         }
 
         /// <summary>
@@ -959,6 +950,34 @@ namespace Atlanticide
 
         #region Level Methods
 
+        public void StartLevel()
+        {
+            Debug.Log("[GameManager] Level starts");
+            GameState = State.Play;
+            SetScore(0);
+            RequiredScore = _levelManager.requiredScore;
+            _levelManager.StartLevel();
+        }
+
+        public void EndLevel(bool levelWon)
+        {
+            Debug.Log("[GameManager] Level ends");
+            GameState = State.LevelEnd;
+            Debug.Log("Level " + (levelWon ? "won" : "lost") +
+                "! Score: " + CurrentScore + " / " + RequiredScore);
+            _ui.ActivateLevelEndScreen(true, levelWon);
+        }
+
+        public bool LevelWinConditionsMet()
+        {
+            return CurrentScore >= RequiredScore;
+        }
+
+        public void UpdateUITimer(float levelTimeElapsedRatio)
+        {
+            _ui.UpdateLevelTimeBar(levelTimeElapsedRatio);
+        }
+
         /// <summary>
         /// Completes a puzzle and either loads the
         /// next one in the level or loads the next
@@ -970,6 +989,20 @@ namespace Atlanticide
             ResetLevelResultAudioSource();
             _levelResultAudioSrc = SFXPlayer.Instance.Play(Sound.Success);
 
+            TryUnlockLevel(CurrentLevel.Number + 1);
+            SaveGame();
+
+            //LoadNextPuzzleOrLevel();
+        }
+
+        public void GoToNextLevel()
+        {
+            _ui.ActivateLevelEndScreen(false);
+            LoadLevelFromBeginning(CurrentLevel.Number + 1);
+        }
+
+        public void GoToNextPuzzleOrLevel()
+        {
             bool loadNextPuzzle =
                 CurrentLevel.CurrentPuzzleNumber > 0 &&
                 LoadPuzzle(CurrentLevel.CurrentPuzzleNumber + 1);
@@ -982,8 +1015,6 @@ namespace Atlanticide
                 TryUnlockLevel(nextLevel);
                 LoadLevelFromBeginning(nextLevel);
             }
-
-            SaveGame();
         }
 
         /// <summary>

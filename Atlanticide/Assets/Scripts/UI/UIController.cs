@@ -17,7 +17,7 @@ namespace Atlanticide.UI
         private Text _scoreText;
 
         [SerializeField]
-        private Slider _energyBar;
+        private Slider _levelTimeBar;
 
         public Image fadeScreen;
 
@@ -40,6 +40,7 @@ namespace Atlanticide.UI
         private Camera _camera;
         private InputController _input;
         private PauseScreen _pauseScreen;
+        private LevelEndScreen _levelEndScreen;
         private PlayerCharacter[] _players;
         private List<PlayerStatus> _playerStatuses;
         private Vector3[] _targetPositions;
@@ -54,6 +55,7 @@ namespace Atlanticide.UI
             _camera = FindObjectOfType<CameraController>().GetComponent<Camera>();
             _input = FindObjectOfType<InputController>();
             _pauseScreen = GetComponentInChildren<PauseScreen>(true);
+            _levelEndScreen = GetComponentInChildren<LevelEndScreen>(true);
 
             if (_pauseScreen != null)
             {
@@ -91,7 +93,7 @@ namespace Atlanticide.UI
                     CreatePlayerStatusUIElement(_players[i]);
                 }
 
-                UpdateEnergyBar(0f);
+                UpdateLevelTimeBar(0f);
             }
         }
 
@@ -104,12 +106,12 @@ namespace Atlanticide.UI
             return ps;
         }
 
-        public void UpdateAll()
-        {
-            UpdatePlayerToolImages();
-            UpdateEnergyBar(World.Instance.GetEnergyRatio());
-            UpdateScoreCounter();
-        }
+        //public void UpdateAll()
+        //{
+        //    UpdatePlayerToolImages();
+        //    UpdateEnergyBar(World.Instance.GetEnergyRatio());
+        //    UpdateScoreCounter();
+        //}
 
         public void UpdateCanvasSize()
         {
@@ -128,10 +130,16 @@ namespace Atlanticide.UI
             }
         }
 
-        public void UpdateEnergyBar(float energy)
+        //public void UpdateEnergyBar(float energy)
+        //{
+        //    energy = Mathf.Clamp01(energy);
+        //    _energyBar.value = energy;
+        //}
+
+        public void UpdateLevelTimeBar(float elapsedTimeRatio)
         {
-            energy = Mathf.Clamp01(energy);
-            _energyBar.value = energy;
+            elapsedTimeRatio = Mathf.Clamp01(elapsedTimeRatio);
+            _levelTimeBar.value = elapsedTimeRatio;
         }
 
         public void UpdatePlayerToolImage(int playerNum, PlayerTool tool)
@@ -158,8 +166,17 @@ namespace Atlanticide.UI
         public void ActivatePauseScreen(bool activate, string playerName)
         {
             UpdateCanvasSize();
-            _pauseScreen.pausingPlayerText.text = playerName;
-            _pauseScreen.Activate(activate);
+
+            if (_pauseScreen != null)
+            {
+                _pauseScreen.pausingPlayerText.text = playerName;
+                _pauseScreen.Activate(activate);
+            }
+        }
+
+        public void ActivateLevelEndScreen(bool activate, bool levelWon = false)
+        {
+            _levelEndScreen.Activate(activate, levelWon);
         }
 
         public void MoveUIObjToWorldPoint(Image uiObj,

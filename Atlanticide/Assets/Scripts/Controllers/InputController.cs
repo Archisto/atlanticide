@@ -88,8 +88,6 @@ namespace Atlanticide
                     CheckMenuInput();
                 }
 
-
-
                 // Testing
                 CheckDebugInput();
             }
@@ -264,13 +262,6 @@ namespace Atlanticide
                     }
                 }
 
-                // Max energy
-                if (Input.GetKeyDown(KeyCode.Y))
-                {
-                    World.Instance.SetEnergyChargesAndUpdateUI
-                        (World.Instance.MaxEnergyCharges);
-                }
-
                 // Swap tools
                 if (Input.GetKeyDown(KeyCode.T))
                 {
@@ -361,6 +352,14 @@ namespace Atlanticide
             {
                 _pausingPlayerNum = -1;
                 World.Instance.PauseGame(false);
+            }
+        }
+
+        public void ActivateLevelEndScreen()
+        {
+            if (!World.Instance.GamePaused)
+            {
+                TogglePause(0);
             }
         }
 
