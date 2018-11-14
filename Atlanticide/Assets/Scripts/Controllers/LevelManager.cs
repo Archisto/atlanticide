@@ -28,6 +28,18 @@ namespace Atlanticide
             get { return _levelTimer.Active; }
         }
 
+        // Orichalcum pickup prefab and pool.
+        public OrichalcumPickup orichalcumPickupPrefab;
+        public Pool<OrichalcumPickup> orichalcumPickupPool;
+
+        // Destructible GameObject debris prefabs and pools.
+        public Debris[] stoneDebrisPrefabArray;
+        public Pool<Debris> stoneDebrisPool;
+        public Debris[] woodDebrisPrefabArray;
+        public Pool<Debris> woodDebrisPool;
+        public Debris[] terracottaDebrisPrefabArray;
+        public Pool<Debris> terracottaDebrisPool;
+
         /// <summary>
         /// Initializes the object.
         /// </summary>
@@ -49,6 +61,10 @@ namespace Atlanticide
                 " - " + _currentLevel.GetCurrentPuzzleName() : "");
 
             _levelTimer = new Timer(_levelTime, true);
+            orichalcumPickupPool = new Pool<OrichalcumPickup>(64, true, orichalcumPickupPrefab);
+            stoneDebrisPool = new Pool<Debris>(32, true, stoneDebrisPrefabArray);
+            woodDebrisPool = new Pool<Debris>(32, true, woodDebrisPrefabArray);
+            terracottaDebrisPool = new Pool<Debris>(32, true, terracottaDebrisPrefabArray);
         }
 
         /// <summary>
