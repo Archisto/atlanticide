@@ -54,11 +54,7 @@ MonoBehaviour:
   gravity: 6
   pushSpeed: 1
   minWalkingSpeedRatio: 0.2
-  telegrabRadius: 2
   _maxEnergyCharges: 15
   _interactRange: 1.5
-  _pitchResetTime: 1
-  _minPitch: 0.5
-  _maxPitch: 1
-  _pitchRise: 0.04
+  _playerInteractStrength: 1
   keyCodes: 

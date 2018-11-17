@@ -14,16 +14,22 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Lauri's Colosseum.unity
     guid: bc6b08e3d1aa81643895fd3ded8decd1
+  - enabled: 1
+    path: Assets/Scenes/LinkProto.unity
+    guid: 5f64e76cf1124f5428493c9e83ea347c
+  - enabled: 1
+    path: Assets/Scenes/LinkProto Lauri.unity
+    guid: 979155f8c2e467e48a047109417c3756
   - enabled: 0
     path: Assets/Scenes/Level1.unity
     guid: e026804eca421d049a49fdba90c17054
   - enabled: 0
     path: Assets/Scenes/Level2.unity
     guid: fcdab2f525b0ddb4693c687a004e5016
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/DemoLevel1-1.unity
     guid: 71164f5a198408347bae05ca04c9b8ad
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/DemoLevel2-1.unity
     guid: bf5025d2914e71f469b3ee0d8bcac92a
   - enabled: 0

@@ -19,6 +19,7 @@ namespace Atlanticide.UI
         [SerializeField]
         private Text _requiredScoreText;
 
+        private LevelManager _levelManager;
         private Level _currentLevel;
 
         public void Activate(bool activate, bool levelWon = false)
@@ -27,10 +28,15 @@ namespace Atlanticide.UI
 
             if (activate)
             {
+                if (_levelManager == null)
+                {
+                    _levelManager = GameManager.Instance.LevelManager;
+                }
+
                 World.Instance.PauseGame(true);
                 _currentLevel = GameManager.Instance.CurrentLevel;
                 _scoreText.text = GameManager.Instance.CurrentScore.ToString();
-                _requiredScoreText.text = GameManager.Instance.RequiredScore.ToString();
+                _requiredScoreText.text = _levelManager.requiredScore.ToString();
 
                 if (levelWon)
                 {

@@ -74,7 +74,7 @@ namespace Atlanticide.UI
 
         public void StartNewGame()
         {
-            GameManager.Instance.LoadLevelFromBeginning(levelNumber);
+            GameManager.Instance.LoadLevel(levelNumber);
 
             // If a save file exists and the player presses the button, there
             // should be a confirmation asking whether the player truly wants to 
@@ -84,7 +84,7 @@ namespace Atlanticide.UI
         public void Continue()
         {
             GameManager.Instance.LoadGame();
-            GameManager.Instance.LoadLevelAndPuzzle(GameManager.Instance.CurrentLevel.Number, GameManager.Instance.CurrentLevel.CurrentPuzzleNumber);
+            GameManager.Instance.LoadLevel(GameManager.Instance.CurrentLevel.Number);
         }
 
         public void MainMenu()

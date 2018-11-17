@@ -2920,6 +2920,8 @@ MonoBehaviour:
   _maxStrengthLength: 5
   _strengthScaleLength: 5
   _minLength: 0.5
+  _pulseStrength: 1.5
+  _pulseCooldownTime: 1
   _wallHitShutdownTime: 0.5
   _hitboxStartPoint: {x: 0, y: -0.1, z: 0}
   _hitboxExtents: {x: 0.1, y: 0.55, z: 0}
@@ -3047,7 +3049,7 @@ LineRenderer:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1561973244487462}
-  m_Enabled: 0
+  m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1

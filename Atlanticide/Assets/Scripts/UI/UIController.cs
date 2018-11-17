@@ -14,14 +14,15 @@ namespace Atlanticide.UI
         private Transform _playerStatusHandler;
 
         [SerializeField]
+        private Slider _levelTimeBar;
+
+        [SerializeField]
         private Text _scoreText;
 
         [SerializeField]
-        private Slider _levelTimeBar;
+        private Text _scoreMultiplierText;
 
         public Image fadeScreen;
-
-        public Image swapIcon;
 
         public Text levelName;
 
@@ -30,9 +31,6 @@ namespace Atlanticide.UI
 
         [SerializeField]
         private Vector2 _targetIconOffset = new Vector2(0, 50);
-
-        [SerializeField]
-        private List<Sprite> _toolImages;
 
         private Canvas _canvas;
         private Vector2 _canvasSize;
@@ -67,7 +65,7 @@ namespace Atlanticide.UI
             _targetPositions = new Vector3[_targetIcons.Length];
 
             InitUI();
-            UpdateScoreCounter();
+            SetScoreCounterValue(0);
         }
 
         /// <summary>
@@ -100,7 +98,6 @@ namespace Atlanticide.UI
         private PlayerStatus CreatePlayerStatusUIElement(PlayerCharacter player)
         {
             PlayerStatus ps = Instantiate(_playerStatusPrefab, _playerStatusHandler);
-            ps.SetToolImage(_toolImages[(int) player.Tool]);
             ps.SetPlayerName(player.name);
             _playerStatuses.Add(ps);
             return ps;
@@ -120,13 +117,24 @@ namespace Atlanticide.UI
         }
 
         /// <summary>
-        /// Updates the score counter.
+        /// Sets the value of the score counter.
         /// </summary>
-        public void UpdateScoreCounter()
+        public void SetScoreCounterValue(int score)
         {
             if (_scoreText != null)
             {
-                _scoreText.text = "Score: " + GameManager.Instance.CurrentScore;
+                _scoreText.text = "Score: " + score;
+            }
+        }
+
+        /// <summary>
+        /// Sets the value of the score multiplier counter.
+        /// </summary>
+        public void SetMultiplierCounterValue(int multiplier)
+        {
+            if (_scoreMultiplierText != null)
+            {
+                _scoreMultiplierText.text = "Multiplier: " + multiplier;
             }
         }
 
@@ -140,27 +148,6 @@ namespace Atlanticide.UI
         {
             elapsedTimeRatio = Mathf.Clamp01(elapsedTimeRatio);
             _levelTimeBar.value = elapsedTimeRatio;
-        }
-
-        public void UpdatePlayerToolImage(int playerNum, PlayerTool tool)
-        {
-            if (_playerStatuses != null)
-            {
-                if (playerNum >= _playerStatuses.Count)
-                {
-                    CreatePlayerStatusUIElement(_players[playerNum]);
-                }
-
-                _playerStatuses[playerNum].SetToolImage(_toolImages[(int) tool]);
-            }
-        }
-
-        public void UpdatePlayerToolImages()
-        {
-            for (int i = 0; i < _players.Length; i++)
-            {
-                UpdatePlayerToolImage(i, _players[i].Tool);
-            }
         }
 
         public void ActivatePauseScreen(bool activate, string playerName)
