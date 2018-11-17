@@ -14,10 +14,13 @@ namespace Atlanticide.UI
         private Transform _playerStatusHandler;
 
         [SerializeField]
+        private Slider _levelTimeBar;
+
+        [SerializeField]
         private Text _scoreText;
 
         [SerializeField]
-        private Slider _levelTimeBar;
+        private Text _scoreMultiplierText;
 
         public Image fadeScreen;
 
@@ -62,7 +65,7 @@ namespace Atlanticide.UI
             _targetPositions = new Vector3[_targetIcons.Length];
 
             InitUI();
-            UpdateScoreCounter();
+            SetScoreCounterValue(0);
         }
 
         /// <summary>
@@ -114,13 +117,24 @@ namespace Atlanticide.UI
         }
 
         /// <summary>
-        /// Updates the score counter.
+        /// Sets the value of the score counter.
         /// </summary>
-        public void UpdateScoreCounter()
+        public void SetScoreCounterValue(int score)
         {
             if (_scoreText != null)
             {
-                _scoreText.text = "Score: " + GameManager.Instance.CurrentScore;
+                _scoreText.text = "Score: " + score;
+            }
+        }
+
+        /// <summary>
+        /// Sets the value of the score multiplier counter.
+        /// </summary>
+        public void SetMultiplierCounterValue(int multiplier)
+        {
+            if (_scoreMultiplierText != null)
+            {
+                _scoreMultiplierText.text = "Multiplier: " + multiplier;
             }
         }
 

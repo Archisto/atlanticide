@@ -32,6 +32,20 @@ namespace Atlanticide
         [SerializeField]
         private float _pitchRise = 0.1f;
 
+        [Header("POOLS")]
+
+        // Orichalcum pickup prefab and pool.
+        public OrichalcumPickup orichalcumPickupPrefab;
+        public Pool<OrichalcumPickup> orichalcumPickupPool;
+
+        // Destructible GameObject debris prefabs and pools.
+        public Debris[] stoneDebrisPrefabArray;
+        public Pool<Debris> stoneDebrisPool;
+        public Debris[] woodDebrisPrefabArray;
+        public Pool<Debris> woodDebrisPool;
+        public Debris[] terracottaDebrisPrefabArray;
+        public Pool<Debris> terracottaDebrisPool;
+
         private UIController _ui;
         private Level _currentLevel;
         private Timer _levelTimer;
@@ -49,18 +63,6 @@ namespace Atlanticide
         {
             get { return _scoreMultiplier; }
         }
-
-        // Orichalcum pickup prefab and pool.
-        public OrichalcumPickup orichalcumPickupPrefab;
-        public Pool<OrichalcumPickup> orichalcumPickupPool;
-
-        // Destructible GameObject debris prefabs and pools.
-        public Debris[] stoneDebrisPrefabArray;
-        public Pool<Debris> stoneDebrisPool;
-        public Debris[] woodDebrisPrefabArray;
-        public Pool<Debris> woodDebrisPool;
-        public Debris[] terracottaDebrisPrefabArray;
-        public Pool<Debris> terracottaDebrisPool;
 
         /// <summary>
         /// Initializes the object.
@@ -99,7 +101,7 @@ namespace Atlanticide
                 {
                     if (_scoreMultDecayTimer.Check())
                     {
-                        _scoreMultiplier = 1;
+                        ResetScoreMultiplier();
                         ResetPickupSFX();
                     }
 
@@ -174,9 +176,15 @@ namespace Atlanticide
         {
             _levelTimer.Reset();
             _levelTimeElapsedRatio = 0f;
-            _scoreMultiplier = 1;
             _scoreMultDecayTimer.Reset();
+            ResetScoreMultiplier();
             ResetPickupSFX();
+        }
+
+        private void ResetScoreMultiplier()
+        {
+            _scoreMultiplier = 1;
+            GameManager.Instance.ResetScoreMultiplierUI();
         }
 
         private void ResetPickupSFX()

@@ -190,7 +190,7 @@ namespace Atlanticide
             {
                 SceneTransition = TransitionPhase.None;
                 World.Instance.PauseGame(false);
-                ResetScene();
+                ResetLevel();
             }
             else if (GameState == State.Play &&
                 (_levelManager != null && !_levelManager.LevelActive))
@@ -707,13 +707,13 @@ namespace Atlanticide
         {
             SceneTransition = TransitionPhase.ResetingScene;
             _fade.StartFadeOut(false);
-            Debug.Log("[GameManager] Restarting level");
+            Debug.Log("[GameManager] Resetting level");
         }
 
         /// <summary>
-        /// Resets the current scene.
+        /// Resets the current level.
         /// </summary>
-        public void ResetScene()
+        public void ResetLevel()
         {
             SetScore(0);
             _ui.ActivateLevelEndScreen(false);
@@ -930,6 +930,7 @@ namespace Atlanticide
             ChangeScore(score);
             _levelManager.PlayCollectSound();
             _levelManager.IncreaseMultiplier();
+            _ui.SetMultiplierCounterValue(_levelManager.ScoreMultiplier);
         }
 
         public void ChangeScore(int score)
@@ -941,7 +942,12 @@ namespace Atlanticide
         public void SetScore(int score)
         {
             CurrentScore = score;
-            _ui.UpdateScoreCounter();
+            _ui.SetScoreCounterValue(score);
+        }
+
+        public void ResetScoreMultiplierUI()
+        {
+            _ui.SetMultiplierCounterValue(1);
         }
 
         public void ActivatePauseScreen(bool activate, string playerName)
