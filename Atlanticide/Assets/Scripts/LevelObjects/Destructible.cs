@@ -9,6 +9,9 @@ namespace Atlanticide
         [SerializeField]
         protected int _maxHitpoints = 3;
 
+        [SerializeField]
+        protected bool _deactivateGameObject = true;
+
         protected int _hitpoints;
 
         public bool Destroyed { get; protected set; }
@@ -48,7 +51,12 @@ namespace Atlanticide
         {
             Debug.Log(name + " was destroyed.");
             Destroyed = true;
-            gameObject.SetActive(false);
+
+            if (_deactivateGameObject)
+            {
+                gameObject.SetActive(false);
+            }
+
             base.DestroyObject();
         }
 

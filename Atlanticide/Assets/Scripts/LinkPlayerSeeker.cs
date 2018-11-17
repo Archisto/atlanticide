@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Atlanticide
 {
-    public class LinkMovable : LevelObject, ILinkInteractable
+    public class LinkPlayerSeeker : LevelObject, ILinkInteractable
     {
         public bool available = true;
 
@@ -24,10 +24,10 @@ namespace Atlanticide
         [SerializeField]
         protected bool _lockAxisY;
 
-        protected Destructible _destructible;
         protected Timer _hitTimer;
         protected float _toughnessLeft;
-        private bool _beamCenterReached;
+        protected Vector3 _targetPosition;
+        protected bool _moveForward;
         private bool _availableByDefault;
         private float _defaultSpeed;
 
@@ -52,35 +52,47 @@ namespace Atlanticide
         {
             _toughnessLeft = _toughness;
             _hitTimer = new Timer(_hitInterval, true);
-            _destructible = GetComponent<Destructible>();
             _defaultPosition = transform.position;
             _availableByDefault = available;
             _defaultSpeed = _speed;
         }
 
         /// <summary>
-        /// Updates the object.
+        /// Updates the object once per frame.
         /// </summary>
         protected override void UpdateObject()
         {
-            if (!available)
-            {
-                return;
-            }
-
             if (AttachedToBeam)
             {
                 if (!TargetLinkBeam.Active)
                 {
                     AttachToBeam(false);
+                    return;
                 }
-                else if (_beamCenterReached)
+
+                _targetPosition = (_moveForward ?
+                    TargetLinkBeam.TargetPosition : TargetLinkBeam.StartPosition);
+                Vector3 oppositeEndPosition = (!_moveForward ?
+                    TargetLinkBeam.TargetPosition : TargetLinkBeam.StartPosition);
+
+                //Vector3 direction = (_targetPosition - transform.position).normalized;
+                //Vector3 newPosition = transform.position + direction * World.Instance.DeltaTime;
+                Vector3 newPosition = TargetLinkBeam.BeamCenter +
+                    Vector3.Project(transform.position - TargetLinkBeam.BeamCenter,
+                    (_targetPosition - TargetLinkBeam.BeamCenter));
+
+                Vector3 direction = (_targetPosition - newPosition).normalized;
+                newPosition += direction * _speed * World.Instance.DeltaTime;
+
+                if (_lockAxisY)
                 {
-                    UpdatePositionAtBeamCenter();
+                    newPosition.y = transform.position.y;
                 }
-                else
+                transform.position = newPosition;
+
+                if (Vector3.Distance(transform.position, _targetPosition) < _accuracy)
                 {
-                    SeekBeamCenter();
+                    ReachTarget();
                 }
             }
             else if (_hitTimer.Active)
@@ -91,51 +103,32 @@ namespace Atlanticide
                 }
             }
 
-            CheckDestructible();
             base.UpdateObject();
-        }
-
-        private void UpdatePositionAtBeamCenter()
-        {
-            transform.position = TargetLinkBeam.BeamCenter;
-        }
-
-        private void SeekBeamCenter()
-        {
-            Vector3 newPosition = TargetLinkBeam.BeamCenter +
-                    Vector3.Project(transform.position - TargetLinkBeam.BeamCenter,
-                    (TargetLinkBeam.BeamCenter - TargetLinkBeam.StartPosition));
-
-            Vector3 direction = (TargetLinkBeam.BeamCenter - newPosition).normalized;
-            newPosition += direction * _speed * World.Instance.DeltaTime;
-
-            if (_lockAxisY)
-            {
-                newPosition.y = transform.position.y;
-            }
-            transform.position = newPosition;
-
-            if (Vector3.Distance(transform.position, TargetLinkBeam.BeamCenter)
-                < _accuracy)
-            {
-                ReachBeamCenter(true);
-            }
         }
 
         protected virtual void AttachToBeam(bool attach, LinkBeam linkBeam = null)
         {
             if (AttachedToBeam != attach)
             {
+                //if (attach)
+                //{
+                //    Debug.Log("Attached to " + linkBeam.Player.name + "'s beam");
+                //}
+                //else
+                //{
+                //    Debug.Log("Detached from " + TargetLinkBeam.Player.name + "'s beam");
+                //}
+
                 if (!attach && TargetLinkBeam != null)
                 {
                     TargetLinkBeam.linkInteractables.Remove(this);
-                    FallToGround();
                 }
 
                 AttachedToBeam = attach;
                 TargetLinkBeam = linkBeam;
                 _toughnessLeft = _toughness;
                 _speed = _defaultSpeed;
+                _moveForward = true; // TODO
                 _hitTimer.Reset();
 
                 if (attach)
@@ -145,30 +138,21 @@ namespace Atlanticide
             }
         }
 
-        protected void ReachBeamCenter(bool reach)
+        protected virtual void ReachTarget()
         {
-            if (reach)
-            {
-                Debug.Log(name + " reached its target");
-            }
-
-            _beamCenterReached = reach;
-        }
-
-        private void FallToGround()
-        {
-            // TODO
+            //Debug.Log(name + " reached its target");
+            AttachToBeam(false);
             available = false;
-            _destructible.DestroyObject();
         }
 
-        private void CheckDestructible()
+        public void SetDirection(bool towardsTarget)
         {
-            if (_destructible.Destroyed)
-            {
-                AttachToBeam(false);
-                available = false;
-            }
+            _moveForward = towardsTarget;
+        }
+
+        public void ChangeDirection()
+        {
+            _moveForward = !_moveForward;
         }
 
         public virtual bool TryInteract(LinkBeam linkBeam)
@@ -205,13 +189,14 @@ namespace Atlanticide
 
         public bool GivePulse(LinkBeam linkBeam, float speedModifier)
         {
-            return false;
+            _speed = Mathf.Abs(_defaultSpeed * speedModifier);
+            SetDirection(speedModifier > 0f);
+            return true;
         }
 
         public override void ResetObject()
         {
             AttachToBeam(false);
-            ReachBeamCenter(false);
             _toughnessLeft = _toughness;
             _hitTimer.Reset();
             available = _availableByDefault;
@@ -231,12 +216,13 @@ namespace Atlanticide
             else if (AttachedToBeam)
             {
                 Gizmos.color = Color.green;
+                Gizmos.DrawLine(transform.position, _targetPosition);
                 Gizmos.DrawLine(transform.position, TargetLinkBeam.BeamCenter);
             }
 
             Gizmos.color = (AttachedToBeam ? Color.blue :
                 (available ? Color.white : Color.grey));
-            Gizmos.DrawWireSphere(transform.position + Vector3.up * 1.5f, _accuracy);
+            Gizmos.DrawWireSphere(transform.position, _accuracy);
         }
     }
 }
