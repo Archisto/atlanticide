@@ -113,6 +113,8 @@ MonoBehaviour:
   _player1SpawnPoint: {fileID: 4525349788122696}
   _player2SpawnPoint: {fileID: 4787080142380638}
   _levelTime: 120
+  _hurryUpWarnTime: 100
+  _hurryUpWarnFlashTime: 0.5
   requiredScore: 10
   _scoreMultiplierDecayTime: 1
   _minPitch: 0.5

@@ -238,9 +238,9 @@ GameObject:
   m_Component:
   - component: {fileID: 224397726082904908}
   - component: {fileID: 223691627907036448}
+  - component: {fileID: 114708151966196002}
   - component: {fileID: 114284162396416334}
   - component: {fileID: 114236612846427376}
-  - component: {fileID: 114708151966196002}
   m_Layer: 5
   m_Name: Canvas
   m_TagString: Untagged
@@ -2265,10 +2265,10 @@ MonoBehaviour:
     m_SelectOnRight: {fileID: 0}
   m_Transition: 1
   m_Colors:
-    m_NormalColor: {r: 0.8784314, g: 0.8901961, b: 0.12941177, a: 1}
+    m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
     m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
     m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
-    m_DisabledColor: {r: 0.8784314, g: 0.8901961, b: 0.12941177, a: 0}
+    m_DisabledColor: {r: 0.38679248, g: 0.38679248, b: 0.38679248, a: 0.23137255}
     m_ColorMultiplier: 1
     m_FadeDuration: 0.1
   m_SpriteState:
@@ -4151,6 +4151,7 @@ MonoBehaviour:
     type: 2}
   _playerStatusHandler: {fileID: 224795387219043994}
   _levelTimeBar: {fileID: 114205490306933520}
+  _levelTimeBarImage: {fileID: 114519857851182462}
   _scoreText: {fileID: 114029825378044312}
   _scoreMultiplierText: {fileID: 114064073764899396}
   fadeScreen: {fileID: 114699310228014548}
@@ -4159,6 +4160,8 @@ MonoBehaviour:
   - {fileID: 114177200411638958}
   - {fileID: 114271999281220748}
   _targetIconOffset: {x: 0, y: 60}
+  _levelTimeBarNormalColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  _levelTimeBarFlashColor: {r: 1, g: 0, b: 0, a: 1}
 --- !u!114 &114714590301712640
 MonoBehaviour:
   m_ObjectHideFlags: 1

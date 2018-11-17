@@ -17,6 +17,9 @@ namespace Atlanticide.UI
         private Slider _levelTimeBar;
 
         [SerializeField]
+        private Image _levelTimeBarImage;
+
+        [SerializeField]
         private Text _scoreText;
 
         [SerializeField]
@@ -31,6 +34,12 @@ namespace Atlanticide.UI
 
         [SerializeField]
         private Vector2 _targetIconOffset = new Vector2(0, 50);
+
+        [SerializeField]
+        private Color _levelTimeBarNormalColor = Color.yellow;
+
+        [SerializeField]
+        private Color _levelTimeBarFlashColor = Color.red;
 
         private Canvas _canvas;
         private Vector2 _canvasSize;
@@ -220,6 +229,12 @@ namespace Atlanticide.UI
                     _targetIcons[i].gameObject.SetActive(false);
                 }
             }
+        }
+
+        public void FlashLevelTimeBar(bool flash)
+        {
+            _levelTimeBarImage.color = (flash ?
+                _levelTimeBarFlashColor : _levelTimeBarNormalColor);
         }
 
         public void ResetUI()
