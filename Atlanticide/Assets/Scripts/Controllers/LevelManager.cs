@@ -16,16 +16,38 @@ namespace Atlanticide
         [SerializeField]
         private float _levelTime = 120f;
 
+        [Header("SCORE")]
+
         public int requiredScore = 1000;
+
+        [SerializeField]
+        private float _scoreMultiplierDecayTime = 1f;
+
+        [SerializeField]
+        private float _minPitch = 0.3f;
+
+        [SerializeField]
+        private float _maxPitch = 2f;
+
+        [SerializeField]
+        private float _pitchRise = 0.1f;
 
         private UIController _ui;
         private Level _currentLevel;
         private Timer _levelTimer;
-        private float levelTimeElapsedRatio;
+        private Timer _scoreMultDecayTimer;
+        private float _levelTimeElapsedRatio;
+        private int _scoreMultiplier = 1;
+        private float _pitch;
 
         public bool LevelActive
         {
             get { return _levelTimer.Active; }
+        }
+
+        public int ScoreMultiplier
+        {
+            get { return _scoreMultiplier; }
         }
 
         // Orichalcum pickup prefab and pool.
@@ -56,11 +78,10 @@ namespace Atlanticide
 
             _ui = GameManager.Instance.GetUI();
             _currentLevel = GameManager.Instance.CurrentLevel;
-            string puzzleName = _currentLevel.GetCurrentPuzzleName();
-            _ui.levelName.text = _currentLevel.LevelSceneName + (puzzleName != null ?
-                " - " + _currentLevel.GetCurrentPuzzleName() : "");
-
+            _ui.levelName.text = _currentLevel.LevelName;
             _levelTimer = new Timer(_levelTime, true);
+            _scoreMultDecayTimer = new Timer(_scoreMultiplierDecayTime, true);
+
             orichalcumPickupPool = new Pool<OrichalcumPickup>(64, true, orichalcumPickupPrefab);
             stoneDebrisPool = new Pool<Debris>(32, true, stoneDebrisPrefabArray);
             woodDebrisPool = new Pool<Debris>(32, true, woodDebrisPrefabArray);
@@ -76,16 +97,22 @@ namespace Atlanticide
             {
                 if (LevelActive)
                 {
+                    if (_scoreMultDecayTimer.Check())
+                    {
+                        _scoreMultiplier = 1;
+                        ResetPickupSFX();
+                    }
+
                     if (_levelTimer.Check())
                     {
                         EndLevel();
                     }
                     else
                     {
-                        levelTimeElapsedRatio = _levelTimer.GetRatio();
+                        _levelTimeElapsedRatio = _levelTimer.GetRatio();
                     }
 
-                    GameManager.Instance.UpdateUITimer(levelTimeElapsedRatio);
+                    GameManager.Instance.UpdateUITimer(_levelTimeElapsedRatio);
                 }
             }
         }
@@ -107,41 +134,54 @@ namespace Atlanticide
                     return Vector3.zero;
                 }
             }
+        }
 
-            //switch (tool)
-            //{
-            //    case PlayerTool.EnergyCollector:
-            //    {
-            //        return _energyCollPlayerSpawnPoint.position;
-            //    }
-            //    case PlayerTool.Shield:
-            //    {
-            //        return _shieldPlayerSpawnPoint.position;
-            //    }
-            //    default:
-            //    {
-            //        return Vector3.zero;
-            //    }
-            //}
+        public void IncreaseMultiplier()
+        {
+            _scoreMultiplier++;
+            _scoreMultDecayTimer.Activate();
+        }
+
+        public void PlayCollectSound()
+        {
+            SFXPlayer.Instance.Play(Sound.Clink, pitch: _pitch);
+            _pitch += _pitchRise;
+            if (_pitch > _maxPitch)
+            {
+                ResetPickupSFX();
+            }
+        }
+
+        public bool EnoughScore(int score)
+        {
+            return score >= requiredScore;
         }
 
         public void StartLevel()
         {
+            ResetLevel();
             _levelTimer.Activate();
-            levelTimeElapsedRatio = 0f;
         }
 
         public void EndLevel()
         {
             _levelTimer.Reset();
-            levelTimeElapsedRatio = 1f;
+            _levelTimeElapsedRatio = 1f;
             GameManager.Instance.EndLevel(false);
         }
 
         public void ResetLevel()
         {
             _levelTimer.Reset();
-            levelTimeElapsedRatio = 0f;
+            _levelTimeElapsedRatio = 0f;
+            _scoreMultiplier = 1;
+            _scoreMultDecayTimer.Reset();
+            ResetPickupSFX();
+        }
+
+        private void ResetPickupSFX()
+        {
+            _pitch = _minPitch;
         }
     }
 }

@@ -21,8 +21,6 @@ namespace Atlanticide.UI
 
         public Image fadeScreen;
 
-        public Image swapIcon;
-
         public Text levelName;
 
         [SerializeField]
@@ -30,9 +28,6 @@ namespace Atlanticide.UI
 
         [SerializeField]
         private Vector2 _targetIconOffset = new Vector2(0, 50);
-
-        [SerializeField]
-        private List<Sprite> _toolImages;
 
         private Canvas _canvas;
         private Vector2 _canvasSize;
@@ -100,7 +95,6 @@ namespace Atlanticide.UI
         private PlayerStatus CreatePlayerStatusUIElement(PlayerCharacter player)
         {
             PlayerStatus ps = Instantiate(_playerStatusPrefab, _playerStatusHandler);
-            ps.SetToolImage(_toolImages[(int) player.Tool]);
             ps.SetPlayerName(player.name);
             _playerStatuses.Add(ps);
             return ps;
@@ -140,27 +134,6 @@ namespace Atlanticide.UI
         {
             elapsedTimeRatio = Mathf.Clamp01(elapsedTimeRatio);
             _levelTimeBar.value = elapsedTimeRatio;
-        }
-
-        public void UpdatePlayerToolImage(int playerNum, PlayerTool tool)
-        {
-            if (_playerStatuses != null)
-            {
-                if (playerNum >= _playerStatuses.Count)
-                {
-                    CreatePlayerStatusUIElement(_players[playerNum]);
-                }
-
-                _playerStatuses[playerNum].SetToolImage(_toolImages[(int) tool]);
-            }
-        }
-
-        public void UpdatePlayerToolImages()
-        {
-            for (int i = 0; i < _players.Length; i++)
-            {
-                UpdatePlayerToolImage(i, _players[i].Tool);
-            }
         }
 
         public void ActivatePauseScreen(bool activate, string playerName)

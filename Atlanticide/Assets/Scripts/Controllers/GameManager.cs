@@ -69,11 +69,11 @@ namespace Atlanticide
         private SettingsManager _settings;
         private SaveSystem _saveSystem;
         private FadeToColor _fade;
+        private AudioSource _levelResultAudioSrc;
         private bool _updateAtSceneStart = true;
         private bool _freshGameStart = true;
         private string _nextSceneName;
         private int _deadPlayerCount;
-        private AudioSource _levelResultAudioSrc;
 
         public State GameState { get; set; }
 
@@ -92,9 +92,17 @@ namespace Atlanticide
                 if (value >= 0)
                 {
                     _deadPlayerCount = value;
-                    CheckLevelFailure();
+                    if (AllPlayersDied)
+                    {
+                        EndLevel(false);
+                    }
                 }
             }
+        }
+
+        public LevelManager LevelManager
+        {
+            get { return _levelManager; }
         }
 
         public int LevelsUnlocked { get; private set; }
@@ -102,8 +110,6 @@ namespace Atlanticide
         public Level CurrentLevel { get; private set; }
 
         public int CurrentScore { get; private set; }
-
-        public int RequiredScore { get; private set; }
 
         public SettingsManager Settings
         {
@@ -143,8 +149,6 @@ namespace Atlanticide
                 return DeadPlayerCount == PlayerCount;
             }
         }
-
-        public bool LevelFailed { get; private set; }
 
         public PlayerInput MenuPlayerInput { get; set; }
 
@@ -188,7 +192,8 @@ namespace Atlanticide
                 World.Instance.PauseGame(false);
                 ResetScene();
             }
-            else if (GameState == State.Play && !_levelManager.LevelActive)
+            else if (GameState == State.Play &&
+                (_levelManager != null && !_levelManager.LevelActive))
             {
                 StartLevel();
             }
@@ -238,11 +243,18 @@ namespace Atlanticide
             {
                 _freshGameStart = false;
                 World.Instance.PauseGame(false);
-                Debug.Log("Level scene init");
+
+                //if (RequiredScore == 0)
+                //{
+                //    RequiredScore = _levelManager.requiredScore;
+                //    _levelManager.StartLevel();
+                //}
+
+                Debug.Log("[GameManager] Level scene init");
             }
             else
             {
-                Debug.Log("Menu scene init");
+                Debug.Log("[GameManager] Menu scene init");
             }
 
             _updateAtSceneStart = false;
@@ -328,14 +340,9 @@ namespace Atlanticide
         private void InitLevels()
         {
             _levels = new List<Level>();
-            _levels.Add(new Level(0, "Debug", 1));
-            _levels.Add(new Level(1, "DemoLevel1", 1));
-            _levels.Add(new Level(2, "DemoLevel2", 1));
-
-            _levels[1].SetPuzzleNames(
-                "Tutorial");
-            _levels[2].SetPuzzleNames(
-                "Challenge");
+            _levels.Add(new Level(0, "LinkProto", "Debug"));
+            _levels.Add(new Level(1, "LinkProto Lauri", "Tutorial"));
+            _levels.Add(new Level(2, "LinkProto", "Challenge"));
 
             LevelsUnlocked = 1;
             CurrentLevel = _levels[0];
@@ -382,8 +389,6 @@ namespace Atlanticide
                 PlayerInput input = new PlayerInput(GetPlayerInputDevice(i));
 
                 _players[i].Input = input;
-                PlayerTool tool = GetPlayerTool(i);
-                _players[i].Tool = tool;
                 _players[i].transform.position = _levelManager.GetSpawnPoint(i);
                 //Debug.Log("Player " + (i + 1) + " input device: " + _players[i].Input.InputDevice);
 
@@ -407,7 +412,6 @@ namespace Atlanticide
             if (_freshGameStart)
             {
                 SaveInputDevices();
-                SavePlayerTools();
             }
         }
 
@@ -610,13 +614,11 @@ namespace Atlanticide
         }
 
         /// <summary>
-        /// Returns the first player character which has the given tool.
-        /// Can return only a living player if necessary.
-        /// Returns null if there is no valid player.
+        /// Legacy code; please remove.
         /// </summary>
-        /// <param name="tool">A player tool</param>
-        /// <param name="includeDead">Are dead players included</param>
-        /// <returns>A player character or null</returns>
+        /// <param name="invalidPlayer"></param>
+        /// <param name="includeDead"></param>
+        /// <returns></returns>
         public PlayerCharacter GetPlayerWithTool(PlayerTool tool,
                                                  bool includeDead)
         {
@@ -658,76 +660,6 @@ namespace Atlanticide
             {
                 action(_players[i]);
             }
-        }
-
-        /// <summary>
-        /// Returns the tool the given player currently uses or should use.
-        /// This is determined by whether there player's tool has been saved.
-        /// </summary>
-        /// <param name="playerID">A player's ID</param>
-        /// <returns>A player tool</returns>
-        public PlayerTool GetPlayerTool(int playerID)
-        {
-            PlayerTool result = PlayerTool.None;
-
-            if (_playerTools[playerID] == PlayerTool.None)
-            {
-                result = PlayerTool.Shield;
-                //result = (PlayerTool) (playerID + 1);
-            }
-            else
-            {
-                result = _playerTools[playerID];
-            }
-
-            return result;
-        }
-
-        /// <summary>
-        /// Saves which player is using which tool.
-        /// </summary>
-        public void SavePlayerTools()
-        {
-            for (int i = 0; i < _players.Length; i++)
-            {
-                _playerTools[i] = _players[i].Tool;
-                //Debug.Log(string.Format("Tool saved: {0} has {1}",
-                //    _players[i].name, _playerTools[i]));
-            }
-        }
-
-        /// <summary>
-        /// Sets the given players tool.
-        /// </summary>
-        /// <param name="player">A player</param>
-        /// <param name="tool">A tool</param>
-        public PlayerTool SetPlayerTool(PlayerCharacter player, PlayerTool tool)
-        {
-            // Cancels actions performed with the current tool
-            if (player.Exists)
-            {
-                if (player.Tool == PlayerTool.EnergyCollector)
-                {
-                    player.EnergyCollector.ResetEnergyCollector();
-                }
-                else if (player.Tool == PlayerTool.Shield)
-                {
-                    player.Shield.CancelBash();
-                    player.Shield.ActivateInstantly(false);
-                }
-            }
-
-            // Sets the new tool
-            player.Tool = tool;
-
-            // The UI controller first updates the tool images in its Start method.
-            // This is for subsequent tool swaps.
-            if (!_updateAtSceneStart)
-            {
-                _ui.UpdatePlayerToolImage(player.ID, player.Tool);
-            }
-
-            return player.Tool;
         }
 
         public InputDevice GetPlayerInputDevice(int playerID)
@@ -774,8 +706,8 @@ namespace Atlanticide
         public void StartSceneReset()
         {
             SceneTransition = TransitionPhase.ResetingScene;
-            _fade.StartFadeOut(LevelFailed);
-            Debug.Log("Restarting level");
+            _fade.StartFadeOut(false);
+            Debug.Log("[GameManager] Restarting level");
         }
 
         /// <summary>
@@ -795,7 +727,6 @@ namespace Atlanticide
             _npcs.ForEach(npc => npc.Respawn());
             _levelObjects.ForEach(obj => obj.ResetObject());
             _ui.ResetUI();
-            LevelFailed = false;
             DeadPlayerCount = 0;
             _fade.StartFadeIn(true);
 
@@ -814,69 +745,23 @@ namespace Atlanticide
             GameState = State.MainMenu;
         }
 
-        /// <summary>
-        /// Loads a level.
-        /// </summary>
-        /// <param name="levelNum">A level number</param>
-        public void LoadLevelFromBeginning(int levelNum)
-        {
-            if (levelNum >= 1)
-            {
-                LoadLevelAndPuzzle(levelNum, 1);
-            }
-            else
-            {
-                Debug.LogWarning("You cannot load a debug level like this. " +
-                    "Load it with LoadDebugLevel(string sceneName).");
-            }
-        }
-
-        /// <summary>
-        /// Loads a puzzle.
-        /// </summary>
-        /// <param name="puzzleNum">A puzzle number</param>
-        /// <returns>Could the puzzle be loaded</returns>
-        public bool LoadPuzzle(int puzzleNum)
-        {
-            string puzzleName = CurrentLevel.GetPuzzleName(puzzleNum);
-            if (puzzleName != null)
-            {
-                string sceneName = "";
-                if (CurrentLevel.Number == 0)
-                {
-                    sceneName = SceneManager.GetActiveScene().name;
-                    Debug.Log("Going to level: " + sceneName);
-                }
-                else
-                {
-                    Debug.Log(string.Format("Going to level {0} puzzle {1}: {2}",
-                        CurrentLevel.Number, puzzleNum, puzzleName));
-                    CurrentLevel.CurrentPuzzleNumber = puzzleNum;
-                    sceneName = CurrentLevel.GetPuzzleSceneName(puzzleNum);
-                }
-
-                StartLoadingScene(sceneName);
-                GameState = State.Play;
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-
-        public void LoadLevelAndPuzzle(int levelNum, int puzzleNum)
+        public void LoadLevel(int levelNum)
         {
             if (!SceneChanging)
             {
-                if (levelNum >= 1 && levelNum <= _levels.Count)
+                if (LevelExists(levelNum))
                 {
                     CurrentLevel = _levels[levelNum];
-                    LoadPuzzle(puzzleNum);
+                    LoadChangedCurrentLevel();
+                }
+                else if (levelNum == 0)
+                {
+                    CurrentLevel = _levels[0];
+                    LoadDebugLevel();
                 }
                 else
                 {
-                    Debug.LogError(string.Format("Invalid level number ({0}).", levelNum));
+                    Debug.LogError(string.Format("Invalid level number: {0}.", levelNum));
                 }
             }
             else
@@ -885,9 +770,48 @@ namespace Atlanticide
             }
         }
 
+        private void LoadChangedCurrentLevel()
+        {
+            Debug.Log(string.Format("[GameManager] Going to level {0}: {1}",
+                    CurrentLevel.Number, CurrentLevel.LevelName));
+            StartLoadingScene(CurrentLevel.LevelSceneName);
+            GameState = State.Play;
+        }
+
+        public void GoToNextLevel()
+        {
+            int nextLevel = CurrentLevel.Number + 1;
+
+            if (LevelExists(nextLevel))
+            {
+                _ui.ActivateLevelEndScreen(false);
+                TryUnlockLevel(nextLevel);
+                LoadLevel(nextLevel);
+            }
+        }
+
+        private bool LevelExists(int levelNum)
+        {
+            return levelNum >= 1 && levelNum < _levels.Count;
+        }
+
+        /// <summary>
+        /// Unlocks the given level if it exists
+        /// and hasn't been unlocked yet.
+        /// </summary>
+        /// <param name="levelNum">A level number</param>
+        private void TryUnlockLevel(int levelNum)
+        {
+            if (levelNum > LevelsUnlocked && LevelExists(levelNum))
+            {
+                LevelsUnlocked = levelNum;
+                Debug.Log("[GameManager] Level " + levelNum + " unlocked");
+            }
+        }
+
         /// <summary>
         /// Testing.
-        /// Loads a debug level: Lauri's Colosseum.
+        /// Loads a debug level: LinkProto.
         /// </summary>
         public void LoadDebugLevel()
         {
@@ -912,7 +836,7 @@ namespace Atlanticide
         {
             if (SceneTransition != TransitionPhase.ExitingScene)
             {
-                Debug.Log("Loading scene: " + sceneName);
+                Debug.Log("[GameManager] Loading scene: " + sceneName);
 
                 if (GameState == State.Play)
                 {
@@ -955,96 +879,42 @@ namespace Atlanticide
             Debug.Log("[GameManager] Level starts");
             GameState = State.Play;
             SetScore(0);
-            RequiredScore = _levelManager.requiredScore;
             _levelManager.StartLevel();
+            ResetLevelResultAudioSource();
         }
 
         public void EndLevel(bool levelWon)
         {
-            Debug.Log("[GameManager] Level ends");
             GameState = State.LevelEnd;
-            Debug.Log("Level " + (levelWon ? "won" : "lost") +
-                "! Score: " + CurrentScore + " / " + RequiredScore);
+
+            if (levelWon)
+            {
+                SaveGame();
+            }
+
+            Debug.Log("[GameManager] Level " + (levelWon ? "won" : "lost") +
+                "! Score: " + CurrentScore + " / " + _levelManager.requiredScore);
             _ui.ActivateLevelEndScreen(true, levelWon);
+
+            ResetLevelResultAudioSource();
+            if (levelWon)
+            {
+                _levelResultAudioSrc = SFXPlayer.Instance.Play(Sound.Success);
+            }
+            else
+            {
+                _levelResultAudioSrc = SFXPlayer.Instance.Play(Sound.Failure);
+            }
         }
 
         public bool LevelWinConditionsMet()
         {
-            return CurrentScore >= RequiredScore;
+            return _levelManager != null && _levelManager.EnoughScore(CurrentScore);
         }
 
         public void UpdateUITimer(float levelTimeElapsedRatio)
         {
             _ui.UpdateLevelTimeBar(levelTimeElapsedRatio);
-        }
-
-        /// <summary>
-        /// Completes a puzzle and either loads the
-        /// next one in the level or loads the next
-        /// level's first puzzle.
-        /// </summary>
-        public void CompletePuzzle()
-        {
-            Debug.Log("Level completed");
-            ResetLevelResultAudioSource();
-            _levelResultAudioSrc = SFXPlayer.Instance.Play(Sound.Success);
-
-            TryUnlockLevel(CurrentLevel.Number + 1);
-            SaveGame();
-
-            //LoadNextPuzzleOrLevel();
-        }
-
-        public void GoToNextLevel()
-        {
-            _ui.ActivateLevelEndScreen(false);
-            LoadLevelFromBeginning(CurrentLevel.Number + 1);
-        }
-
-        public void GoToNextPuzzleOrLevel()
-        {
-            bool loadNextPuzzle =
-                CurrentLevel.CurrentPuzzleNumber > 0 &&
-                LoadPuzzle(CurrentLevel.CurrentPuzzleNumber + 1);
-
-            // The level's last puzzle was completed so the
-            // next level's first puzzle is loaded instead
-            if (!loadNextPuzzle)
-            {
-                int nextLevel = CurrentLevel.Number + 1;
-                TryUnlockLevel(nextLevel);
-                LoadLevelFromBeginning(nextLevel);
-            }
-        }
-
-        /// <summary>
-        /// Unlocks the given level if it's valid
-        /// and hasn't been unlocked yet.
-        /// </summary>
-        /// <param name="levelNum">A level number</param>
-        private void TryUnlockLevel(int levelNum)
-        {
-            if (levelNum > LevelsUnlocked &&
-                levelNum >= 1 && levelNum <= _levels.Count)
-            {
-                LevelsUnlocked = levelNum;
-                Debug.Log("Level " + levelNum + " unlocked");
-            }
-        }
-
-        /// <summary>
-        /// Restarts the level if the players failed.
-        /// </summary>
-        public void CheckLevelFailure()
-        {
-            if (AllPlayersDied)
-            {
-                Debug.Log("Level failed");
-                LevelFailed = true;
-                ResetLevelResultAudioSource();
-                _levelResultAudioSrc = SFXPlayer.Instance.Play(Sound.Failure);
-                StartSceneReset();
-            }
         }
 
         private void ResetLevelResultAudioSource()
@@ -1058,11 +928,13 @@ namespace Atlanticide
         public void CollectScorePickup(int score)
         {
             ChangeScore(score);
-            World.Instance.PlayCollectSound();
+            _levelManager.PlayCollectSound();
+            _levelManager.IncreaseMultiplier();
         }
 
         public void ChangeScore(int score)
         {
+            score = score * _levelManager.ScoreMultiplier;
             SetScore(CurrentScore + score);
         }
 
@@ -1114,17 +986,11 @@ namespace Atlanticide
 
             data.LevelsUnlocked = LevelsUnlocked;
             data.LevelNum = CurrentLevel.Number;
-            data.PuzzleNum = CurrentLevel.CurrentPuzzleNumber;
             data.Score = CurrentScore; // TODO: Highscores for levels
 
-            foreach (PlayerCharacter player in _players)
-            {
-                data.PlayerDataList.Add((PlayerData) player.GetSaveData());
-            }
-
             _saveSystem.Save(data);
-            Debug.Log(string.Format("Game saved (level {0}-{1})",
-                CurrentLevel.Number, CurrentLevel.CurrentPuzzleNumber));
+            Debug.Log(string.Format("[GameManager] Game saved (level {0})",
+                CurrentLevel.Number));
         }
 
         /// <summary>
@@ -1145,28 +1011,19 @@ namespace Atlanticide
             SetScore(data.Score); // TODO: Highscores for levels
 
             bool inLevel = false;
-            if (data.LevelNum >= 1 && data.LevelNum <= _levels.Count)
+            if (LevelExists(data.LevelNum))
             {
                 inLevel = true;
                 CurrentLevel =
                     _levels.Find(level => level.Number == data.LevelNum);
-
-                if (CurrentLevel.ValidPuzzleNumber(data.PuzzleNum))
-                {
-                    CurrentLevel.CurrentPuzzleNumber = data.PuzzleNum;
-                }
             }
-
-            Utils.TrySetData(_players, data.PlayerDataList, false);
-            SavePlayerTools();
 
             if (inLevel)
             {
-                Debug.Log(string.Format("Game loaded (level {0}-{1})",
-                    CurrentLevel.Number, CurrentLevel.CurrentPuzzleNumber));
+                Debug.Log(string.Format("Game loaded (level {0}: {1})",
+                    CurrentLevel.Number, CurrentLevel.LevelName));
 
-                LoadLevelAndPuzzle(CurrentLevel.Number,
-                    CurrentLevel.CurrentPuzzleNumber);
+                LoadLevel(CurrentLevel.Number);
             }
             else
             {
@@ -1178,7 +1035,10 @@ namespace Atlanticide
 
         public void ResetSaveData()
         {
-            // TODO
+            LevelsUnlocked = 1;
+            CurrentLevel = _levels[0];
+            CurrentScore = 0;
+            SaveGame();
         }
 
         #endregion Persistence

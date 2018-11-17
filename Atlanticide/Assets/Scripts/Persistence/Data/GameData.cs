@@ -9,10 +9,9 @@ namespace Atlanticide.Persistence
         public int ID { get; set; }
         public int LevelsUnlocked;
         public int LevelNum;
-        public int PuzzleNum;
         public int Score;
-        public List<PlayerData> PlayerDataList = new List<PlayerData>();
 
+        //public List<PlayerData> PlayerDataList = new List<PlayerData>();
         //public List<UnitData> EnemyDataList = new List<UnitData>();
     }
 }

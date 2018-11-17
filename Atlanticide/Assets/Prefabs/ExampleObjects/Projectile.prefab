@@ -25,7 +25,6 @@ GameObject:
   - component: {fileID: 54970143051027274}
   - component: {fileID: 114204464223301432}
   - component: {fileID: 114161746573794730}
-  - component: {fileID: 114613580595468400}
   m_Layer: 11
   m_Name: Projectile
   m_TagString: Untagged
@@ -129,25 +128,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3ece001fb63147c4686ca79b33ee3d57, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _topSpeed: {x: 0, y: 0, z: 0}
   _acceleration: 1
   _deceleration: -1
-  _decayDistance: 10
   _active: 1
   _hasInstantTopSpeedByDefault: 1
---- !u!114 &114613580595468400
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1857649544940456}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bbe50ab621cf0ee40888582ae2db13af, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _baseTelegrabSpeed: 1
-  _active: 1
+  _topSpeed: {x: 0, y: 0, z: 0}
+  _decayDistance: 10
 --- !u!135 &135602964130924380
 SphereCollider:
   m_ObjectHideFlags: 1

@@ -121,8 +121,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 1223873337239298}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fb6bd598de48f2b4f9f4b1d4ebfda3ae, type: 3}
+  m_Script: {fileID: 11500000, guid: 54810cd578f45d441a3d40fc5877cf6d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _toughness: 2
+  _toughness: 10
   _hitInterval: 0.3
+  _regenMode: 0
+  _regenAmount: 1
+  _regenInterval: 0.3
