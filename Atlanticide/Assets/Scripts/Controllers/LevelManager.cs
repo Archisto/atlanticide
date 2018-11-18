@@ -13,8 +13,16 @@ namespace Atlanticide
         [SerializeField]
         private Transform _player2SpawnPoint;
 
+        [Header("LEVEL TIME")]
+
         [SerializeField]
         private float _levelTime = 120f;
+
+        [SerializeField]
+        private float _hurryUpWarnTime = 100f;
+
+        [SerializeField]
+        private float _hurryUpWarnFlashTime = 0.5f;
 
         [Header("SCORE")]
 
@@ -49,10 +57,12 @@ namespace Atlanticide
         private UIController _ui;
         private Level _currentLevel;
         private Timer _levelTimer;
+        private Timer _hurryUpWarnTimer;
         private Timer _scoreMultDecayTimer;
         private float _levelTimeElapsedRatio;
         private int _scoreMultiplier = 1;
         private float _pitch;
+        private bool _flashLevelTimeBar;
 
         public bool LevelActive
         {
@@ -62,6 +72,14 @@ namespace Atlanticide
         public int ScoreMultiplier
         {
             get { return _scoreMultiplier; }
+        }
+
+        public bool TimeIsRunningOut
+        {
+            get
+            {
+                return _levelTimer.elapsedTime > _hurryUpWarnTime;
+            }
         }
 
         /// <summary>
@@ -82,6 +100,7 @@ namespace Atlanticide
             _currentLevel = GameManager.Instance.CurrentLevel;
             _ui.levelName.text = _currentLevel.LevelName;
             _levelTimer = new Timer(_levelTime, true);
+            _hurryUpWarnTimer = new Timer(_hurryUpWarnFlashTime, true);
             _scoreMultDecayTimer = new Timer(_scoreMultiplierDecayTime, true);
 
             orichalcumPickupPool = new Pool<OrichalcumPickup>(64, true, orichalcumPickupPrefab);
@@ -107,14 +126,29 @@ namespace Atlanticide
 
                     if (_levelTimer.Check())
                     {
-                        EndLevel();
+                        LoseLevel();
                     }
                     else
                     {
                         _levelTimeElapsedRatio = _levelTimer.GetRatio();
+                        UpdateHurryUpWarning();
                     }
 
-                    GameManager.Instance.UpdateUITimer(_levelTimeElapsedRatio);
+                    _ui.UpdateLevelTimeBar(_levelTimeElapsedRatio);
+                }
+            }
+        }
+
+        private void UpdateHurryUpWarning()
+        {
+            if (TimeIsRunningOut)
+            {
+                if (_hurryUpWarnTimer.Check() ||
+                    !_hurryUpWarnTimer.Active)
+                {
+                    _flashLevelTimeBar = !_flashLevelTimeBar;
+                    _ui.FlashLevelTimeBar(_flashLevelTimeBar);
+                    _hurryUpWarnTimer.Activate();
                 }
             }
         }
@@ -165,10 +199,11 @@ namespace Atlanticide
             _levelTimer.Activate();
         }
 
-        public void EndLevel()
+        public void LoseLevel()
         {
             _levelTimer.Reset();
             _levelTimeElapsedRatio = 1f;
+            _ui.FlashLevelTimeBar(true);
             GameManager.Instance.EndLevel(false);
         }
 
@@ -177,14 +212,22 @@ namespace Atlanticide
             _levelTimer.Reset();
             _levelTimeElapsedRatio = 0f;
             _scoreMultDecayTimer.Reset();
+            ResetHurryUpWarning();
             ResetScoreMultiplier();
             ResetPickupSFX();
+        }
+
+        private void ResetHurryUpWarning()
+        {
+            _hurryUpWarnTimer.Reset();
+            _ui.FlashLevelTimeBar(false);
+            _flashLevelTimeBar = false;
         }
 
         private void ResetScoreMultiplier()
         {
             _scoreMultiplier = 1;
-            GameManager.Instance.ResetScoreMultiplierUI();
+            _ui.SetMultiplierCounterValue(1);
         }
 
         private void ResetPickupSFX()

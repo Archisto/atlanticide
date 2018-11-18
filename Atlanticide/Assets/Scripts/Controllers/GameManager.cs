@@ -890,6 +890,7 @@ namespace Atlanticide
             if (levelWon)
             {
                 SaveGame();
+                _ui.FlashLevelTimeBar(false);
             }
 
             Debug.Log("[GameManager] Level " + (levelWon ? "won" : "lost") +
@@ -910,11 +911,6 @@ namespace Atlanticide
         public bool LevelWinConditionsMet()
         {
             return _levelManager != null && _levelManager.EnoughScore(CurrentScore);
-        }
-
-        public void UpdateUITimer(float levelTimeElapsedRatio)
-        {
-            _ui.UpdateLevelTimeBar(levelTimeElapsedRatio);
         }
 
         private void ResetLevelResultAudioSource()
@@ -943,11 +939,6 @@ namespace Atlanticide
         {
             CurrentScore = score;
             _ui.SetScoreCounterValue(score);
-        }
-
-        public void ResetScoreMultiplierUI()
-        {
-            _ui.SetMultiplierCounterValue(1);
         }
 
         public void ActivatePauseScreen(bool activate, string playerName)
