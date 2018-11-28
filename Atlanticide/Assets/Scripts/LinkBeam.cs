@@ -116,6 +116,11 @@ namespace Atlanticide
         /// </summary>
         public void Activate(bool activate, ILinkTarget target = null)
         {
+            if (Active == activate)
+            {
+                return;
+            }
+
             if (activate && target != null)
             {
                 // TODO: Player must face the target before activating the beam

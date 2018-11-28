@@ -7,8 +7,8 @@ namespace Atlanticide
     public class Timer
     {
         public float targetTime;
+        public float elapsedTime;
 
-        private float _elapsedTime;
         private bool _pausable;
         private bool _locked;
 
@@ -61,7 +61,7 @@ namespace Atlanticide
                 Reset();
                 Active = true;
                 progress = Mathf.Clamp01(progress);
-                _elapsedTime = progress * targetTime;
+                elapsedTime = progress * targetTime;
             }
         }
 
@@ -73,10 +73,10 @@ namespace Atlanticide
         {
             if (Active)
             {
-                _elapsedTime +=
+                elapsedTime +=
                     (_pausable ? World.Instance.DeltaTime : Time.deltaTime);
 
-                if (_elapsedTime >= targetTime)
+                if (elapsedTime >= targetTime)
                 {
                     Finish();
                     return true;
@@ -108,7 +108,7 @@ namespace Atlanticide
             }
             else
             {
-                return Mathf.Clamp01(_elapsedTime / targetTime);
+                return Mathf.Clamp01(elapsedTime / targetTime);
             }
         }
 
@@ -133,7 +133,7 @@ namespace Atlanticide
         {
             Active = false;
             Finished = false;
-            _elapsedTime = 0f;
+            elapsedTime = 0f;
         }
     }
 }

@@ -36,7 +36,6 @@ namespace Atlanticide
         public List<PlayerInput> _inputs;
 
         private PlayerCharacter[] _players;
-        private ToolSwapping _toolSwap;
         private CameraController _camera;
         private int _pausingPlayerNum;
         private float _inputDeadZone = 0.2f;
@@ -60,7 +59,6 @@ namespace Atlanticide
             };
 
             _players = GameManager.Instance.GetPlayers();
-            _toolSwap = FindObjectOfType<ToolSwapping>();
             _camera = FindObjectOfType<CameraController>();
 
             CheckConnectedControllers();
@@ -87,8 +85,6 @@ namespace Atlanticide
                 {
                     CheckMenuInput();
                 }
-
-
 
                 // Testing
                 CheckDebugInput();
@@ -179,42 +175,6 @@ namespace Atlanticide
                         _players[i].HandleAltActionInput();
                     }
                 }
-                // If the player has initiated a tool swap request
-                // but dies, the request is canceled
-                else
-                {
-                    CancelToolSwap(_players[i]);
-                }
-            }
-        }
-
-        private void LegacyPlayerInput(int i)
-        {
-            // Changing stance
-            _players[i].HandleStanceInput();
-
-            // Interacting with certain level objects
-            _players[i].HandleInteractionInput();
-
-            // Jumping
-            _players[i].HandleJumpInput();
-
-            // Using the player's primary action
-            if (_players[i].HandleActionInput())
-            {
-                CancelToolSwap(_players[i]);
-            }
-
-            // Using the player's secondary action
-            if (_players[i].HandleAltActionInput())
-            {
-                CancelToolSwap(_players[i]);
-            }
-
-            // Tool swapping
-            if (_players[i].CheckToolSwapInput())
-            {
-                _toolSwap.InitiateSwapRequest(_players[i]);
             }
         }
         
@@ -245,7 +205,7 @@ namespace Atlanticide
         private void CheckDebugInput()
         {
             // Change scene
-            LoadLevelOrPuzzle();
+            LoadLevel();
 
             // Pause play mode
             if (Input.GetKeyDown(KeyCode.P))
@@ -262,19 +222,6 @@ namespace Atlanticide
                     {
                         player.Respawn();
                     }
-                }
-
-                // Max energy
-                if (Input.GetKeyDown(KeyCode.Y))
-                {
-                    World.Instance.SetEnergyChargesAndUpdateUI
-                        (World.Instance.MaxEnergyCharges);
-                }
-
-                // Swap tools
-                if (Input.GetKeyDown(KeyCode.T))
-                {
-                    _toolSwap.SwapTools();
                 }
 
                 // Toggle noclip
@@ -364,6 +311,14 @@ namespace Atlanticide
             }
         }
 
+        public void ActivateLevelEndScreen()
+        {
+            if (!World.Instance.GamePaused)
+            {
+                TogglePause(0);
+            }
+        }
+
         /// <summary>
         /// Returns whether the given player can unpause the game.
         /// If the player is unavailable, anyone can unpause.
@@ -379,14 +334,6 @@ namespace Atlanticide
             else
             {
                 return _pausingPlayerNum == playerNum;
-            }
-        }
-
-        private void CancelToolSwap(PlayerCharacter player)
-        {
-            if (_toolSwap.RequestInitiatedBy(player))
-            {
-                _toolSwap.EndSwapRequest();
             }
         }
 
@@ -478,7 +425,7 @@ namespace Atlanticide
         /// </summary>
         public void ResetInput()
         {
-            _toolSwap.EndSwapRequest();
+            // TODO
         }
 
         private void LogController(PlayerCharacter player)
@@ -488,11 +435,9 @@ namespace Atlanticide
         }
 
         // Testing
-        private void LoadLevelOrPuzzle()
+        private void LoadLevel()
         {
-            bool input = false;
-            int levelOrPuzzle = 1;
-            bool level = true;
+            int levelNum = 0;
 
             if (Input.GetKeyDown(KeyCode.Keypad0))
             {
@@ -505,33 +450,20 @@ namespace Atlanticide
             }
             else if (Input.GetKeyDown(KeyCode.Keypad1))
             {
-                levelOrPuzzle = 1;
-                level = true;
-                input = true;
+                levelNum = 1;
             }
             else if (Input.GetKeyDown(KeyCode.Keypad2))
             {
-                levelOrPuzzle = 2;
-                level = false;
-                input = true;
+                levelNum = 2;
             }
             else if (Input.GetKeyDown(KeyCode.Keypad3))
             {
-                levelOrPuzzle = 2;
-                level = true;
-                input = true;
+                levelNum = 3;
             }
 
-            if (input)
+            if (levelNum > 0)
             {
-                if (level)
-                {
-                    GameManager.Instance.LoadLevelFromBeginning(levelOrPuzzle);
-                }
-                else
-                {
-                    GameManager.Instance.LoadPuzzle(levelOrPuzzle);
-                }
+                GameManager.Instance.LoadLevel(levelNum);
             }
         }
     }

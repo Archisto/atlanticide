@@ -14,14 +14,18 @@ namespace Atlanticide.UI
         private Transform _playerStatusHandler;
 
         [SerializeField]
+        private Slider _levelTimeBar;
+
+        [SerializeField]
+        private Image _levelTimeBarImage;
+
+        [SerializeField]
         private Text _scoreText;
 
         [SerializeField]
-        private Slider _energyBar;
+        private Text _scoreMultiplierText;
 
         public Image fadeScreen;
-
-        public Image swapIcon;
 
         public Text levelName;
 
@@ -32,7 +36,10 @@ namespace Atlanticide.UI
         private Vector2 _targetIconOffset = new Vector2(0, 50);
 
         [SerializeField]
-        private List<Sprite> _toolImages;
+        private Color _levelTimeBarNormalColor = Color.yellow;
+
+        [SerializeField]
+        private Color _levelTimeBarFlashColor = Color.red;
 
         private Canvas _canvas;
         private Vector2 _canvasSize;
@@ -40,6 +47,7 @@ namespace Atlanticide.UI
         private Camera _camera;
         private InputController _input;
         private PauseScreen _pauseScreen;
+        private LevelEndScreen _levelEndScreen;
         private PlayerCharacter[] _players;
         private List<PlayerStatus> _playerStatuses;
         private Vector3[] _targetPositions;
@@ -54,6 +62,7 @@ namespace Atlanticide.UI
             _camera = FindObjectOfType<CameraController>().GetComponent<Camera>();
             _input = FindObjectOfType<InputController>();
             _pauseScreen = GetComponentInChildren<PauseScreen>(true);
+            _levelEndScreen = GetComponentInChildren<LevelEndScreen>(true);
 
             if (_pauseScreen != null)
             {
@@ -65,7 +74,7 @@ namespace Atlanticide.UI
             _targetPositions = new Vector3[_targetIcons.Length];
 
             InitUI();
-            UpdateScoreCounter();
+            SetScoreCounterValue(0);
         }
 
         /// <summary>
@@ -91,25 +100,24 @@ namespace Atlanticide.UI
                     CreatePlayerStatusUIElement(_players[i]);
                 }
 
-                UpdateEnergyBar(0f);
+                UpdateLevelTimeBar(0f);
             }
         }
 
         private PlayerStatus CreatePlayerStatusUIElement(PlayerCharacter player)
         {
             PlayerStatus ps = Instantiate(_playerStatusPrefab, _playerStatusHandler);
-            ps.SetToolImage(_toolImages[(int) player.Tool]);
             ps.SetPlayerName(player.name);
             _playerStatuses.Add(ps);
             return ps;
         }
 
-        public void UpdateAll()
-        {
-            UpdatePlayerToolImages();
-            UpdateEnergyBar(World.Instance.GetEnergyRatio());
-            UpdateScoreCounter();
-        }
+        //public void UpdateAll()
+        //{
+        //    UpdatePlayerToolImages();
+        //    UpdateEnergyBar(World.Instance.GetEnergyRatio());
+        //    UpdateScoreCounter();
+        //}
 
         public void UpdateCanvasSize()
         {
@@ -118,48 +126,53 @@ namespace Atlanticide.UI
         }
 
         /// <summary>
-        /// Updates the score counter.
+        /// Sets the value of the score counter.
         /// </summary>
-        public void UpdateScoreCounter()
+        public void SetScoreCounterValue(int score)
         {
             if (_scoreText != null)
             {
-                _scoreText.text = "Score: " + GameManager.Instance.CurrentScore;
+                _scoreText.text = "Score: " + score;
             }
         }
 
-        public void UpdateEnergyBar(float energy)
+        /// <summary>
+        /// Sets the value of the score multiplier counter.
+        /// </summary>
+        public void SetMultiplierCounterValue(int multiplier)
         {
-            energy = Mathf.Clamp01(energy);
-            _energyBar.value = energy;
-        }
-
-        public void UpdatePlayerToolImage(int playerNum, PlayerTool tool)
-        {
-            if (_playerStatuses != null)
+            if (_scoreMultiplierText != null)
             {
-                if (playerNum >= _playerStatuses.Count)
-                {
-                    CreatePlayerStatusUIElement(_players[playerNum]);
-                }
-
-                _playerStatuses[playerNum].SetToolImage(_toolImages[(int) tool]);
+                _scoreMultiplierText.text = "Multiplier: " + multiplier;
             }
         }
 
-        public void UpdatePlayerToolImages()
+        //public void UpdateEnergyBar(float energy)
+        //{
+        //    energy = Mathf.Clamp01(energy);
+        //    _energyBar.value = energy;
+        //}
+
+        public void UpdateLevelTimeBar(float elapsedTimeRatio)
         {
-            for (int i = 0; i < _players.Length; i++)
-            {
-                UpdatePlayerToolImage(i, _players[i].Tool);
-            }
+            elapsedTimeRatio = Mathf.Clamp01(elapsedTimeRatio);
+            _levelTimeBar.value = elapsedTimeRatio;
         }
 
         public void ActivatePauseScreen(bool activate, string playerName)
         {
             UpdateCanvasSize();
-            _pauseScreen.pausingPlayerText.text = playerName;
-            _pauseScreen.Activate(activate);
+
+            if (_pauseScreen != null)
+            {
+                _pauseScreen.pausingPlayerText.text = playerName;
+                _pauseScreen.Activate(activate);
+            }
+        }
+
+        public void ActivateLevelEndScreen(bool activate, bool levelWon = false)
+        {
+            _levelEndScreen.Activate(activate, levelWon);
         }
 
         public void MoveUIObjToWorldPoint(Image uiObj,
@@ -216,6 +229,12 @@ namespace Atlanticide.UI
                     _targetIcons[i].gameObject.SetActive(false);
                 }
             }
+        }
+
+        public void FlashLevelTimeBar(bool flash)
+        {
+            _levelTimeBarImage.color = (flash ?
+                _levelTimeBarFlashColor : _levelTimeBarNormalColor);
         }
 
         public void ResetUI()

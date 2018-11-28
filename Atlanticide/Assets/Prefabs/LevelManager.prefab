@@ -21,7 +21,6 @@ GameObject:
   - component: {fileID: 4414935867648102}
   - component: {fileID: 114870816128330676}
   - component: {fileID: 114949632137208592}
-  - component: {fileID: 114666515403901816}
   m_Layer: 0
   m_Name: LevelManager
   m_TagString: Untagged
@@ -100,22 +99,6 @@ Transform:
   m_Father: {fileID: 4414935867648102}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &114666515403901816
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1247031363536192}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9f6137d7d6cbbe54db752e2784c757d1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _swapRequestDuration: 3
-  _swapRange: 3
-  _iconDistFromPlayerHead: 2
-  _swapIconOffColor: {r: 0.0627451, g: 0.07450981, b: 0.0627451, a: 0.39215687}
-  _swapIconOnColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 0.5882353}
 --- !u!114 &114870816128330676
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -129,6 +112,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _player1SpawnPoint: {fileID: 4525349788122696}
   _player2SpawnPoint: {fileID: 4787080142380638}
+  _levelTime: 120
+  _hurryUpWarnTime: 100
+  _hurryUpWarnFlashTime: 0.5
+  requiredScore: 10
+  _scoreMultiplierDecayTime: 1
+  _minPitch: 0.5
+  _maxPitch: 1
+  _pitchRise: 0.04
   orichalcumPickupPrefab: {fileID: 114472806107964208, guid: 42ac1592a09300442817e26528986661,
     type: 2}
   stoneDebrisPrefabArray:

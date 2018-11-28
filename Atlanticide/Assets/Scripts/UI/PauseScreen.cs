@@ -39,22 +39,14 @@ namespace Atlanticide.UI
             Input.SwapInputDevices();
         }
 
-        public void RestartPuzzle()
-        {
-            GameManager.Instance.StartSceneReset();
-            ResumeGame();
-        }
-
         public void RestartLevel()
         {
-            GameManager.Instance.LoadPuzzle(1);
-            ResumeGame();
+            GameManager.Instance.StartSceneReset();
         }
 
         public void ReturnToMainMenu()
         {
             GameManager.Instance.LoadMainMenu();
-            ResumeGame();
         }
 
         public void QuitGame()
