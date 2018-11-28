@@ -1020,7 +1020,7 @@ namespace Atlanticide
                 Debug.Log(string.Format("Game loaded (level {0}: {1})",
                     CurrentLevel.Number, CurrentLevel.LevelName));
 
-                LoadLevel(CurrentLevel.Number);
+                //LoadLevel(CurrentLevel.Number);
             }
             else
             {

@@ -857,14 +857,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _playerStatusPrefab: {fileID: 0}
   _playerStatusHandler: {fileID: 0}
+  _levelTimeBar: {fileID: 0}
+  _levelTimeBarImage: {fileID: 0}
   _scoreText: {fileID: 0}
-  _energyBar: {fileID: 0}
+  _scoreMultiplierText: {fileID: 0}
   fadeScreen: {fileID: 1784452018}
-  swapIcon: {fileID: 0}
   levelName: {fileID: 0}
   _targetIcons: []
   _targetIconOffset: {x: 0, y: 50}
-  _toolImages: []
+  _levelTimeBarNormalColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  _levelTimeBarFlashColor: {r: 1, g: 0, b: 0, a: 1}
 --- !u!114 &318695251
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3072,7 +3074,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1680423206}
-        m_MethodName: QuitGame
+        m_MethodName: DeleteSaveData
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
