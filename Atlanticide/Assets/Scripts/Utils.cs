@@ -81,6 +81,19 @@ namespace Atlanticide
             return null;
         }
 
+        public static int GetFirstNullIndex(Array array)
+        {
+            for (int i = 0; i < array.Length; i++)
+            {
+                if (array.GetValue(i) == null)
+                {
+                    return i;
+                }
+            }
+
+            return -1;
+        }
+
         public static float Ratio(float value, float lowBound, float highBound)
         {
             if (value <= lowBound)

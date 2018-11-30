@@ -42,8 +42,7 @@ namespace Atlanticide.UI
 
             sim = es.gameObject.GetComponent<StandaloneInputModule>();
 
-            playerInput = new PlayerInput(InputDevice.Keyboard);
-            //playerInput = new PlayerInput(InputDevice.Gamepad1);
+            playerInput = GameManager.Instance.MenuPlayerInput;
 
             MainMenu();
 
@@ -54,6 +53,7 @@ namespace Atlanticide.UI
         {
             GameManager.Instance.LoadLevel(levelNumber);
 
+            // TODO:
             // If a save file exists and the player presses the button, there
             // should be a confirmation asking whether the player truly wants to 
             // overwrite their save file (in the case that there is only one).
@@ -87,7 +87,8 @@ namespace Atlanticide.UI
 
         public void DeleteSaveData()
         {
-            // Resets the save file. There should be a confirmation after pressing the button.
+            // TODO: There should be a confirmation after pressing the button.
+            // Resets the save file.
             GameManager.Instance.ResetSaveData();
 
             CheckSave();

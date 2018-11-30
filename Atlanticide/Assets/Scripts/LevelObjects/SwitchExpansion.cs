@@ -45,7 +45,6 @@ namespace Atlanticide
             if (CanCheckSwitch())
             {
                 _switchActivated = _switch.Activated;
-
                 if (_switchActivated && !_activated)
                 {
                     Activate();

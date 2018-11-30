@@ -232,6 +232,11 @@ namespace Atlanticide
             PlayerCount = 2;
             _playerTools = new PlayerTool[MaxPlayers];
             _inputDevices = new InputDevice[MaxPlayers];
+            for (int i = 0; i < _inputDevices.Length; i++)
+            {
+                _inputDevices[i] = InputDevice.None;
+            }
+
             _updateAtSceneStart = true;
 
             MenuPlayerInput = new PlayerInput(InputDevice.Keyboard);
@@ -271,6 +276,7 @@ namespace Atlanticide
             InitUI();
             InitFade();
             InitInputController();
+            MusicPlayer.Instance.fadeTime = _fade.FadeOutTime;
 
             if (GameState == State.Play)
             {
@@ -384,20 +390,11 @@ namespace Atlanticide
                 _players[i].ID = i;
                 _players[i].name = "Player " + (i + 1);
 
-                // TODO: Player 1 uses the same input as in the main menu.
-                // The other player uses other input.
-                PlayerInput input = new PlayerInput(GetPlayerInputDevice(i));
-
+                PlayerInput input = GetPlayerInput(i);
                 _players[i].Input = input;
-                _players[i].transform.position = _levelManager.GetSpawnPoint(i);
-                //Debug.Log("Player " + (i + 1) + " input device: " + _players[i].Input.InputDevice);
+                Debug.Log(_players[i].name + " input: " + input.InputDevice);
 
-                // TODO: Needs to be removed because player 1 already
-                // should have the menu input as their input
-                if (i == 0)
-                {
-                    MenuPlayerInput = input;
-                }
+                _players[i].transform.position = _levelManager.GetSpawnPoint(i);
 
                 string creationMsg = "created";
                 if (i >= PlayerCount)
@@ -662,25 +659,55 @@ namespace Atlanticide
             }
         }
 
-        public InputDevice GetPlayerInputDevice(int playerID)
+        public PlayerInput GetPlayerInput(int playerID)
         {
-            InputDevice result = InputDevice.Keyboard;
+            PlayerInput result = null;
+            InputDevice device = InputDevice.Keyboard;
 
-            if (_freshGameStart)
+            if (playerID > 0)
             {
-                // Testing PS controller
-                //if (playerID != 0)
-                //{
-                //    playerID = 2;
-                //}
-                result = (InputDevice) playerID;
+                int firstUnusedInputDeviceNum = GetFirstUnusedInputDeviceNum(_inputDevices);
+                if (firstUnusedInputDeviceNum >= 0)
+                {
+                    device = (InputDevice) firstUnusedInputDeviceNum;
+                }
+            }
+
+            if (playerID == 0)
+            {
+                result = MenuPlayerInput;
             }
             else
             {
-                result = _inputDevices[playerID];
+                result = new PlayerInput(device);
             }
 
+            _inputDevices[playerID] = result.InputDevice;
             return result;
+        }
+
+        public static int GetFirstUnusedInputDeviceNum(InputDevice[] usedInputDevices)
+        {
+            int inputDeviceIndex = 0;
+
+            for (int i = 0; i < usedInputDevices.Length; i++)
+            {
+                if ((int) usedInputDevices[i] == inputDeviceIndex)
+                {
+                    inputDeviceIndex++;
+                }
+            }
+
+            // NOTE: The next index points to "None".
+            if (inputDeviceIndex > (int) InputDevice.Gamepad3)
+            {
+                Debug.LogError("All input devices are in use.");
+                return -1;
+            }
+            else
+            {
+                return inputDeviceIndex;
+            }
         }
 
         /// <summary>
@@ -700,13 +727,26 @@ namespace Atlanticide
 
         #region Scene Management
 
+        private void StartFadeOut(int nextTrack = -1)
+        {
+            _fade.StartFadeOut(false);
+            if (nextTrack >= 0)
+            {
+                MusicPlayer.Instance.StartFadeOut(nextTrack);
+            }
+            else
+            {
+                MusicPlayer.Instance.StartFadeOut();
+            }
+        }
+
         /// <summary>
         /// Starts reseting level with a fade-out.
         /// </summary>
         public void StartSceneReset()
         {
             SceneTransition = TransitionPhase.ResetingScene;
-            _fade.StartFadeOut(false);
+            StartFadeOut();
             Debug.Log("[GameManager] Resetting level");
         }
 
@@ -743,6 +783,7 @@ namespace Atlanticide
         {
             StartLoadingScene(MainMenuKey);
             GameState = State.MainMenu;
+            StartFadeOut(0);
         }
 
         public void LoadLevel(int levelNum)
@@ -752,11 +793,13 @@ namespace Atlanticide
                 if (LevelExists(levelNum))
                 {
                     CurrentLevel = _levels[levelNum];
+                    StartFadeOut(1);
                     LoadChangedCurrentLevel();
                 }
                 else if (levelNum == 0)
                 {
                     CurrentLevel = _levels[0];
+                    StartFadeOut(1);
                     LoadDebugLevel();
                 }
                 else
@@ -881,6 +924,12 @@ namespace Atlanticide
             SetScore(0);
             _levelManager.StartLevel();
             ResetLevelResultAudioSource();
+
+            int trackNum = 1; // TODO: Don't hardcode!
+            if (!MusicPlayer.Instance.IsPlaying || MusicPlayer.Instance.currentTrack != trackNum)
+            {
+                MusicPlayer.Instance.Play(trackNum);
+            }
         }
 
         public void EndLevel(bool levelWon)
@@ -897,14 +946,15 @@ namespace Atlanticide
                 "! Score: " + CurrentScore + " / " + _levelManager.requiredScore);
             _ui.ActivateLevelEndScreen(true, levelWon);
 
+            MusicPlayer.Instance.Stop();
             ResetLevelResultAudioSource();
             if (levelWon)
             {
-                _levelResultAudioSrc = SFXPlayer.Instance.Play(Sound.Success);
+                _levelResultAudioSrc = SFXPlayer.Instance.Play(Sound.Victory_Jingle);
             }
             else
             {
-                _levelResultAudioSrc = SFXPlayer.Instance.Play(Sound.Failure);
+                _levelResultAudioSrc = SFXPlayer.Instance.Play(Sound.Loss_Jingle);
             }
         }
 
