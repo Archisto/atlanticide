@@ -25,6 +25,15 @@ ModelImporter:
     100038: shield force field
     100040: shield rotator
     100042: shield segments
+    100044: L_Clavicle
+    100046: L_Hand
+    100048: L_LowerArm
+    100050: L_UpperArm
+    100052: Pelvis
+    100054: Pelvis_HELPER
+    100056: SHIELD
+    100058: shield brace
+    100060: Spine
     400000: Segment_BONE_000
     400002: Segment_BONE_001
     400004: Segment_BONE_002
@@ -47,15 +56,26 @@ ModelImporter:
     400038: shield force field
     400040: shield rotator
     400042: shield segments
+    400044: L_Clavicle
+    400046: L_Hand
+    400048: L_LowerArm
+    400050: L_UpperArm
+    400052: Pelvis
+    400054: Pelvis_HELPER
+    400056: SHIELD
+    400058: shield brace
+    400060: Spine
     2100000: No Name
     2100002: shield_segments
     2100004: 15 - Default
     2300000: //RootNode
     2300002: shield force field
     2300004: shield rotator
+    2300006: shield brace
     3300000: //RootNode
     3300002: shield force field
     3300004: shield rotator
+    3300006: shield brace
     4300000: shield brace
     4300002: shield segments
     4300004: shield rotator

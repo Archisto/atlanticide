@@ -47,29 +47,7 @@ namespace Atlanticide.UI
 
             MainMenu();
 
-            // If no save game is detected, the continue button should not be interactable.
-
-            // if (SaveSlot != null)
-            // continueButton.interactable = true;
-            // else 
-            //continueButton.interactable = false;
-            
-            if (GameManager.Instance.CurrentLevel.Number >= 1)
-            {
-                continueButton.interactable = true;
-            }
-            else
-            {
-                continueButton.interactable = false;
-            }
-
-            // If a save game exists, the delete save data button should be interactable.
-            // Otherwise, it should not.
-
-            // if (SaveSlot != null)
-            // deleteSaveDataButton.interactable = true;
-            // else
-            deleteSaveDataButton.interactable = false;
+            CheckSave();
         }
 
         public void StartNewGame()
@@ -83,7 +61,6 @@ namespace Atlanticide.UI
 
         public void Continue()
         {
-            GameManager.Instance.LoadGame();
             GameManager.Instance.LoadLevel(GameManager.Instance.CurrentLevel.Number);
         }
 
@@ -110,8 +87,26 @@ namespace Atlanticide.UI
 
         public void DeleteSaveData()
         {
-            // Removes the player's save file (if there is only one).
-            // There should be a confirmation after pressing the button.
+            // Resets the save file. There should be a confirmation after pressing the button.
+            GameManager.Instance.ResetSaveData();
+
+            CheckSave();
+        }
+
+        public void CheckSave()
+        {
+            GameManager.Instance.LoadGame();
+
+            if (GameManager.Instance.CurrentLevel.Number >= 1)
+            {
+                continueButton.interactable = true;
+                deleteSaveDataButton.interactable = true;
+            }
+            else
+            {
+                continueButton.interactable = false;
+                deleteSaveDataButton.interactable = false;
+            }
         }
     }
 }
