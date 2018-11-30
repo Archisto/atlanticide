@@ -12,7 +12,8 @@ namespace Atlanticide
         Keyboard = 0,
         Gamepad1 = 1,
         Gamepad2 = 2,
-        Gamepad3 = 3
+        Gamepad3 = 3,
+        None = 4
     }
 
     /// <summary>

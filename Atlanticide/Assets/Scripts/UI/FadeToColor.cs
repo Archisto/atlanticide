@@ -47,6 +47,9 @@ namespace Atlanticide
             }
         }
 
+        public float FadeOutTime { get { return _fadeOutTime; } }
+        public float FadeInTime { get { return _fadeInTime; } }
+
         /// <summary>
         /// Initializes the object.
         /// </summary>
