@@ -20,7 +20,7 @@ namespace Atlanticide
         {
             if (detonate)
             {
-                destructibleGameObject.Destruction();
+                destructibleGameObject.Destroy();
                 detonate = false;
             }
         }

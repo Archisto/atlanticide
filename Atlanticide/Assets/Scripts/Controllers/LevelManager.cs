@@ -103,8 +103,8 @@ namespace Atlanticide
             _hurryUpWarnTimer = new Timer(_hurryUpWarnFlashTime, true);
             _scoreMultDecayTimer = new Timer(_scoreMultiplierDecayTime, true);
 
-            orichalcumPickupPool = new Pool<OrichalcumPickup>(64, true, orichalcumPickupPrefab);
-            stoneDebrisPool = new Pool<Debris>(32, true, stoneDebrisPrefabArray);
+            orichalcumPickupPool = new Pool<OrichalcumPickup>(128, true, orichalcumPickupPrefab);
+            stoneDebrisPool = new Pool<Debris>(128, true, stoneDebrisPrefabArray);
             woodDebrisPool = new Pool<Debris>(32, true, woodDebrisPrefabArray);
             terracottaDebrisPool = new Pool<Debris>(32, true, terracottaDebrisPrefabArray);
         }

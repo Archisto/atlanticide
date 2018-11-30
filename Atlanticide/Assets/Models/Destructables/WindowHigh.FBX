@@ -8,11 +8,11 @@ FBXHeaderExtension:  {
 		Version: 1000
 		Year: 2018
 		Month: 11
-		Day: 29
-		Hour: 12
-		Minute: 45
-		Second: 34
-		Millisecond: 554
+		Day: 30
+		Hour: 13
+		Minute: 43
+		Second: 8
+		Millisecond: 965
 	}
 	Creator: "FBX SDK/FBX Plugins version 2018.1"
 	SceneInfo: "SceneInfo::GlobalInfo", "UserData" {
@@ -28,21 +28,21 @@ FBXHeaderExtension:  {
 			Comment: ""
 		}
 		Properties70:  {
-			P: "DocumentUrl", "KString", "Url", "", "C:\Users\Toni\Desktop\Atlanticide\Atlanticide\Assets\Models\Destructibles\WindowHigh.FBX"
-			P: "SrcDocumentUrl", "KString", "Url", "", "C:\Users\Toni\Desktop\Atlanticide\Atlanticide\Assets\Models\Destructibles\WindowHigh.FBX"
+			P: "DocumentUrl", "KString", "Url", "", "C:\Users\Antonius Maximus\Desktop\Atlanticide\Atlanticide\Assets\Models\Destructables\WindowHigh.FBX"
+			P: "SrcDocumentUrl", "KString", "Url", "", "C:\Users\Antonius Maximus\Desktop\Atlanticide\Atlanticide\Assets\Models\Destructables\WindowHigh.FBX"
 			P: "Original", "Compound", "", ""
 			P: "Original|ApplicationVendor", "KString", "", "", "Autodesk"
 			P: "Original|ApplicationName", "KString", "", "", "3ds Max"
 			P: "Original|ApplicationVersion", "KString", "", "", "2018"
-			P: "Original|DateTime_GMT", "DateTime", "", "", "29/11/2018 10:45:34.553"
-			P: "Original|FileName", "KString", "", "", "C:\Users\Toni\Desktop\Atlanticide\Atlanticide\Assets\Models\Destructibles\WindowHigh.FBX"
+			P: "Original|DateTime_GMT", "DateTime", "", "", "30/11/2018 11:43:08.964"
+			P: "Original|FileName", "KString", "", "", "C:\Users\Antonius Maximus\Desktop\Atlanticide\Atlanticide\Assets\Models\Destructables\WindowHigh.FBX"
 			P: "LastSaved", "Compound", "", ""
 			P: "LastSaved|ApplicationVendor", "KString", "", "", "Autodesk"
 			P: "LastSaved|ApplicationName", "KString", "", "", "3ds Max"
 			P: "LastSaved|ApplicationVersion", "KString", "", "", "2018"
-			P: "LastSaved|DateTime_GMT", "DateTime", "", "", "29/11/2018 10:45:34.553"
-			P: "Original|ApplicationActiveProject", "KString", "", "", "C:\Users\Toni\Documents\3dsMax"
-			P: "Original|ApplicationNativeFile", "KString", "", "", "C:\Users\Toni\Dropbox\+ Fall 2018 Project\DestructableBuildingParts.max"
+			P: "LastSaved|DateTime_GMT", "DateTime", "", "", "30/11/2018 11:43:08.964"
+			P: "Original|ApplicationActiveProject", "KString", "", "", "C:\Users\Antonius Maximus\Documents\3dsMax"
+			P: "Original|ApplicationNativeFile", "KString", "", "", "C:\Users\Antonius Maximus\Dropbox\+ Fall 2018 Project\DestructableBuildingParts.max"
 		}
 	}
 }
@@ -77,7 +77,7 @@ GlobalSettings:  {
 
 Documents:  {
 	Count: 1
-	Document: 2527381238464, "", "Scene" {
+	Document: 2363106270288, "", "Scene" {
 		Properties70:  {
 			P: "SourceObject", "object", "", ""
 			P: "ActiveAnimStackName", "KString", "", "", ""
@@ -227,7 +227,7 @@ Definitions:  {
 ;------------------------------------------------------------------
 
 Objects:  {
-	Geometry: 2524157641328, "Geometry::", "Mesh" {
+	Geometry: 2363104480336, "Geometry::", "Mesh" {
 		Properties70:  {
 			P: "Color", "ColorRGB", "Color", "",0.772549019607843,0.772549019607843,0
 		}
@@ -303,7 +303,7 @@ Objects:  {
 			}
 		}
 	}
-	Model: 2525186950368, "Model::WindowHigh", "Mesh" {
+	Model: 2362726271264, "Model::WindowHigh", "Mesh" {
 		Version: 232
 		Properties70:  {
 			P: "PreRotation", "Vector3D", "Vector", "",-90,-0,0
@@ -318,7 +318,7 @@ Objects:  {
 		Shading: T
 		Culling: "CullingOff"
 	}
-	Material: 2523383546736, "Material::01 - Default", "" {
+	Material: 2364289466256, "Material::01 - Default", "" {
 		Version: 102
 		ShadingModel: "phong"
 		MultiLayer: 0
@@ -348,11 +348,11 @@ Objects:  {
 Connections:  {
 	
 	;Model::WindowHigh, Model::RootNode
-	C: "OO",2525186950368,0
+	C: "OO",2362726271264,0
 	
 	;Geometry::, Model::WindowHigh
-	C: "OO",2524157641328,2525186950368
+	C: "OO",2363104480336,2362726271264
 	
 	;Material::01 - Default, Model::WindowHigh
-	C: "OO",2523383546736,2525186950368
+	C: "OO",2364289466256,2362726271264
 }

@@ -160,6 +160,7 @@ namespace Atlanticide
 
         public virtual void Destroy()
         {
+            IsDestroyed = true;
             _toughnessLeft = 0f;
             gameObject.SetActive(false);
             SFXPlayer.Instance.Play(Sound.Cyclops_Exploding, volumeFactor: 0.3f);
@@ -169,6 +170,7 @@ namespace Atlanticide
         {
             if (IsDestroyed)
             {
+                IsDestroyed = false;
                 gameObject.SetActive(true);
                 _toughnessLeft = toughnessLeft;
             }
