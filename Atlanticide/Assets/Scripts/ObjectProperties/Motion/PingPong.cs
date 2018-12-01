@@ -19,6 +19,9 @@ namespace Atlanticide
         private Vector3 _position2 = Vector3.one;
 
         [SerializeField]
+        private bool _changePosRelativeToDefaultPos;
+
+        [SerializeField]
         private bool _sineWave;
 
         private Vector3 _defaultPosition;
@@ -26,6 +29,7 @@ namespace Atlanticide
         private Vector3 _targetPosition;
         private float _elapsedTime;
         private bool _reverse;
+        private bool _starting = true;
 
         /// <summary>
         /// Initializes the object.
@@ -56,13 +60,18 @@ namespace Atlanticide
             {
                 _elapsedTime = 0f;
                 _reverse = !_reverse;
-                transform.localPosition = _targetPosition;
+                ChangePosition(_targetPosition);
                 _startPosition = _targetPosition;
                 UpdateTargetPosition();
+
+                if (_starting)
+                {
+                    _starting = false;
+                }
             }
             else
             {
-                transform.localPosition = Vector3.Lerp(_startPosition, _targetPosition, ApplyModifiersToRatio(ratio));
+                ChangePositionLerp(_startPosition, _targetPosition, ApplyModifiersToRatio(ratio));
             }
         }
 
@@ -80,6 +89,37 @@ namespace Atlanticide
             }
         }
 
+        private void ChangePositionLerp(Vector3 start, Vector3 target, float ratio)
+        {
+            Vector3 position = Vector3.zero;
+
+            if (_changePosRelativeToDefaultPos)
+            {
+                if (_starting)
+                {
+                    target += _defaultPosition;
+                }
+                else
+                {
+                    position = _defaultPosition;
+                }
+            }
+
+            position += Vector3.Lerp
+                (start, target, ApplyModifiersToRatio(ratio));
+            transform.localPosition = position;
+        }
+
+        private void ChangePosition(Vector3 position)
+        {
+            if (_changePosRelativeToDefaultPos)
+            {
+                position += _defaultPosition;
+            }
+            
+            transform.localPosition = position;
+        }
+
         private void UpdateTargetPosition()
         {
             _targetPosition = (_reverse ? _position1 : _position2);
@@ -88,10 +128,11 @@ namespace Atlanticide
         public void ResetPosition()
         {
             transform.localPosition = _defaultPosition;
-            _startPosition = _defaultPosition;
             _reverse = false;
-            _elapsedTime = _oneDirTime * _startRatio;
+            _starting = true;
+            _startPosition = _defaultPosition;
             UpdateTargetPosition();
+            _elapsedTime = _oneDirTime * _startRatio;
         }
     }
 }

@@ -11,6 +11,9 @@ namespace Atlanticide
     /// </summary>
     public class ToughPickup : Pickup, ILinkInteractable
     {
+        [SerializeField]
+        private bool _canBePickedUpByPlayer = true;
+
         [SerializeField, Range(1f, 30f)]
         private float _toughness = 1f;
 
@@ -67,7 +70,8 @@ namespace Atlanticide
         /// <param name="collision">The collision</param>
         protected void OnCollisionStay(Collision collision)
         {
-            if (!IsCollected && !_hitTimer.Active &&
+            if (_canBePickedUpByPlayer &&
+                !IsCollected && !_hitTimer.Active &&
                 World.Instance.PlayerInteractStrength > 0f)
             {
                 PlayerCharacter pc = collision.gameObject.
