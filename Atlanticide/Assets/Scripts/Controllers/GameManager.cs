@@ -1008,6 +1008,23 @@ namespace Atlanticide
             }
         }
 
+        public void AddLevelObjectsToArray(LevelObject[] levelObjectsToAdd)
+        {
+            LevelObject[] newLevelObjects = new LevelObject[_levelObjects.Length + levelObjectsToAdd.Length];
+
+            for (int i = 0; i < _levelObjects.Length; i++)
+            {
+                newLevelObjects[i] = _levelObjects[i];
+            }
+
+            for (int i = 0; i < levelObjectsToAdd.Length; i++)
+            {
+                newLevelObjects[_levelObjects.Length + i] = levelObjectsToAdd[i];
+            }
+
+            _levelObjects = newLevelObjects;
+        }
+
         #endregion Level Methods
 
         #region Persistence

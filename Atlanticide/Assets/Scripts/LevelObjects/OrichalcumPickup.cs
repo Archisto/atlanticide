@@ -7,15 +7,15 @@ namespace Atlanticide
     {
 
         // Use this for initialization
-        void Start()
+        protected override void Start()
         {
-
+            base.Start();
         }
 
         // Update is called once per frame
-        void Update()
+        protected override void UpdateObject()
         {
-
+            base.UpdateObject();
         }
 
         /// <summary>
@@ -23,9 +23,6 @@ namespace Atlanticide
         /// </summary>
         public override void ResetObject()
         {
-            IsCollected = false;
-            SetToDefaultPosition();
-            gameObject.SetActive(true);
             base.ResetObject();
         }
     }

@@ -2927,7 +2927,7 @@ MonoBehaviour:
   _hitboxExtents: {x: 0.1, y: 0.55, z: 0}
   _layerMask:
     serializedVersion: 2
-    m_Bits: 14848
+    m_Bits: 15104
   _useLineRenderer: 1
   _strengthRatio: 0
 --- !u!114 &114183816673013010
