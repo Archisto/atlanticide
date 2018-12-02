@@ -105,8 +105,8 @@ namespace Atlanticide
 
             orichalcumPickupPool = new Pool<OrichalcumPickup>(128, true, orichalcumPickupPrefab);
             stoneDebrisPool = new Pool<Debris>(128, true, stoneDebrisPrefabArray);
-            woodDebrisPool = new Pool<Debris>(32, true, woodDebrisPrefabArray);
-            terracottaDebrisPool = new Pool<Debris>(32, true, terracottaDebrisPrefabArray);
+            woodDebrisPool = new Pool<Debris>(64, true, woodDebrisPrefabArray);
+            terracottaDebrisPool = new Pool<Debris>(128, true, terracottaDebrisPrefabArray);
         }
 
         /// <summary>

@@ -80,7 +80,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1702123806251516}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -1, y: 1, z: 0}
+  m_LocalPosition: {x: 11.98, y: 1, z: 3.67}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 4414935867648102}
@@ -93,7 +93,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1340101263505736}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 8.84, y: 1, z: 2.11}
+  m_LocalPosition: {x: 17.39, y: 1, z: 3.9}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 4414935867648102}
@@ -131,9 +131,9 @@ MonoBehaviour:
   - {fileID: 114248194978923306, guid: 6073c43bb18e5bd44888c848e754a365, type: 2}
   - {fileID: 114074689312514572, guid: b2866f70e1442c34d8abb40b18b34065, type: 2}
   terracottaDebrisPrefabArray:
-  - {fileID: 114717635662397190, guid: 6ef88818e981f4a4891cafee731a830b, type: 2}
-  - {fileID: 114948375165442382, guid: 0c0060b507e8b07438ad8e86e251546a, type: 2}
-  - {fileID: 114814381505255854, guid: a33933d5cb6a5cc41809bd9057ebcd72, type: 2}
+  - {fileID: 114084745111631280, guid: 6ef88818e981f4a4891cafee731a830b, type: 2}
+  - {fileID: 114088457045770582, guid: 0c0060b507e8b07438ad8e86e251546a, type: 2}
+  - {fileID: 114105906561150608, guid: a33933d5cb6a5cc41809bd9057ebcd72, type: 2}
 --- !u!114 &114949632137208592
 MonoBehaviour:
   m_ObjectHideFlags: 1
