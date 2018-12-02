@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657868, g: 0.49641263, b: 0.57481706, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -216,7 +216,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 4209680561713104, guid: e370b286f64f11b4faf9c3287e90b691, type: 2}
       propertyPath: m_RootOrder
-      value: 5
+      value: 4
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e370b286f64f11b4faf9c3287e90b691, type: 2}
@@ -373,7 +373,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 4580147673768324, guid: 637d10e28d817354d8fc0f6d0a22450f, type: 2}
       propertyPath: m_RootOrder
-      value: 6
+      value: 7
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 637d10e28d817354d8fc0f6d0a22450f, type: 2}
@@ -415,10 +415,72 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 4109859290790634, guid: 6843a9f87191ac84ea951e29395336b0, type: 2}
       propertyPath: m_RootOrder
-      value: 4
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1336748776786920, guid: 6843a9f87191ac84ea951e29395336b0, type: 2}
+      propertyPath: m_Name
+      value: Manager
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 6843a9f87191ac84ea951e29395336b0, type: 2}
+  m_IsPrefabAsset: 0
+--- !u!1 &536747742 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1336748776786920, guid: 6843a9f87191ac84ea951e29395336b0,
+    type: 2}
+  m_PrefabInternal: {fileID: 536747741}
+--- !u!114 &536747743
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 536747742}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cd85129ff4f523743972487f7e039a42, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!1001 &686619546
+Prefab:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 4746708604096572, guid: a633c2f6eb009a84c926f1268cb0b488, type: 2}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4746708604096572, guid: a633c2f6eb009a84c926f1268cb0b488, type: 2}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4746708604096572, guid: a633c2f6eb009a84c926f1268cb0b488, type: 2}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4746708604096572, guid: a633c2f6eb009a84c926f1268cb0b488, type: 2}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4746708604096572, guid: a633c2f6eb009a84c926f1268cb0b488, type: 2}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4746708604096572, guid: a633c2f6eb009a84c926f1268cb0b488, type: 2}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4746708604096572, guid: a633c2f6eb009a84c926f1268cb0b488, type: 2}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4746708604096572, guid: a633c2f6eb009a84c926f1268cb0b488, type: 2}
+      propertyPath: m_RootOrder
+      value: 6
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: a633c2f6eb009a84c926f1268cb0b488, type: 2}
   m_IsPrefabAsset: 0
 --- !u!1001 &704289873
 Prefab:
@@ -695,14 +757,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _playerStatusPrefab: {fileID: 0}
   _playerStatusHandler: {fileID: 0}
+  _levelTimeBar: {fileID: 0}
+  _levelTimeBarImage: {fileID: 0}
   _scoreText: {fileID: 0}
-  _energyBar: {fileID: 0}
+  _scoreMultiplierText: {fileID: 0}
   fadeScreen: {fileID: 417749449}
-  swapIcon: {fileID: 0}
   levelName: {fileID: 0}
   _targetIcons: []
   _targetIconOffset: {x: 0, y: 50}
-  _toolImages: []
+  _levelTimeBarNormalColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  _levelTimeBarFlashColor: {r: 1, g: 0, b: 0, a: 1}
 --- !u!114 &1703102783
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -778,7 +842,7 @@ RectTransform:
   - {fileID: 999511020}
   - {fileID: 417749451}
   m_Father: {fileID: 0}
-  m_RootOrder: 7
+  m_RootOrder: 8
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}

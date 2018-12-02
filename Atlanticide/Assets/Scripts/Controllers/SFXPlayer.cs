@@ -81,7 +81,18 @@ namespace Atlanticide
         Ground_Collapse = 56,
         Dissolve = 57,
         Projectile_1 = 58,
-        Clink = 59
+        Clink = 59,
+        Button_Highlight = 60,
+        Button_Press = 61,
+        Laser_Activate_Object = 62,
+        Laser_Cutting = 63,
+        Laser_Explosion_1 = 64,
+        Laser_Explosion_2 = 65,
+        Vase_Break = 66,
+        Clock_Ticking = 67,
+        Trumpets = 68,
+        Victory_Jingle = 69,
+        Loss_Jingle = 70
     }
 
     public class SFXPlayer : MonoBehaviour

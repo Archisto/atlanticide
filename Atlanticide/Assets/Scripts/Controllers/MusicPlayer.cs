@@ -79,15 +79,22 @@ namespace Atlanticide
         /// <summary>
         /// The current track
         /// </summary>
-        private int currentTrack = 0;
+        public int currentTrack;
+        public float fadeTime;
 
         private AudioSource audioSrc;
-
+        private float baseVolume;
         private float oldProgress;
-
         private float waitStartTime;
+        private float elapsedFadeTime;
         
-        private float fadeSpeed;
+        public bool IsPlaying
+        {
+            get
+            {
+                return audioSrc.isPlaying;
+            }
+        }
 
         /// <summary>
         /// Lets a new Singleton instance be created.
@@ -125,9 +132,7 @@ namespace Atlanticide
 
             // Initializes the volume
             audioSrc.volume = GameManager.Instance.Settings.MusicVolume;
-
-            // Initializes the fade speed
-            fadeSpeed = audioSrc.volume / 5f;
+            baseVolume = audioSrc.volume;
 
             // Corrects timeBetweenTracks' invalid value
             if (timeBetweenTracks < 0)
@@ -148,7 +153,7 @@ namespace Atlanticide
         private void Update()
         {
             // The track is playing
-            if (audioSrc.isPlaying)
+            if (IsPlaying)
             {
                 UpdateWhenPlaying();
             }
@@ -258,18 +263,23 @@ namespace Atlanticide
         /// </summary>
         public void Play()
         {
-            PlayTrack(currentTrack);
+            Play(currentTrack);
         }
 
         /// <summary>
         /// Starts playing a certain track.
         /// </summary>
         /// <param name="trackNum">the track's number in the rack list</param>
-        public void PlayTrack(int trackNum)
+        public void Play(int trackNum)
         {
             if (trackNum >= 0 &&
                 trackNum < tracks.Count)
             {
+                if (fadeOut)
+                {
+                    FinishFadeOut();
+                }
+
                 if (paused)
                 {
                     paused = false;
@@ -278,6 +288,7 @@ namespace Atlanticide
                 currentTrack = trackNum;
                 audioSrc.clip = tracks[currentTrack];
                 audioSrc.Play();
+                Debug.Log("[MusicPlayer] Playing track " + currentTrack);
             }
         }
 
@@ -296,9 +307,10 @@ namespace Atlanticide
         /// </summary>
         private void Reset()
         {
-            audioSrc.time = 0;
-            progress = 0;
-            oldProgress = 0;
+            audioSrc.time = 0f;
+            progress = 0f;
+            oldProgress = 0f;
+            elapsedFadeTime = 0f;
         }
 
         /// <summary>
@@ -379,7 +391,7 @@ namespace Atlanticide
 
                 if (!fadeOut)
                 {
-                    fadeSpeed = audioSrc.volume / 5f;
+                    baseVolume = volume;
                 }
             }
         }
@@ -387,9 +399,23 @@ namespace Atlanticide
         /// <summary>
         /// Starts fading out the track.
         /// </summary>
-        private void StartFadeOut()
+        public void StartFadeOut()
         {
+            Debug.Log("[MusicPlayer] Fade out starting");
             fadeOut = true;
+            elapsedFadeTime = 0f;
+        }
+
+        /// <summary>
+        /// Starts fading out the track if the next track is different.
+        /// </summary>
+        /// <param name="nextTrack">The next track's number</param>
+        public void StartFadeOut(int nextTrack)
+        {
+            if (currentTrack != nextTrack)
+            {
+                StartFadeOut();
+            }
         }
 
         /// <summary>
@@ -398,9 +424,14 @@ namespace Atlanticide
         /// </summary>
         private void UpdateFadeOut()
         {
-            float newVolume = audioSrc.volume - 
-                fadeSpeed * Time.deltaTime;
+            elapsedFadeTime += Time.deltaTime;
+            float ratio = 1;
+            if (fadeTime > 0)
+            {
+                ratio = elapsedFadeTime / fadeTime;
+            }
 
+            float newVolume = Mathf.Lerp(baseVolume, 0, ratio);
             if (newVolume <= 0)
             {
                 FinishFadeOut();
@@ -417,9 +448,10 @@ namespace Atlanticide
         /// </summary>
         private void FinishFadeOut()
         {
-            fadeOut = false;
+            Debug.Log("[MusicPlayer] Fade out finished");
             Stop();
-            SetVolume(GameManager.Instance.Settings.MusicVolume);
+            fadeOut = false;
+            SetVolume(baseVolume);
         }
     }
 }

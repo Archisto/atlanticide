@@ -81,6 +81,19 @@ namespace Atlanticide
             return null;
         }
 
+        public static int GetFirstNullIndex(Array array)
+        {
+            for (int i = 0; i < array.Length; i++)
+            {
+                if (array.GetValue(i) == null)
+                {
+                    return i;
+                }
+            }
+
+            return -1;
+        }
+
         public static float Ratio(float value, float lowBound, float highBound)
         {
             if (value <= lowBound)
@@ -312,6 +325,20 @@ namespace Atlanticide
         public static bool Between(float value, float min, float max)
         {
             return value >= min && value <= max;
+        }
+
+        public static Vector3 MinVector3(Vector3 v1, Vector3 v2)
+        {
+            return new Vector3(Mathf.Min(v1.x, v2.x),
+                               Mathf.Min(v1.y, v2.y),
+                               Mathf.Min(v1.z, v2.z));
+        }
+
+        public static Vector3 MaxVector3(Vector3 v1, Vector3 v2)
+        {
+            return new Vector3(Mathf.Max(v1.x, v2.x),
+                               Mathf.Max(v1.y, v2.y),
+                               Mathf.Max(v1.z, v2.z));
         }
 
         public static float DistanceTo(this MonoBehaviour obj,

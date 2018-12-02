@@ -12,6 +12,7 @@ namespace Atlanticide
     public class LinkBeam : MonoBehaviour
     {
         private const string WallKey = "Wall";
+        private const string PlatformKey = "Platform";
 
         [Header("STRENGTH PROPERTIES")]
 
@@ -351,7 +352,7 @@ namespace Atlanticide
 
                     if (pickup == null && linkInteractable == null && !wallHit)
                     {
-                        if (CheckIfWallHit(collider))
+                        if (CheckIfEnvironmentHit(collider))
                         {
                             if (!_shutdownTimer.Active)
                             {
@@ -389,12 +390,16 @@ namespace Atlanticide
             linkInteractable.TryInteract(this);
         }
 
-        private bool CheckIfWallHit(Collider collider)
+        private bool CheckIfEnvironmentHit(Collider collider)
         {
-            LinkDestructible bd = collider.transform.
+            LinkDestructible linkDestructible = collider.transform.
                 GetComponent<LinkDestructible>();
-            return bd == null && WallKey.Equals
-                (LayerMask.LayerToName(collider.gameObject.layer));
+            bool envHit =
+                WallKey.Equals
+                    (LayerMask.LayerToName(collider.gameObject.layer)) ||
+                PlatformKey.Equals
+                    (LayerMask.LayerToName(collider.gameObject.layer));
+            return linkDestructible == null && envHit;
         }
 
         private bool CheckIfWallHit(RaycastHit[] hits)
