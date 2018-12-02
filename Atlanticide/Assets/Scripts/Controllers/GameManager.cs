@@ -373,7 +373,7 @@ namespace Atlanticide
         {
             _players = new PlayerCharacter[MaxPlayers];
             _playerPrefab = Resources.Load<PlayerCharacter>
-                ("New2_PlayerCharacter");
+                ("New3_P1_PlayerCharacter");
             CreatePlayers();
             ActivatePlayers(PlayerCount);
         }

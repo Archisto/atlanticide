@@ -18,16 +18,18 @@ namespace Atlanticide
 
         public int spawnAmount;
 
-        public float randomSpread,
-            randomEjectForce,
-            randomEjectForceVariance,
-            randomEjectAngle,
-            randomTorqueAmount;
+        public float ejectForce,
+            ejectAngle,
+            torqueAmount;
+
+        [Range(0f, 2f)]
+        public float ejectForceVariance = 0.5f;
+
+        [Range(0f, 2f)]
+        public float baseScale = 1f;
 
         [Range(0f, 1f)]
-        public float randomScale;
-
-        public GameObject parent;
+        public float randomScale = 0.25f;
 
         private MeshRenderer _meshRenderer;
 
@@ -43,7 +45,7 @@ namespace Atlanticide
         // Use this for initialization
         void Start()
         {
-            _meshRenderer = parent.GetComponent<MeshRenderer>();
+            _meshRenderer = transform.parent.gameObject.GetComponent<MeshRenderer>();
             _boundsMin = _meshRenderer.bounds.min;
             _boundsMax = _meshRenderer.bounds.max;
             _levelManager = FindObjectOfType<LevelManager>();
@@ -70,13 +72,13 @@ namespace Atlanticide
                     Random.Range(_boundsMin.z, _boundsMax.z));
 
                 //Randomized scale for the pooled object
-                float randomizedScale = Random.Range(1f - randomScale, 1f + randomScale);
+                float randomizedScale = Random.Range(baseScale - randomScale, baseScale + randomScale);
                 Vector3 v_randomScale = new Vector3(randomizedScale, randomizedScale, randomizedScale);
 
                 //Randomized torque for the pooled object
-                Vector3 randomTorque = new Vector3(Random.Range(-randomTorqueAmount, randomTorqueAmount),
-                    Random.Range(-randomTorqueAmount, randomTorqueAmount),
-                    Random.Range(-randomTorqueAmount, randomTorqueAmount));
+                Vector3 randomTorque = new Vector3(Random.Range(-torqueAmount, torqueAmount),
+                    Random.Range(-torqueAmount, torqueAmount),
+                    Random.Range(-torqueAmount, torqueAmount));
 
                 switch (type)
                 {
@@ -96,9 +98,9 @@ namespace Atlanticide
 
                 if (type != Type.Orichalcum) {
                     //Randomized force for the pooled object.
-                    Vector3 randomForce = Vector3.up + new Vector3(Random.Range(-randomEjectAngle, randomEjectAngle),
-                        Random.Range(-randomEjectAngle, randomEjectAngle),
-                        Random.Range(-randomEjectAngle, randomEjectAngle));
+                    Vector3 randomForce = Vector3.up + new Vector3(Random.Range(-ejectAngle, ejectAngle),
+                        Random.Range(-ejectAngle, ejectAngle),
+                        Random.Range(-ejectAngle, ejectAngle));
                     // Apply new position, rotation, scale, force and torque to the pooled object.
                     _pooledDebris.transform.position = positionWithinBounds;
                     _pooledDebris.transform.localRotation = randomQuaternion;
@@ -108,9 +110,9 @@ namespace Atlanticide
                 } else
                 {
                     //Randomized force for the pooled object.
-                    Vector3 randomForce = new Vector3(Random.Range(-randomEjectAngle, randomEjectAngle),
-                        Random.Range(-randomEjectAngle / 2f, randomEjectAngle / 2f),
-                        Random.Range(-randomEjectAngle, randomEjectAngle));
+                    Vector3 randomForce = new Vector3(Random.Range(-ejectAngle, ejectAngle),
+                        Random.Range(-ejectAngle / 2f, ejectAngle / 2f),
+                        Random.Range(-ejectAngle, ejectAngle));
                     // Apply new position, rotation, scale, force and torque to the pooled object.
                     _pooledOrichalcumPickup.transform.position = positionWithinBounds;
                     _pooledOrichalcumPickup.transform.localRotation = randomQuaternion;
