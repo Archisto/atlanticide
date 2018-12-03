@@ -24,7 +24,7 @@ GameObject:
   - component: {fileID: 114749316140691432}
   - component: {fileID: 65079290549320198}
   m_Layer: 13
-  m_Name: WidePot
+  m_Name: WidePot2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
