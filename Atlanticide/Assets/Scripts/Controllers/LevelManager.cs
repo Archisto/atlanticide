@@ -63,6 +63,7 @@ namespace Atlanticide
         private int _scoreMultiplier = 1;
         private float _pitch;
         private bool _flashLevelTimeBar;
+        private bool _hasPlayedHurryUpSound;
 
         public bool LevelActive
         {
@@ -103,10 +104,10 @@ namespace Atlanticide
             _hurryUpWarnTimer = new Timer(_hurryUpWarnFlashTime, true);
             _scoreMultDecayTimer = new Timer(_scoreMultiplierDecayTime, true);
 
-            orichalcumPickupPool = new Pool<OrichalcumPickup>(64, true, orichalcumPickupPrefab);
-            stoneDebrisPool = new Pool<Debris>(32, true, stoneDebrisPrefabArray);
-            woodDebrisPool = new Pool<Debris>(32, true, woodDebrisPrefabArray);
-            terracottaDebrisPool = new Pool<Debris>(32, true, terracottaDebrisPrefabArray);
+            orichalcumPickupPool = new Pool<OrichalcumPickup>(128, true, orichalcumPickupPrefab);
+            stoneDebrisPool = new Pool<Debris>(128, true, stoneDebrisPrefabArray);
+            woodDebrisPool = new Pool<Debris>(64, true, woodDebrisPrefabArray);
+            terracottaDebrisPool = new Pool<Debris>(128, true, terracottaDebrisPrefabArray);
         }
 
         /// <summary>
@@ -149,6 +150,14 @@ namespace Atlanticide
                     _flashLevelTimeBar = !_flashLevelTimeBar;
                     _ui.FlashLevelTimeBar(_flashLevelTimeBar);
                     _hurryUpWarnTimer.Activate();
+                }
+
+                if (!_hasPlayedHurryUpSound)
+                {
+                    SFXPlayer.Instance.Play(Sound.Trumpets);
+                    SFXPlayer.Instance.PlayLooped(Sound.Clock_Ticking);
+
+                    _hasPlayedHurryUpSound = true;
                 }
             }
         }
@@ -205,6 +214,7 @@ namespace Atlanticide
             _levelTimeElapsedRatio = 1f;
             _ui.FlashLevelTimeBar(true);
             GameManager.Instance.EndLevel(false);
+            StopTickingSound();
         }
 
         public void ResetLevel()
@@ -222,6 +232,8 @@ namespace Atlanticide
             _hurryUpWarnTimer.Reset();
             _ui.FlashLevelTimeBar(false);
             _flashLevelTimeBar = false;
+            _hasPlayedHurryUpSound = false;
+            StopTickingSound();
         }
 
         private void ResetScoreMultiplier()
@@ -233,6 +245,11 @@ namespace Atlanticide
         private void ResetPickupSFX()
         {
             _pitch = _minPitch;
+        }
+
+        public void StopTickingSound()
+        {
+            SFXPlayer.Instance.StopIndividualSFX("Clock Ticking");
         }
     }
 }

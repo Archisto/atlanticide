@@ -373,7 +373,7 @@ namespace Atlanticide
         {
             _players = new PlayerCharacter[MaxPlayers];
             _playerPrefab = Resources.Load<PlayerCharacter>
-                ("New2_PlayerCharacter");
+                ("New3_P1_PlayerCharacter");
             CreatePlayers();
             ActivatePlayers(PlayerCount);
         }
@@ -783,6 +783,9 @@ namespace Atlanticide
         {
             StartLoadingScene(MainMenuKey);
             GameState = State.MainMenu;
+
+            _levelManager.StopTickingSound();
+
             StartFadeOut(0);
         }
 
