@@ -96,7 +96,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 4294967295
+  m_StaticEditorFlags: 0
   m_IsActive: 0
 --- !u!1 &1857657887162082
 GameObject:
@@ -163,7 +163,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 4294967295
+  m_StaticEditorFlags: 0
   m_IsActive: 0
 --- !u!4 &4024581840078872
 Transform:
@@ -563,14 +563,13 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1208823655034490}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1032bff078e37ae45b5a56fa006cfb29, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hoverHeight: 1
-  hoverSpeed: 1
-  _rootObj: {fileID: 4088527965472816}
+  hoverHeight: 0.005
+  hoverSpeed: 2
 --- !u!136 &136249736108657994
 CapsuleCollider:
   m_ObjectHideFlags: 1
