@@ -20,12 +20,12 @@ GameObject:
   m_Component:
   - component: {fileID: 4373487214404608}
   - component: {fileID: 114461011623954592}
-  m_Layer: 9
+  m_Layer: 18
   m_Name: PrefabSpawner (Terracotta)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 4294967295
+  m_StaticEditorFlags: 0
   m_IsActive: 0
 --- !u!1 &1654751657928214
 GameObject:
@@ -57,12 +57,12 @@ GameObject:
   - component: {fileID: 4398324286683010}
   - component: {fileID: 198528148602354914}
   - component: {fileID: 199197261364017784}
-  m_Layer: 9
+  m_Layer: 18
   m_Name: Dust Particle System (Terracotta)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 4294967295
+  m_StaticEditorFlags: 0
   m_IsActive: 0
 --- !u!4 &4209462007198618
 Transform:
@@ -70,8 +70,8 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1654751657928214}
-  m_LocalRotation: {x: -0.42554748, y: -0.56472063, z: -0.42554748, w: 0.56472063}
-  m_LocalPosition: {x: 9.339, y: 3.087, z: 6.01}
+  m_LocalRotation: {x: -0.42554873, y: 0.56471896, z: 0.42554623, w: 0.5647223}
+  m_LocalPosition: {x: 1.1416492, y: 1.9869057, z: 2.0863113}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4398324286683010}
@@ -186,7 +186,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   type: 3
-  spawnAmount: 4
+  spawnAmount: 2
   ejectForce: 16
   ejectAngle: 0.5
   torqueAmount: 128
@@ -213,8 +213,10 @@ MonoBehaviour:
   - {fileID: 0}
   destroyDelay: 5
   applyForceOnFall: 1
+  isWall: 0
   forceOnFall: 0.25
   torqueOnFall: 4
+  ruins: {fileID: 0}
 --- !u!198 &198528148602354914
 ParticleSystem:
   m_ObjectHideFlags: 1
@@ -1098,7 +1100,7 @@ ParticleSystem:
       countCurve:
         serializedVersion: 2
         minMaxState: 0
-        scalar: 8
+        scalar: 4
         minScalar: 0
         maxCurve:
           serializedVersion: 2
