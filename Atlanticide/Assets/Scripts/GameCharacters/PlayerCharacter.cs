@@ -35,12 +35,6 @@ namespace Atlanticide
 
         public PlayerInput Input { get; set; }
 
-        public PlayerTool Tool { get; set; }
-
-        public EnergyCollector EnergyCollector { get; private set; }
-
-        public Shield Shield { get; private set; }
-
         /// <summary>
         /// The player's link beam.
         /// </summary>
@@ -100,96 +94,22 @@ namespace Atlanticide
 
         public bool Respawning { get; set; }
 
-        #region Tool States
-
-        public bool ToolIsIdle
-        {
-            get
-            {
-                return EnergyCollectorIsIdle || ShieldIsIdle; 
-            }
-        }
-
-        public bool EnergyCollectorIsIdle
-        {
-            get
-            {
-                return (Tool == PlayerTool.EnergyCollector && EnergyCollector.IsIdle);
-            }
-        }
-
-        public bool EnergyCollectorIsEmitting
-        {
-            get
-            {
-                return (Tool == PlayerTool.EnergyCollector && EnergyCollector.IsEmitting);
-            }
-        }
-
-        public bool EnergyCollectorIsDraining
-        {
-            get
-            {
-                return (Tool == PlayerTool.EnergyCollector && EnergyCollector.IsDraining);
-            }
-        }
-
-        public bool ShieldIsIdle
-        {
-            get
-            {
-                return (Tool == PlayerTool.Shield && Shield.IsIdle);
-            }
-        }
-
-        public bool ShieldIsActive
-        {
-            get
-            {
-                return (Tool == PlayerTool.Shield && Shield.Active);
-            }
-        }
-
-        public bool ShieldBlocksDamage
-        {
-            get
-            {
-                return (Tool == PlayerTool.Shield && Shield.BlocksDamage);
-            }
-        }
-
-        #endregion Tool States
-
         public bool IsAvailableForActions()
         {
             return (!IsDead && !IsImmobile && 
-                    !Climbing && !Pushing && ToolIsIdle);
+                    !Climbing && !Pushing && !BeamOn);
         }
 
         private bool CanJump()
         {
-            bool restrictions = Jumping || !_groundCollider.AbleToJump ||
-                !Shield.IsIdle;
+            bool restrictions = Jumping || !_groundCollider.AbleToJump;
             bool permissions = Climbing;
             return !restrictions || permissions;
         }
 
         private bool CanClimb()
         {
-            bool restrictions = Climbing || !EnergyCollector.IsIdle ||
-                !Shield.IsIdle;
-            return !restrictions;
-        }
-
-        private bool CanUseEnergyCollector()
-        {
             bool restrictions = Climbing;
-            return !restrictions;
-        }
-
-        private bool CanActivateShield()
-        {
-            bool restrictions = Climbing || Shield.Active;
             return !restrictions;
         }
 
@@ -205,10 +125,8 @@ namespace Atlanticide
         protected override void Start()
         {
             base.Start();
-            EnergyCollector = GetComponentInChildren<EnergyCollector>();
-            Shield = GetComponentInChildren<Shield>();
             LinkBeam = GetComponentInChildren<LinkBeam>();
-            LinkBeam.Init(this, Shield.Activate);
+            LinkBeam.Init(this, ActivateShield);
             LinkObject = LinkBeam.gameObject;
             Animator = GetComponentInChildren<Animator>();
             ShieldAnimator = ShieldModel.GetComponent<Animator>();
@@ -228,7 +146,6 @@ namespace Atlanticide
             {
                 UpdateJump();
                 UpdateRotation();
-                UpdateShield();
             }
         }
 
@@ -240,9 +157,9 @@ namespace Atlanticide
         {
             float speed = _speed;
 
-            if (!Shield.IsIdle)
+            if (BeamOn)
             {
-                speed = _speed * Shield.PlayerSpeedModifier;
+                speed = _speed * LinkBeam.PlayerSpeedModifier;
             }
             else if (!LinkBeam.Active && !IsLinkTarget)
             {
@@ -256,25 +173,18 @@ namespace Atlanticide
             Vector3 inputDirection = input.normalized;
             inputDir = new Vector3(inputDirection.x, 0, inputDirection.y);
             forwardDir = transform.forward;
-            if (!Shield.IsIdle)
+            float angle = 0;
+            if (transform.forward.x >= 0)
             {
-                float angle = 0;
-                if (transform.forward.x >= 0)
-                {
-                    angle = Vector3.Angle(transform.forward, Vector3.forward);
-                }
-                else
-                {
-                    angle = 360 - Vector3.Angle(transform.forward, Vector3.forward);
-                }
-                //Debug.Log("angle: " + angle);
-                inputDirection = Quaternion.AngleAxis(angle, Vector3.forward) * inputDirection;
-                newInputDir = new Vector3(inputDirection.x, 0, inputDirection.y);
+                angle = Vector3.Angle(transform.forward, Vector3.forward);
             }
             else
             {
-                newInputDir = Vector3.zero;
+                angle = 360 - Vector3.Angle(transform.forward, Vector3.forward);
             }
+            //Debug.Log("angle: " + angle);
+            inputDirection = Quaternion.AngleAxis(angle, Vector3.forward) * inputDirection;
+            newInputDir = new Vector3(inputDirection.x, 0, inputDirection.y);
 
             Animator.SetFloat("Horizontal", inputDirection.x);
             Animator.SetFloat("Vertical", inputDirection.y);
@@ -332,9 +242,9 @@ namespace Atlanticide
             }
         }
 
-        private void UpdateShield()
+        private void ActivateShield(bool activate)
         {
-            if (ShieldIsActive)
+            if (activate)
             {
                 Animator.SetBool("Shield Active", true);
                 ShieldAnimator.SetBool("Shield Active", true);
@@ -375,7 +285,7 @@ namespace Atlanticide
         /// <param name="input">The looking direction</param>
         public void LookInput(Vector3 input)
         {
-            if (!ShieldIsIdle)
+            if (!BeamOn)
             {
                 RotateTowards(input, true);
             }
@@ -395,7 +305,7 @@ namespace Atlanticide
         {
             bool inputHeld = false;
             bool inputjustReleased = false;
-            bool active = Input.GetActionInput(out inputHeld, out inputjustReleased);
+            Input.GetActionInput(out inputHeld, out inputjustReleased);
             bool result = false;
 
             if (LinkBeam != null)
@@ -437,90 +347,6 @@ namespace Atlanticide
             return result;
         }
 
-        public bool Old_HandleActionInput()
-        {
-            bool inputHeld = false;
-            bool inputjustReleased = false;
-            bool active = Input.GetActionInput(out inputHeld, out inputjustReleased);
-            bool result = false;
-
-            if (Tool == PlayerTool.EnergyCollector &&
-                CanUseEnergyCollector())
-            {
-                // Drain
-                if (active)
-                {
-                    result = UseEnergyCollector(drain: true);
-                }
-            }
-            else if (Tool == PlayerTool.Shield &&
-                (Shield.Active || CanActivateShield()))
-            {
-                // Open the shield if the action button is held down
-                if (inputHeld && !Shield.Active)
-                {
-                    Shield.Activate(true);
-                }
-                // Open or close the shield if pressed once,
-                // close if released after holding
-                else if (inputjustReleased)
-                {
-                    Shield.Activate(!Shield.Active);
-                }
-
-                // Starts shield opening/closing animation
-                //Animator.SetBool("Shield Active", Shield.Active);
-
-                result = !Shield.IsIdle;
-            }
-
-            return result;
-        }
-
-        public bool Old_HandleAltActionInput()
-        {
-            bool active = Input.GetAltActionInput();
-            bool result = false;
-
-            if (active)
-            {
-                if (Tool == PlayerTool.EnergyCollector &&
-                    CanUseEnergyCollector())
-                {
-                    // Emit
-                    result = UseEnergyCollector(drain: false);
-                }
-                else if (Tool == PlayerTool.Shield)
-                {
-                    result = Shield.Bash();
-                }
-            }
-
-            return result;
-        }
-
-        /// <summary>
-        /// Handles changing the player character's stance.
-        /// Only the player with shield can change stance
-        /// by raising the shield above his/her head.
-        /// </summary>
-        /// <returns>Does the stance change</returns>
-        public bool HandleStanceInput()
-        {
-            if (Tool == PlayerTool.Shield &&
-                (Shield.BlocksDamage || Shield.Raised))
-            {
-                bool input = Input.GetStanceInput();
-                if (input)
-                {
-                    Shield.RaiseAboveHead(!Shield.Raised);
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
         /// <summary>
         /// Handles interacting with various level objects such as respawn points.
         /// </summary>
@@ -530,17 +356,19 @@ namespace Atlanticide
             bool input = Input.GetInteractInput();
             if (input && InteractionTarget != null)
             {
+                // TODO: No more energy charges.
+
                 // Checks whether the energy cost is not too high
                 if (World.Instance.CurrentEnergyCharges >=
                     InteractionTarget.EnergyCost)
                 {
                     if (InteractionTarget.Interact())
                     {
-                        if (InteractionTarget.EnergyCost != 0)
-                        {
-                            // Removes the energy cost from the players
-                            EnergyCollector.ChangeCharges(-1 * InteractionTarget.EnergyCost);
-                        }
+                        //if (InteractionTarget.EnergyCost != 0)
+                        //{
+                        //    // Removes the energy cost from the players
+                        //    EnergyCollector.ChangeCharges(-1 * InteractionTarget.EnergyCost);
+                        //}
 
                         // Makes the interaction target forget the player
                         InteractionTarget.TryRemoveInteractorAfterInteraction();
@@ -553,37 +381,7 @@ namespace Atlanticide
             return false;
         }
 
-        public bool CheckToolSwapInput()
-        {
-            bool input = Input.GetToolSwapInput();
-            return (input && ToolIsIdle);
-        }
-
         #endregion Input
-
-        /// <summary>
-        /// Uses the energy collector for draining or emitting energy.
-        /// Returns whether succeeded in draining or emitting energy.
-        /// </summary>
-        /// <param name="drain">Should energy be drained</param>
-        /// <returns>Is draining or emitting energy successful</returns>
-        public bool UseEnergyCollector(bool drain)
-        {
-            bool result = false;
-            if (EnergyCollector != null && EnergyCollector.IsIdle)
-            {
-                if (drain)
-                {
-                    result = EnergyCollector.TryDraining();
-                }
-                else
-                {
-                    result = EnergyCollector.TryEmitting();
-                }
-            }
-
-            return result;
-        }
 
         /// <summary>
         /// Makes the player character jump.
@@ -774,6 +572,7 @@ namespace Atlanticide
             ResetCommon();
             Input.ResetInput();
             ResetAnimatorMovementAxis();
+            ActivateShield(false);
             EndClimb();
             EndPush();
             InteractionTarget = null;
@@ -792,16 +591,6 @@ namespace Atlanticide
             if (LinkBeam != null)
             {
                 LinkBeam.ResetLinkBeam();
-            }
-
-            if (EnergyCollector != null)
-            {
-                EnergyCollector.ResetEnergyCollector();
-            }
-
-            if (Shield != null)
-            {
-                Shield.ResetShield();
             }
         }
 

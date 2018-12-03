@@ -51,6 +51,11 @@ namespace Atlanticide
         [SerializeField]
         private LayerMask _layerMask;
 
+        [Header("MISCELLANEOUS")]
+
+        [SerializeField]
+        private float _playerSpeedModifier = 1f;
+
         [Header("DEBUG")]
 
         public bool _useLineRenderer;
@@ -95,7 +100,9 @@ namespace Atlanticide
             }
         }
 
-        public delegate bool Activation(bool activate);
+        public float PlayerSpeedModifier { get { return _playerSpeedModifier; } }
+
+        public delegate void Activation(bool activate);
         private Activation stateChangeCallback;
 
         /// <summary>

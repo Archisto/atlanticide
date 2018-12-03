@@ -42,6 +42,8 @@ namespace Atlanticide
 
         private Debris _pooledDebris;
 
+        private int _defaultSpawnAmount;
+
         // Use this for initialization
         void Start()
         {
@@ -49,6 +51,7 @@ namespace Atlanticide
             _boundsMin = _meshRenderer.bounds.min;
             _boundsMax = _meshRenderer.bounds.max;
             _levelManager = FindObjectOfType<LevelManager>();
+            _defaultSpawnAmount = spawnAmount;
 
             // Null
             _pooledOrichalcumPickup = null;
@@ -123,6 +126,11 @@ namespace Atlanticide
 
                 spawnAmount--;
             }
+        }
+
+        public void ResetSpawner()
+        {
+            spawnAmount = _defaultSpawnAmount;
         }
     }
 }

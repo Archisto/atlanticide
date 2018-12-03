@@ -466,9 +466,9 @@ namespace Atlanticide
         {
             foreach (AudioSource audioSrc in audioSrcPool)
             {
-                if (audioSrc.enabled && audioSrc.clip.name == clipName)
+                if (audioSrc.enabled && audioSrc.clip != null &&
+                    audioSrc.clip.name == clipName)
                 {
-                    Debug.Log("Stopped sound effect " + audioSrc.clip.name);
                     audioSrc.Stop();
                     audioSrc.loop = false;
                 }

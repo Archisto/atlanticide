@@ -20,8 +20,8 @@ namespace Atlanticide
         [SerializeField]
         Switch _switch;
 
-        [SerializeField]
-        EnergyTarget _energyTarget;
+        //[SerializeField]
+        //EnergyTarget _energyTarget;
 
         [SerializeField]
         private bool _needsMaxCharge;
@@ -43,14 +43,14 @@ namespace Atlanticide
                 {
                     Activated = _switch.Activated;
                 }
-                else if (_energyTarget != null)
-                {
-                    if (_energyTarget.Usable)
-                    {
-                        Activated = (_needsMaxCharge ?
-                            _energyTarget.MaxCharge : _energyTarget.ZeroCharge);
-                    }
-                }
+                //else if (_energyTarget != null)
+                //{
+                //    if (_energyTarget.Usable)
+                //    {
+                //        Activated = (_needsMaxCharge ?
+                //            _energyTarget.MaxCharge : _energyTarget.ZeroCharge);
+                //    }
+                //}
 
                 base.UpdateObject();
             }

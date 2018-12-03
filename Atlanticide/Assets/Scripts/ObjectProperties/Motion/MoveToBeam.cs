@@ -14,6 +14,7 @@ namespace Atlanticide
         public Vector3 position;
         public Vector3 targetPosition;
         public bool isMoving;
+        public bool beamReached;
 
         private LinkBeam linkBeam;
         Vector3 rangeMin;
@@ -55,6 +56,7 @@ namespace Atlanticide
                 {
                     position = pointOnBeam;
                     StopMoving();
+                    beamReached = true;
                 }
                 else
                 {
@@ -84,6 +86,7 @@ namespace Atlanticide
             this.linkBeam = linkBeam;
             position = currentPosition;
             isMoving = true;
+            beamReached = false;
         }
 
         /// <summary>
@@ -93,6 +96,7 @@ namespace Atlanticide
         {
             linkBeam = null;
             isMoving = false;
+            beamReached = false;
         }
     }
 }

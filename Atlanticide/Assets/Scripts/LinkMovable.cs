@@ -24,6 +24,23 @@ namespace Atlanticide
         [SerializeField]
         protected bool _lockAxisY;
 
+        [Header("AUDIO")]
+
+        [SerializeField]
+        protected bool _playSoundWhenAttachedToBeam = true;
+
+        [SerializeField]
+        protected bool _playSoundWhenDetachedFromBeam = true;
+
+        [SerializeField]
+        protected Sound _attachSound = Sound.Taking_Energy;
+
+        [SerializeField]
+        protected Sound _detachSound = Sound.Using_Energy;
+
+        [SerializeField]
+        protected float _volumeFactor = 1f;
+
         protected Destructible _destructible;
         protected Timer _hitTimer;
         protected float _toughnessLeft;
@@ -141,6 +158,15 @@ namespace Atlanticide
                 if (attach)
                 {
                     linkBeam.linkInteractables.Add(this);
+
+                    if (_playSoundWhenAttachedToBeam)
+                    {
+                        SFXPlayer.Instance.Play(_attachSound, volumeFactor: _volumeFactor);
+                    }
+                }
+                else if (_playSoundWhenDetachedFromBeam)
+                {
+                    SFXPlayer.Instance.Play(_detachSound, volumeFactor: _volumeFactor);
                 }
             }
         }

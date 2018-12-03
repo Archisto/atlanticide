@@ -45,9 +45,9 @@ namespace Atlanticide
             {
                 GameCharacter character = immediateCollider.
                     transform.parent.GetComponent<GameCharacter>();
-                Shield shield = immediateCollider.transform.GetComponent<Shield>();
+                //Shield shield = immediateCollider.transform.GetComponent<Shield>();
 
-                if (character != null && shield == null)
+                if (character != null)// && shield == null)
                 {
                     dontDestroy = character.IsDead; // TODO: Replace with something better
                     hit = Hit(character);
