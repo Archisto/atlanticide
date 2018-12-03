@@ -11,6 +11,23 @@ namespace Atlanticide
         [SerializeField]
         private float _hitInterval = 0.3f;
 
+        [Header("AUDIO")]
+
+        [SerializeField]
+        protected bool _playSoundWhenActivated = true;
+
+        [SerializeField]
+        protected bool _playSoundWhenDeactivated = true;
+
+        [SerializeField]
+        protected Sound _activateSound = Sound.Door_Open;
+
+        [SerializeField]
+        protected Sound _deactivateSound = Sound.Door_Close;
+
+        [SerializeField]
+        protected float _volumeFactor = 1f;
+
         protected Timer _hitTimer;
 
         protected override void Start()
@@ -42,6 +59,12 @@ namespace Atlanticide
                 {
                     Activated = true;
                     _hitTimer.Activate();
+
+                    if (_playSoundWhenActivated)
+                    {
+                        SFXPlayer.Instance.Play(_activateSound, volumeFactor: _volumeFactor);
+                    }
+
                     return true;
                 }
             }

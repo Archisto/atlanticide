@@ -47,8 +47,8 @@ namespace Atlanticide
         [SerializeField]
         int KeyCode;
 
-        [SerializeField]
-        EnergyTarget Target;
+        //[SerializeField]
+        //EnergyTarget Target;
 
         private bool TowardsTarget;
 
@@ -148,15 +148,15 @@ namespace Atlanticide
         // Checks if energy target has max level charge
         private void CheckEnergyTarget()
         {
-            if (Target.MaxCharge)
-            {
-                CallForMovement(true);
-            }
+            //if (Target.MaxCharge)
+            //{
+            //    CallForMovement(true);
+            //}
 
-            if (Target.HasJustBeenReset)
-            {
-                CallForMovement(false);
-            }
+            //if (Target.HasJustBeenReset)
+            //{
+            //    CallForMovement(false);
+            //}
         }
 
         // Determines to what direction Object should move

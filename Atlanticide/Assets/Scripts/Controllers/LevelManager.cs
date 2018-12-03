@@ -55,11 +55,11 @@ namespace Atlanticide
         public Pool<Debris> terracottaDebrisPool;
 
         private UIController _ui;
+        private TimeBar _timeBar;
         private Level _currentLevel;
         private Timer _levelTimer;
         private Timer _hurryUpWarnTimer;
         private Timer _scoreMultDecayTimer;
-        private float _levelTimeElapsedRatio;
         private int _scoreMultiplier = 1;
         private float _pitch;
         private bool _flashLevelTimeBar;
@@ -69,6 +69,13 @@ namespace Atlanticide
         {
             get { return _levelTimer.Active; }
         }
+
+        public Timer LevelTimer
+        {
+            get { return _levelTimer; }
+        }
+
+        public float LevelTimeElapsedRatio { get; private set; }
 
         public int ScoreMultiplier
         {
@@ -109,6 +116,11 @@ namespace Atlanticide
             woodDebrisPool = new Pool<Debris>(64, true, woodDebrisPrefabArray);
             terracottaDebrisPool = new Pool<Debris>(128, true, terracottaDebrisPrefabArray);
         }
+        
+        public void SetTimeBar(TimeBar timeBar)
+        {
+            _timeBar = timeBar;
+        }
 
         /// <summary>
         /// Updates the object once per frame.
@@ -131,11 +143,9 @@ namespace Atlanticide
                     }
                     else
                     {
-                        _levelTimeElapsedRatio = _levelTimer.GetRatio();
+                        LevelTimeElapsedRatio = _levelTimer.GetRatio();
                         UpdateHurryUpWarning();
                     }
-
-                    _ui.UpdateLevelTimeBar(_levelTimeElapsedRatio);
                 }
             }
         }
@@ -148,8 +158,17 @@ namespace Atlanticide
                     !_hurryUpWarnTimer.Active)
                 {
                     _flashLevelTimeBar = !_flashLevelTimeBar;
-                    _ui.FlashLevelTimeBar(_flashLevelTimeBar);
+                    _timeBar.FlashLevelTimeBar(_flashLevelTimeBar);
                     _hurryUpWarnTimer.Activate();
+
+                    //if (_flashLevelTimeBar)
+                    //{
+                    //    SFXPlayer.Instance.Play(Sound.Clink);
+                    //}
+                    //else
+                    //{
+                    //    SFXPlayer.Instance.Play(Sound.Clink, pitch: 0.6f);
+                    //}
                 }
 
                 if (!_hasPlayedHurryUpSound)
@@ -211,8 +230,7 @@ namespace Atlanticide
         public void LoseLevel()
         {
             _levelTimer.Reset();
-            _levelTimeElapsedRatio = 1f;
-            _ui.FlashLevelTimeBar(true);
+            LevelTimeElapsedRatio = 1f;
             GameManager.Instance.EndLevel(false);
             StopTickingSound();
         }
@@ -220,17 +238,21 @@ namespace Atlanticide
         public void ResetLevel()
         {
             _levelTimer.Reset();
-            _levelTimeElapsedRatio = 0f;
+            LevelTimeElapsedRatio = 0f;
             _scoreMultDecayTimer.Reset();
             ResetHurryUpWarning();
             ResetScoreMultiplier();
             ResetPickupSFX();
+            orichalcumPickupPool.DeactivateAllObjects();
+            stoneDebrisPool.DeactivateAllObjects();
+            woodDebrisPool.DeactivateAllObjects();
+            terracottaDebrisPool.DeactivateAllObjects();
         }
 
         private void ResetHurryUpWarning()
         {
             _hurryUpWarnTimer.Reset();
-            _ui.FlashLevelTimeBar(false);
+            _timeBar.FlashLevelTimeBar(false);
             _flashLevelTimeBar = false;
             _hasPlayedHurryUpSound = false;
             StopTickingSound();

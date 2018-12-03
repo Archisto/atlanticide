@@ -13,6 +13,12 @@ namespace Atlanticide
         [SerializeField]
         private int _score = 100;
 
+        [SerializeField]
+        private bool _bigScoreGain;
+
+        [SerializeField]
+        private MoveToBeamActivator _moveToBeam;
+
         protected PickupExpansion _expansion;
         private int _charLayer;
 
@@ -26,12 +32,23 @@ namespace Atlanticide
             _expansion = GetComponent<PickupExpansion>();
             _charLayer = LayerMask.NameToLayer("GameCharacter");
             _defaultPosition = transform.position;
+
+            if (_moveToBeam != null)
+            {
+                _moveToBeam.Init(transform);
+            }
+
             ResetObject();
         }
 
-        public void SetDefaultPosition(Vector3 position)
+        protected override void UpdateObject()
         {
-            _defaultPosition = position;
+            if (_moveToBeam != null && _moveToBeam.BeamReached)
+            {
+                Collect(null);
+            }
+
+            base.UpdateObject();
         }
 
         /// <summary>
@@ -57,7 +74,7 @@ namespace Atlanticide
         /// <param name="character">A player character</param>
         public virtual void Collect(PlayerCharacter character)
         {
-            GameManager.Instance.CollectScorePickup(_score);
+            GameManager.Instance.CollectScorePickup(_score, _bigScoreGain);
             IsCollected = true;
 
             if (_expansion != null)
@@ -73,8 +90,19 @@ namespace Atlanticide
         /// </summary>
         public override void DestroyObject()
         {
+            if (_moveToBeam != null)
+            {
+                _moveToBeam.ResetMoveToBeam();
+                //_moveToBeam.stayUpright = false;
+            }
+
             gameObject.SetActive(false);
             base.DestroyObject();
+        }
+
+        public void SetDefaultPosition(Vector3 position)
+        {
+            _defaultPosition = position;
         }
 
         /// <summary>
@@ -83,6 +111,11 @@ namespace Atlanticide
         public override void ResetObject()
         {
             IsCollected = false;
+            if (_moveToBeam != null)
+            {
+                _moveToBeam.ResetMoveToBeam();
+                _moveToBeam.stayUpright = true;
+            }
             SetToDefaultPosition();
             gameObject.SetActive(true);
             base.ResetObject();

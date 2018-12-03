@@ -57,12 +57,13 @@ namespace Atlanticide
         #region Fields
 
         private LevelManager _levelManager;
-        private PlayerCharacter _playerPrefab;
         private PlayerCharacter[] _players;
         private PlayerTool[] _playerTools;
         private InputDevice[] _inputDevices;
         private NonPlayerCharacter[] _npcs;
         private UIController _ui;
+        private ScoreCounter _scoreCounter;
+        private TimeBar _timeBar;
         private List<Level> _levels;
         private LevelObject[] _levelObjects;
         private InputController _input;
@@ -296,9 +297,20 @@ namespace Atlanticide
         private void InitUI()
         {
             _ui = FindObjectOfType<UIController>();
+            _scoreCounter = FindObjectOfType<ScoreCounter>();
+            _timeBar = FindObjectOfType<TimeBar>();
+
             if (_ui == null)
             {
                 Debug.LogError(Utils.GetObjectMissingString("UIController"));
+            }
+            if (_scoreCounter == null)
+            {
+                Debug.LogError(Utils.GetObjectMissingString("ScoreCounter"));
+            }
+            if (_timeBar == null)
+            {
+                Debug.LogError(Utils.GetObjectMissingString("TimeBar"));
             }
         }
 
@@ -341,6 +353,10 @@ namespace Atlanticide
             {
                 Debug.LogError(Utils.GetObjectMissingString("LevelManager"));
             }
+            else
+            {
+                _levelManager.SetTimeBar(_timeBar);
+            }
         }
 
         private void InitLevels()
@@ -372,8 +388,6 @@ namespace Atlanticide
         private void InitPlayers()
         {
             _players = new PlayerCharacter[MaxPlayers];
-            _playerPrefab = Resources.Load<PlayerCharacter>
-                ("New3_P1_PlayerCharacter");
             CreatePlayers();
             ActivatePlayers(PlayerCount);
         }
@@ -384,9 +398,31 @@ namespace Atlanticide
         /// <param name="playerCount">The player count</param>
         private void CreatePlayers()
         {
+            string playerPrefabName = "";
             for (int i = 0; i < MaxPlayers; i++)
             {
-                _players[i] = Instantiate(_playerPrefab);
+                playerPrefabName = "New3_P1_PlayerCharacter";
+                switch (i)
+                {
+                    case 0:
+                    {
+                        playerPrefabName = "New3_P1_PlayerCharacter";
+                        break;
+                    }
+                    case 1:
+                    {
+                        playerPrefabName = "New3_P2_PlayerCharacter";
+                        break;
+                    }
+                }
+
+                _players[i] = Instantiate(Resources.Load<PlayerCharacter>(playerPrefabName));
+                if (_players[i] == null)
+                {
+                    Debug.LogError("Could not load player character prefab: " + playerPrefabName);
+                    return;
+                }
+
                 _players[i].ID = i;
                 _players[i].name = "Player " + (i + 1);
 
@@ -611,19 +647,6 @@ namespace Atlanticide
         }
 
         /// <summary>
-        /// Legacy code; please remove.
-        /// </summary>
-        /// <param name="invalidPlayer"></param>
-        /// <param name="includeDead"></param>
-        /// <returns></returns>
-        public PlayerCharacter GetPlayerWithTool(PlayerTool tool,
-                                                 bool includeDead)
-        {
-            return GetValidPlayer(p =>
-                p.Tool == tool && (!p.IsDead || includeDead));
-        }
-
-        /// <summary>
         /// Returns the first player character
         /// which fulfills all requirements.
         /// If none does, returns null.
@@ -756,6 +779,7 @@ namespace Atlanticide
         public void ResetLevel()
         {
             SetScore(0);
+            _scoreCounter.ResetCounter();
             _ui.ActivateLevelEndScreen(false);
             World.Instance.ResetWorld();
             _levelManager.ResetLevel();
@@ -942,12 +966,12 @@ namespace Atlanticide
             if (levelWon)
             {
                 SaveGame();
-                _ui.FlashLevelTimeBar(false);
             }
 
             Debug.Log("[GameManager] Level " + (levelWon ? "won" : "lost") +
                 "! Score: " + CurrentScore + " / " + _levelManager.requiredScore);
             _ui.ActivateLevelEndScreen(true, levelWon);
+            _timeBar.FlashLevelTimeBar(!levelWon);
 
             MusicPlayer.Instance.Stop();
             ResetLevelResultAudioSource();
@@ -974,12 +998,13 @@ namespace Atlanticide
             }
         }
 
-        public void CollectScorePickup(int score)
+        public void CollectScorePickup(int score, bool bigScoreGain)
         {
             ChangeScore(score);
             _levelManager.PlayCollectSound();
             _levelManager.IncreaseMultiplier();
             _ui.SetMultiplierCounterValue(_levelManager.ScoreMultiplier);
+            _scoreCounter.UpdateScore(CurrentScore, bigScoreGain);
         }
 
         public void ChangeScore(int score)

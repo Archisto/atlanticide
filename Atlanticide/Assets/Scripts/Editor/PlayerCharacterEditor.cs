@@ -18,12 +18,12 @@ namespace Atlanticide.MyEditor
             _playerTarget = target as PlayerCharacter;
         }
 
-        public override void OnInspectorGUI()
-        {
-            base.OnInspectorGUI();
+        //public override void OnInspectorGUI()
+        //{
+        //    base.OnInspectorGUI();
 
-            string label = "Tool: " + _playerTarget.Tool.ToString();
-            EditorGUILayout.LabelField(label, EditorStyles.boldLabel);
-        }
+        //    string label = "Tool: " + _playerTarget.Tool.ToString();
+        //    EditorGUILayout.LabelField(label, EditorStyles.boldLabel);
+        //}
     }
 }

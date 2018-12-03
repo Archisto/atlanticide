@@ -27,8 +27,8 @@ namespace Atlanticide
         [SerializeField]
         float rampSpeed = 0;
 
-        [SerializeField]
-        EnergyTarget _target;
+        //[SerializeField]
+        //EnergyTarget _target;
 
         FollowPath _pathFollower;
         Path path;
@@ -65,20 +65,20 @@ namespace Atlanticide
 
         private void CheckEnergyLevel()
         {
-            if (!activated && _target.MaxCharge)
-            {
-                activated = true;
-                forward = forwardOnDefault;
-                EnterPath();
-            }
+            //if (!activated && _target.MaxCharge)
+            //{
+            //    activated = true;
+            //    forward = forwardOnDefault;
+            //    EnterPath();
+            //}
 
-            if (activated && !World.Instance.EmittingEnergy)
-            {
-                _target.currentCharges = 0;
-                forward = !forwardOnDefault;
-                EnterPath();
-                activated = false;
-            }
+            //if (activated && !World.Instance.EmittingEnergy)
+            //{
+            //    _target.currentCharges = 0;
+            //    forward = !forwardOnDefault;
+            //    EnterPath();
+            //    activated = false;
+            //}
         }
 
         public override void ResetObject()

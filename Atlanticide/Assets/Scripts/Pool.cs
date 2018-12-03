@@ -107,6 +107,12 @@ namespace Atlanticide
         {
             foreach(T component in _pool)
             {
+                LevelObject lo = component as LevelObject;
+                if (lo != null)
+                {
+                    lo.ResetObject();
+                }
+
                 component.gameObject.SetActive(false);
             }
         }

@@ -95,15 +95,15 @@ namespace Atlanticide
             if (Physics.Raycast(transform.position, transform.TransformDirection(Vector3.forward), out hit, Range))
             {
                 // Check whether shield or character has been hit and react accordingly
-                Shield shield = hit.collider.gameObject.GetComponent<Shield>();
+                //Shield shield = hit.collider.gameObject.GetComponent<Shield>();
                 PlayerCharacter character;
 
-                if (shield != null && shield.BlocksDamage)
-                {
-                    HitShield(shield);
-                }
-                else
-                {
+                //if (shield != null && shield.BlocksDamage)
+                //{
+                //    HitShield(shield);
+                //}
+                //else
+                //{
                     character = hit.collider.gameObject.
                         GetComponentInParent<PlayerCharacter>();
                     if (character != null && !character.IsDead)
@@ -114,7 +114,7 @@ namespace Atlanticide
                     {
                         HitType = HitCastType.NONE;
                     }
-                }
+                //}
             }
             else
             {
@@ -126,12 +126,12 @@ namespace Atlanticide
         /// What happens when enemy hits a shield
         /// </summary>
         /// <param name="shield">shield script on the object that is hit</param>
-        protected virtual void HitShield(Shield shield)
-        {
-            shield.Hit();
-            HitType = HitCastType.SHIELD;
-            Debug.Log("shield hit");
-        }
+        //protected virtual void HitShield(Shield shield)
+        //{
+        //    shield.Hit();
+        //    HitType = HitCastType.SHIELD;
+        //    Debug.Log("shield hit");
+        //}
 
         /// <summary>
         /// What happens when enemy hits a character

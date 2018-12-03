@@ -33,6 +33,22 @@ namespace Atlanticide
         [SerializeField]
         protected float _regenInterval = 0.3f;
 
+        [Header("AUDIO")]
+
+        [SerializeField]
+        protected bool _playSoundWhenDestroyed = true;
+
+        [SerializeField]
+        protected Sound _destroySound = Sound.Cyclops_Exploding;
+
+        [SerializeField]
+        protected float _volumeFactor = 1f;
+
+        [Header("OTHER")]
+
+        [SerializeField]
+        protected bool _setGameObjectInactiveWhenDestroyed = true;
+
         protected Timer _hitTimer;
         protected Timer _regenTimer;
         protected float _toughnessLeft;
@@ -162,8 +178,16 @@ namespace Atlanticide
         {
             IsDestroyed = true;
             _toughnessLeft = 0f;
-            gameObject.SetActive(false);
-            SFXPlayer.Instance.Play(Sound.Cyclops_Exploding, volumeFactor: 0.3f);
+
+            if (_setGameObjectInactiveWhenDestroyed)
+            {
+                gameObject.SetActive(false);
+            }
+
+            if (_playSoundWhenDestroyed)
+            {
+                SFXPlayer.Instance.Play(_destroySound, volumeFactor: _volumeFactor);
+            }
         }
 
         public virtual void Repair(float toughnessLeft)
@@ -171,8 +195,8 @@ namespace Atlanticide
             if (IsDestroyed)
             {
                 IsDestroyed = false;
-                gameObject.SetActive(true);
                 _toughnessLeft = toughnessLeft;
+                gameObject.SetActive(true);
             }
         }
 
@@ -181,10 +205,11 @@ namespace Atlanticide
         /// </summary>
         public override void ResetObject()
         {
+            IsDestroyed = false;
             _toughnessLeft = _toughness;
+            gameObject.SetActive(true);
             _hitTimer.Reset();
             _regenTimer.Reset();
-            gameObject.SetActive(true);
             base.ResetObject();
         }
 

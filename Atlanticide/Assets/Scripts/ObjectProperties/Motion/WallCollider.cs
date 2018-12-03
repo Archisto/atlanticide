@@ -97,15 +97,15 @@ namespace Atlanticide
 
                     hit = HitObjectInPositionInDirection(position, dir, _mask);
                     GameObject hitObj = null;
-                    Shield shield = null;
+                    //Shield shield = null;
                     if (hit.collider != null)
                     {
                         hitObj = hit.collider.gameObject;
-                        shield = hitObj.GetComponent<Shield>();
+                        //shield = hitObj.GetComponent<Shield>();
                     }
 
                     if (hitObj != null && hitObj != this.gameObject &&
-                        !hitObj.tag.Equals(NoCollisionKey) && shield == null)
+                        !hitObj.tag.Equals(NoCollisionKey))// && shield == null)
                     {
                         //if (hit.collider != null && hit.collider.gameObject != gameObject &&
                         //!hit.collider.gameObject.tag.Equals(PlayerKey) &&
