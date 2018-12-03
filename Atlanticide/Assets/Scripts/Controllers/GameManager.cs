@@ -783,6 +783,9 @@ namespace Atlanticide
         {
             StartLoadingScene(MainMenuKey);
             GameState = State.MainMenu;
+
+            _levelManager.StopTickingSound();
+
             StartFadeOut(0);
         }
 
