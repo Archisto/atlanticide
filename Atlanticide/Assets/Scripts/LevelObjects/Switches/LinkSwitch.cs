@@ -16,6 +16,8 @@ namespace Atlanticide
         [SerializeField]
         protected bool _playSoundWhenActivated = true;
 
+        private bool _hasPlayedActivateSound;
+
         [SerializeField]
         protected bool _playSoundWhenDeactivated = true;
 
@@ -62,7 +64,12 @@ namespace Atlanticide
 
                     if (_playSoundWhenActivated)
                     {
-                        SFXPlayer.Instance.Play(_activateSound, volumeFactor: _volumeFactor);
+                        if (!_hasPlayedActivateSound)
+                        {
+                            SFXPlayer.Instance.Play(_activateSound, volumeFactor: _volumeFactor);
+
+                            _hasPlayedActivateSound = true;
+                        }
                     }
 
                     return true;
@@ -85,6 +92,7 @@ namespace Atlanticide
         public override void ResetObject()
         {
             _hitTimer.Reset();
+            _hasPlayedActivateSound = false;
             base.ResetObject();
         }
 

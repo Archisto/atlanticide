@@ -37,7 +37,7 @@ GameObject:
   m_Layer: 0
   m_Name: Marker
   m_TagString: Untagged
-  m_Icon: {fileID: -5487077368411116049, guid: 0000000000000000d000000000000000, type: 0}
+  m_Icon: {fileID: 7174288486110832750, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
@@ -110,7 +110,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1702123806251516}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1.5, y: 0, z: -1}
+  m_LocalPosition: {x: 22, y: 0, z: 4}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4872520828399296}
@@ -124,7 +124,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1340101263505736}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 4.5, y: 0, z: -1}
+  m_LocalPosition: {x: 12, y: 0, z: 4}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4967684798597950}
@@ -170,8 +170,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _player1SpawnPoint: {fileID: 4525349788122696}
   _player2SpawnPoint: {fileID: 4787080142380638}
-  _levelTime: 30
-  _hurryUpWarnTime: 20
+  _levelTime: 120
+  _hurryUpWarnTime: 100
   _hurryUpWarnFlashTime: 0.46
   requiredScore: 0
   _scoreMultiplierDecayTime: 1

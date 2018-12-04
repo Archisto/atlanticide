@@ -27,6 +27,22 @@ namespace Atlanticide
 
         public ParticleSystem dustParticleSystem;
 
+        [Header("AUDIO")]
+
+        [SerializeField]
+        protected bool _playSoundWhenDestroyed = true;
+
+        [SerializeField]
+        protected Sound _fallingSound = Sound.Cyclops_Exploding;
+
+        private bool _hasPlayedFallingSound;
+
+        [SerializeField]
+        protected Sound _destroySound = Sound.Cyclops_Exploding;
+
+        [SerializeField]
+        protected float _volumeFactor = 1f;
+
         // Use this for initialization
         void Start()
         {
@@ -57,6 +73,12 @@ namespace Atlanticide
                         obeliskBrokenRigidBody.AddRelativeTorque(southTorque, forceMode);
                         break;
                 }
+
+                if(!_hasPlayedFallingSound)
+                {
+                    SFXPlayer.Instance.Play(_fallingSound, volumeFactor: _volumeFactor);
+                    _hasPlayedFallingSound = true;
+                }
             }
         }
 
@@ -79,6 +101,12 @@ namespace Atlanticide
             _falling = false;
             obeliskBrokenRigidBody.velocity = Vector3.zero;
             obeliskBrokenRigidBody.constraints = RigidbodyConstraints.FreezeAll;
+
+            if (_playSoundWhenDestroyed)
+            {
+                SFXPlayer.Instance.Play(_destroySound, volumeFactor: _volumeFactor);
+                _hasPlayedFallingSound = false;
+            }
         }
     }
 }

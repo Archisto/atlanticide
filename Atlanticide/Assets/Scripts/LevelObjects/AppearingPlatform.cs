@@ -23,6 +23,19 @@ namespace Atlanticide
         [SerializeField]
         private bool _permanent;
 
+        [Header("AUDIO")]
+
+        [SerializeField]
+        protected bool _playSoundWhenDestroyed = true;
+
+        [SerializeField]
+        protected Sound _appearSound = Sound.Cyclops_Exploding;
+
+        private bool _hasPlayedAppearSound;
+
+        [SerializeField]
+        protected float _volumeFactor = 1f;
+
         private KeyCodeSwitch _switch;
         private Dissolve _dissolve;
         private bool _active;
@@ -74,6 +87,13 @@ namespace Atlanticide
             if (_changingVisibility)
             {
                 UpdateVisibility();
+
+                if (!_hasPlayedAppearSound)
+                {
+                    SFXPlayer.Instance.Play(_appearSound, volumeFactor: _volumeFactor);
+
+                    _hasPlayedAppearSound = true;
+                }
             }
             else if (StateChangeIsAllowed())
             {
@@ -117,6 +137,7 @@ namespace Atlanticide
         {
             _elapsedTime = 0f;
             _changingVisibility = false;
+            _hasPlayedAppearSound = false;
             Init();
             base.ResetObject();
         }
