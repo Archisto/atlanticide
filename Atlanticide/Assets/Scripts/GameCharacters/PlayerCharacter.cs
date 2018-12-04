@@ -632,5 +632,15 @@ namespace Atlanticide
             Gizmos.color = Color.red;
             Gizmos.DrawLine(startPos, startPos + newInputDir * dist);
         }
+
+        public void PlayFootstep1()
+        {
+            SFXPlayer.Instance.Play(Sound.Footsteps_Tile_1);
+        }
+
+        public void PlayFootstep2()
+        {
+            SFXPlayer.Instance.Play(Sound.Footsteps_Tile_2, volumeFactor: 0.8f);
+        }
     }
 }

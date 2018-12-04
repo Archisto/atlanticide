@@ -89,7 +89,7 @@ namespace Atlanticide
                 }
             }
             _meshRenderer.material.color = new Color(1f, 1f, 1f, 0f);
-            //SFXPlayer.Instance.Play(Sound.Cyclops_Exploding, volumeFactor: 0.3f);
+            SFXPlayer.Instance.Play(_destroySound, volumeFactor: _volumeFactor);
             if (isWall) {
                 ruins.SetActive(true);
             } else {

@@ -72,6 +72,8 @@ namespace Atlanticide
         private Color _weakColor = Color.red;
         private Color _shutdownWarningColor = Color.yellow;
 
+        private bool _hasStartedBeamLoopSound;
+
         public bool Active { get; private set; }
 
         public PlayerCharacter Player { get; private set; }
@@ -134,6 +136,7 @@ namespace Atlanticide
                 // TODO: Player must face the target before activating the beam
                 //float playerWrongRotOffset = 1f; 
                 UpdateBeamEnds(target);
+
                 RaycastHit[] hits = GetRaycastHits();
                 if (BeamLength > _minLength &&
                     (hits.Length == 0 || !CheckIfWallHit(hits)))
@@ -149,6 +152,13 @@ namespace Atlanticide
                     if (_target.LinkBeam != null)
                     {
                         _target.LinkBeam.ActivatePlayerShield(true);
+
+                        if (!_hasStartedBeamLoopSound)
+                        {
+                            SFXPlayer.Instance.PlayLooped(Sound.Cyclops_Laser_Beam);
+
+                            _hasStartedBeamLoopSound = true;
+                        }
                     }
                 }
             }
@@ -173,6 +183,8 @@ namespace Atlanticide
                 }
 
                 SFXPlayer.Instance.Play(Sound.Cyclops_Shortcircuit);
+
+                StopBeamLoopSound();
             }
 
             ActivatePlayerShield(Active);
@@ -440,6 +452,18 @@ namespace Atlanticide
             _pulseCooldownTimer.Reset();
             _shutdownTimer.Reset();
             linkInteractables.Clear();
+
+            StopBeamLoopSound();
+        }
+
+        public void StopBeamLoopSound()
+        {
+            if (_hasStartedBeamLoopSound)
+            {
+                SFXPlayer.Instance.StopIndividualSFX("Cyclops Laser Beam2");
+
+                _hasStartedBeamLoopSound = false;
+            }
         }
 
         private void OnDrawGizmos()

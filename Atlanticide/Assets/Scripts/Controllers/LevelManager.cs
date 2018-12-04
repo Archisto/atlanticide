@@ -65,6 +65,8 @@ namespace Atlanticide
         private bool _flashLevelTimeBar;
         private bool _hasPlayedHurryUpSound;
 
+        private LinkBeam _lb;
+
         public bool LevelActive
         {
             get { return _levelTimer.Active; }
@@ -110,6 +112,8 @@ namespace Atlanticide
             _levelTimer = new Timer(_levelTime, true);
             _hurryUpWarnTimer = new Timer(_hurryUpWarnFlashTime, true);
             _scoreMultDecayTimer = new Timer(_scoreMultiplierDecayTime, true);
+
+            _lb = FindObjectOfType<LinkBeam>();
 
             orichalcumPickupPool = new Pool<OrichalcumPickup>(128, true, orichalcumPickupPrefab);
             stoneDebrisPool = new Pool<Debris>(128, true, stoneDebrisPrefabArray);
@@ -233,6 +237,7 @@ namespace Atlanticide
             LevelTimeElapsedRatio = 1f;
             GameManager.Instance.EndLevel(false);
             StopTickingSound();
+            _lb.StopBeamLoopSound();
         }
 
         public void ResetLevel()
@@ -256,6 +261,7 @@ namespace Atlanticide
             _flashLevelTimeBar = false;
             _hasPlayedHurryUpSound = false;
             StopTickingSound();
+            _lb.StopBeamLoopSound();
         }
 
         private void ResetScoreMultiplier()
@@ -271,7 +277,7 @@ namespace Atlanticide
 
         public void StopTickingSound()
         {
-            SFXPlayer.Instance.StopIndividualSFX("Clock Ticking");
+            SFXPlayer.Instance.StopIndividualSFX("Clock Ticking2");
         }
     }
 }
