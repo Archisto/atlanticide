@@ -66,7 +66,8 @@ namespace Atlanticide
             }
             if (collision.gameObject.layer == 8)
             {
-                if (collision.gameObject.GetComponent<Rigidbody>().angularVelocity.magnitude > 0f)
+                Rigidbody rigidbody = collision.gameObject.GetComponent<Rigidbody>();
+                if (rigidbody != null && rigidbody.angularVelocity.magnitude > 0f)
                 {
                     Destroy();
                 }
