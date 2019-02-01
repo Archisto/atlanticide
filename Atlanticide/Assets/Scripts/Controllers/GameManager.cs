@@ -32,7 +32,7 @@ namespace Atlanticide
         #endregion Statics
 
         public const int MaxPlayers = 2;
-        public const int LevelCount = 2;
+        public const int LevelCount = 1;
 
         private const string PressStartKey = "PressStart";
         private const string MainMenuKey = "MainMenu";
@@ -362,9 +362,10 @@ namespace Atlanticide
         private void InitLevels()
         {
             _levels = new List<Level>();
-            _levels.Add(new Level(0, "LinkProto", "Debug"));
-            _levels.Add(new Level(1, "LinkProto Lauri", "Tutorial"));
-            _levels.Add(new Level(2, "LinkProto", "Challenge"));
+            _levels.Add(new Level(0, "LinkDemoLevel1", ""));
+            _levels.Add(new Level(1, "LinkDemoLevel1", ""));
+            //_levels.Add(new Level(1, "LinkProto Lauri", "Tutorial"));
+            //_levels.Add(new Level(2, "LinkProto", "Challenge"));
 
             LevelsUnlocked = 1;
             CurrentLevel = _levels[0];
